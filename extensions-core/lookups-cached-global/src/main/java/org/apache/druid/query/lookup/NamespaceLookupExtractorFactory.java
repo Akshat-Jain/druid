@@ -70,6 +70,7 @@ public class NamespaceLookupExtractorFactory implements LookupExtractorFactory
       @JacksonInject final CacheScheduler cacheScheduler
   )
   {
+    System.out.println("NamespaceLookupExtractorFactory.NamespaceLookupExtractorFactory");
     this.extractionNamespace = Preconditions.checkNotNull(
         extractionNamespace,
         "extractionNamespace should be specified"
@@ -94,6 +95,7 @@ public class NamespaceLookupExtractorFactory implements LookupExtractorFactory
   @Override
   public boolean start()
   {
+    System.out.println("NamespaceLookupExtractorFactory.start");
     final Lock writeLock = startStopSync.writeLock();
     try {
       writeLock.lockInterruptibly();
@@ -104,6 +106,7 @@ public class NamespaceLookupExtractorFactory implements LookupExtractorFactory
         }
         if (firstCacheTimeout > 0) {
           entry = cacheScheduler.scheduleAndWait(extractionNamespace, firstCacheTimeout);
+          System.out.println("NamespaceLookupExtractorFactory.start entry = " + entry);
           if (entry == null) {
             LOG.error("Failed to schedule and wait for lookup [%s]", extractorID);
             return false;

@@ -326,6 +326,7 @@ public class Lifecycle
 
   public void start() throws Exception
   {
+    System.out.println("Printing Lifecycle.start method.");
     startStopLock.lock();
     try {
       if (!state.get().equals(State.NOT_STARTED)) {

@@ -605,11 +605,13 @@ public class WorkerMemoryParameters
    */
   private static long computeTotalLookupFootprint(final Injector injector)
   {
+    System.out.println("WorkerMemoryParameters.computeTotalLookupFootprint");
     // Subtract memory taken up by lookups. Correctness of this operation depends on lookups being loaded *before*
     // we create this instance. Luckily, this is the typical mode of operation, since by default
     // druid.lookup.enableLookupSyncOnStartup = true.
     final LookupExtractorFactoryContainerProvider lookupManager =
         injector.getInstance(LookupExtractorFactoryContainerProvider.class);
+    System.out.println("lookupManager.getAllLookupNames() = " + lookupManager.getAllLookupNames());
 
     int lookupCount = 0;
     long lookupFootprint = 0;
@@ -622,6 +624,8 @@ public class WorkerMemoryParameters
           final LookupExtractor extractor = container.getLookupExtractorFactory().get();
           lookupFootprint += extractor.estimateHeapFootprint();
           lookupCount++;
+          System.out.println("lookupName = " + lookupName);
+          System.out.println("extractor.estimateHeapFootprint() = " + extractor.estimateHeapFootprint());
         }
         catch (Exception e) {
           log.noStackTrace().warn(e, "Failed to load lookup [%s] for size estimation. Skipping.", lookupName);
@@ -631,6 +635,7 @@ public class WorkerMemoryParameters
 
     log.debug("Lookup footprint: %d lookups with %,d total bytes.", lookupCount, lookupFootprint);
 
+    System.out.println("Returned total lookupFootprint = " + lookupFootprint);
     return lookupFootprint;
   }
 }

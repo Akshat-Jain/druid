@@ -31,8 +31,10 @@ import org.apache.druid.java.util.common.logger.Logger;
 import org.apache.druid.java.util.emitter.service.ServiceEmitter;
 import org.apache.druid.java.util.emitter.service.ServiceMetricEvent;
 import org.apache.druid.query.lookup.LookupExtractor;
+import org.apache.druid.query.lookup.NamespaceLookupExtractorFactory;
 import org.apache.druid.query.lookup.namespace.CacheGenerator;
 import org.apache.druid.query.lookup.namespace.ExtractionNamespace;
+import org.apache.druid.query.lookup.namespace.JdbcExtractionNamespace;
 
 import javax.annotation.Nullable;
 import java.util.IdentityHashMap;
@@ -185,6 +187,7 @@ public final class CacheScheduler
 
     private Future<?> schedule(final T namespace)
     {
+      System.out.println("EntryImpl.schedule");
       final long updateMs = namespace.getPollMs();
       Runnable command = this::updateCache;
       if (updateMs > 0) {
@@ -196,7 +199,22 @@ public final class CacheScheduler
 
     private void updateCache()
     {
+      System.out.println("EntryImpl.updateCache");
       boolean updatedCacheSuccessfully = false;
+
+      if (namespace instanceof JdbcExtractionNamespace){
+        if (((JdbcExtractionNamespace) namespace).getTable().equals("rollnumberlookup")){
+          try{
+            System.out.println("Sleeping for 2 minutes before updating cache because table is roll number lookup");
+            TimeUnit.MINUTES.sleep(2);
+            System.out.println("Finished sleeping for 2 minutes after updating cache for table roll number lookup");
+          }
+          catch (Exception e){
+            System.out.println("e = " + e);
+          }
+        }
+      }
+
       try {
         // Ensures visibility of the whole EntryImpl's state (fields and their state).
         startLatch.await();
@@ -226,6 +244,7 @@ public final class CacheScheduler
 
     private boolean tryUpdateCache(String currentVersion) throws Exception
     {
+      System.out.println("EntryImpl.tryUpdateCache");
       boolean updatedCacheSuccessfully = false;
       CacheHandler newCache = null;
       try {
@@ -260,6 +279,7 @@ public final class CacheScheduler
           if (newCache != null && !updatedCacheSuccessfully) {
             newCache.close();
           }
+          System.out.println("No rows are present, logging error");
           log.error(t, "Failed to update %s", this);
         }
         catch (Exception e) {
@@ -493,9 +513,17 @@ public final class CacheScheduler
   @Nullable
   public Entry scheduleAndWait(ExtractionNamespace namespace, long waitForFirstRunMs) throws InterruptedException
   {
+    System.out.println("CacheScheduler.scheduleAndWait");
     Exception loadException = null;
+//    System.out.println("Sleeping for 2 minutes before schedule(namespace)");
+//    TimeUnit.MINUTES.sleep(2);
     final Entry entry = schedule(namespace);
+    System.out.println("entry = " + entry);
     log.debug("Scheduled new %s", entry);
+//    System.out.println("entry.impl = " + entry.impl);
+//    System.out.println("entry.impl.firstLoadFinishedSuccessfully = " + entry.impl.firstLoadFinishedSuccessfully);
+//    System.out.println("Sleeping for 2 minutes after schedule(namespace)");
+//    TimeUnit.MINUTES.sleep(2);
     boolean success = false;
     try {
       success = (boolean) entry.impl.firstLoadFinishedSuccessfully.get(waitForFirstRunMs, TimeUnit.MILLISECONDS);
@@ -512,11 +540,13 @@ public final class CacheScheduler
     finally {
       if (!success) {
         // ExecutionException's cause is logged in entry.close()
+        System.out.println("success = " + success);
         entry.close();
         if (loadException != null) {
-          log.error(loadException, "CacheScheduler[%s] - problem during start or waiting for the first run", entry);
+          System.out.println("loadException = " + loadException);
+          log.error(loadException, "CacheScheduler[%s] - problem during start or waiting for the first run1000.0", entry);
         } else {
-          log.error("CacheScheduler[%s] - problem during start or waiting for the first run", entry);
+          log.error("CacheScheduler[%s] - problem during start or waiting for the first runupdated2000.0", entry);
         }
       }
     }

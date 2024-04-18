@@ -93,6 +93,7 @@ public class LifecycleModule implements Module
    */
   public static void register(Binder binder, Class<?> clazz, Class<? extends Annotation> annotation)
   {
+    System.out.println("Printing LifecycleModule.register method. binder = " + binder + ", clazz = " + clazz + ", annotation = " + annotation);
     registerKey(binder, Key.get(clazz, annotation));
   }
 

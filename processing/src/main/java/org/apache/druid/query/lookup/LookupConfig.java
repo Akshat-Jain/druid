@@ -35,7 +35,7 @@ public class LookupConfig
   private String snapshotWorkingDir;
 
   @JsonProperty("enableLookupSyncOnStartup")
-  private boolean enableLookupSyncOnStartup = true;
+  private boolean enableLookupSyncOnStartup = false;
 
   @Min(1)
   @JsonProperty("numLookupLoadingThreads")
@@ -65,7 +65,8 @@ public class LookupConfig
       @JsonProperty("snapshotWorkingDir") String snapshotWorkingDir
   )
   {
-    this.snapshotWorkingDir = StringUtils.nullToEmptyNonDruidDataString(snapshotWorkingDir);
+//    this.snapshotWorkingDir = StringUtils.nullToEmptyNonDruidDataString(snapshotWorkingDir);
+    this.snapshotWorkingDir = "/tmp";
   }
 
   public String getSnapshotWorkingDir()

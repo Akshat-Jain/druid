@@ -147,6 +147,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  */
@@ -366,6 +367,15 @@ public class CliPeon extends GuiceRunnable
   @Override
   public void run()
   {
+    System.out.println("CliPeon.run");
+//    try {
+//      System.out.println("Sleeping for 15 seconds");
+//      TimeUnit.SECONDS.sleep(15);
+//      System.out.println("Finished sleeping for 15 seconds");
+//    }
+//    catch (Exception e){
+//      System.out.println("e = " + e);
+//    }
     try {
       Injector injector = makeInjector(ImmutableSet.of(NodeRole.PEON));
       try {

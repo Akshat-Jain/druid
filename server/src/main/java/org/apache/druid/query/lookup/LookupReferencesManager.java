@@ -159,6 +159,7 @@ public class LookupReferencesManager implements LookupExtractorFactoryContainerP
   @LifecycleStart
   public void start() throws IOException
   {
+    System.out.println("Printing LookupReferencesManager.start method");
     if (!lifecycleLock.canStart()) {
       throw new ISE("can't start.");
     }
@@ -375,7 +376,17 @@ public class LookupReferencesManager implements LookupExtractorFactoryContainerP
 
   private void loadAllLookupsAndInitStateRef()
   {
+//    try {
+//      System.out.println("Sleeping for 1 minute");
+//      TimeUnit.MINUTES.sleep(1);
+//      System.out.println("Finished sleeping for 1 minute");
+//    }
+//    catch (Exception e){
+//      System.out.println("e = " + e);
+//    }
+    System.out.println("Printing LookupReferencesManager.loadAllLookupsAndInitStateRef method");
     List<LookupBean> lookupBeanList = getLookupsList();
+    System.out.println("lookupBeanList = " + lookupBeanList);
     if (lookupBeanList != null) {
       startLookups(lookupBeanList);
     } else {
@@ -390,6 +401,8 @@ public class LookupReferencesManager implements LookupExtractorFactoryContainerP
   @Nullable
   private List<LookupBean> getLookupsList()
   {
+    System.out.println("LookupReferencesManager.getLookupsList");
+    System.out.println("lookupConfig.getEnableLookupSyncOnStartup() = " + lookupConfig.getEnableLookupSyncOnStartup());
     List<LookupBean> lookupBeanList;
     if (lookupConfig.getEnableLookupSyncOnStartup()) {
       lookupBeanList = getLookupListFromCoordinator(lookupListeningAnnouncerConfig.getLookupTier());
@@ -489,6 +502,8 @@ public class LookupReferencesManager implements LookupExtractorFactoryContainerP
   @Nullable
   private List<LookupBean> getLookupListFromSnapshot()
   {
+    System.out.println("LookupReferencesManager.getLookupListFromSnapshot");
+    System.out.println("lookupSnapshotTaker = " + lookupSnapshotTaker);
     if (lookupSnapshotTaker != null) {
       return lookupSnapshotTaker.pullExistingSnapshot(lookupListeningAnnouncerConfig.getLookupTier());
     }
@@ -506,6 +521,7 @@ public class LookupReferencesManager implements LookupExtractorFactoryContainerP
 
   private void startLookups(final List<LookupBean> lookupBeanList)
   {
+    System.out.println("Printing LookupReferencesManager.startLookups method");
     final ImmutableMap.Builder<String, LookupExtractorFactoryContainer> builder = ImmutableMap.builder();
     final ExecutorService executorService = Execs.multiThreaded(
         lookupConfig.getNumLookupLoadingThreads(),
@@ -549,10 +565,12 @@ public class LookupReferencesManager implements LookupExtractorFactoryContainerP
   ) throws InterruptedException
   {
     for (LookupBean lookupBean : lookupBeans) {
+      System.out.println("Submitting task to completion service for " + lookupBean.getName());
       completionService.submit(() -> startLookup(lookupBean));
     }
     Map<String, LookupExtractorFactoryContainer> successfulLookups = new HashMap<>();
     for (int i = 0; i < lookupBeans.size(); i++) {
+      System.out.println("Taking out task from completion service for " + lookupBeans.get(i).getName());
       Future<Map.Entry<String, LookupExtractorFactoryContainer>> completedFuture = completionService.take();
       try {
         Map.Entry<String, LookupExtractorFactoryContainer> lookupResult = completedFuture.get();
@@ -571,8 +589,28 @@ public class LookupReferencesManager implements LookupExtractorFactoryContainerP
   @Nullable
   private Map.Entry<String, LookupExtractorFactoryContainer> startLookup(LookupBean lookupBean)
   {
+    System.out.println("Printing LookupReferencesManager.startLookup method. lookupBean = " + lookupBean);
+//    try {
+//      System.out.println("Sleeping for 1 minute");
+//      TimeUnit.MINUTES.sleep(1);
+//      System.out.println("Finished sleeping for 1 minute");
+//    }
+//    catch (Exception e){
+//      System.out.println("e = " + e);
+//    }
+
+    System.out.println("Printing LookupReferencesManager.startLookup");
     LookupExtractorFactoryContainer container = lookupBean.getContainer();
     LOG.info("Starting lookup [%s]:[%s]", lookupBean.getName(), container);
+//    try {
+//      System.out.println("Sleeping for 15 seconds for loading lookup " + lookupBean.getName());
+////      TimeUnit.MINUTES.sleep(5);
+//      TimeUnit.SECONDS.sleep(15);
+//      System.out.println("Finished sleeping for 15 seconds");
+//    }
+//    catch (Exception e){
+//      System.out.println("e = " + e);
+//    }
     try {
       if (container.getLookupExtractorFactory().start()) {
         LOG.info("Started lookup [%s]:[%s]", lookupBean.getName(), container);

@@ -58,6 +58,8 @@ public class LookupSnapshotTaker
 
   public synchronized List<LookupBean> pullExistingSnapshot(final String tier)
   {
+    System.out.println("LookupSnapshotTaker.pullExistingSnapshot");
+    System.out.println("tier = " + tier);
     final File persistFile = getPersistFile(tier);
 
     List<LookupBean> lookupBeanList;
