@@ -79,10 +79,14 @@ public class ExecutorLifecycle
       ObjectMapper jsonMapper
   )
   {
+    System.out.println("ExecutorLifecycle.ExecutorLifecycle");
     this.taskExecutorConfig = taskExecutorConfig;
     this.taskConfig = taskConfig;
     this.taskActionClientFactory = taskActionClientFactory;
     this.taskRunner = taskRunner;
+
+    System.out.println("taskRunner.getClass() = " + taskRunner.getClass()); // this prints SingleTaskBackgroundRunner because of binding done in CliPeon.java
+
     this.jsonMapper = jsonMapper.copy().addMixIn(PasswordProvider.class, PasswordProviderRedactionMixIn.class);
   }
 

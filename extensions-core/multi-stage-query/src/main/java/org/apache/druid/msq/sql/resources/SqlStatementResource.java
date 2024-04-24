@@ -138,6 +138,7 @@ public class SqlStatementResource
       final AuthorizerMapper authorizerMapper
   )
   {
+    System.out.println("SqlStatementResource.SqlStatementResource");
     this.msqSqlStatementFactory = msqSqlStatementFactory;
     this.jsonMapper = jsonMapper;
     this.overlordClient = overlordClient;
@@ -165,6 +166,7 @@ public class SqlStatementResource
   @Consumes(MediaType.APPLICATION_JSON)
   public Response doPost(final SqlQuery sqlQuery, @Context final HttpServletRequest req)
   {
+    System.out.println("SqlStatementResource.doPost");
     SqlQuery modifiedQuery = createModifiedSqlQuery(sqlQuery);
 
     final HttpStatement stmt = msqSqlStatementFactory.httpStatement(modifiedQuery, req);
@@ -682,6 +684,12 @@ public class SqlStatementResource
   private SqlQuery createModifiedSqlQuery(SqlQuery sqlQuery)
   {
     Map<String, Object> context = sqlQuery.getContext();
+
+    // [todo][Akshat]: Lookups need to be populated here dynamically to populate in controller's sqlQueryContext
+    // update: find new location + common location path across task types
+    context.put("samplekey1", "samplevalue1");
+    context.put("samplekey2", "samplevalue2");
+
     if (context.containsKey(RESULT_FORMAT)) {
       throw InvalidInput.exception("Query context parameter [%s] is not allowed", RESULT_FORMAT);
     }

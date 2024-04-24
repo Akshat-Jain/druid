@@ -220,6 +220,8 @@ public class CliPeon extends GuiceRunnable
           @Override
           public void configure(Binder binder)
           {
+            System.out.println("CliPeon.configure");
+//            binder.bindConstant().annotatedWith(Names.named("lookupInjectedName")).to("lookupInjectedNameValue");
             taskDirPath = taskAndStatusFile.get(0);
             attemptId = taskAndStatusFile.get(1);
 
@@ -355,6 +357,14 @@ public class CliPeon extends GuiceRunnable
           public String getTaskIDFromTask(final Task task)
           {
             return task.getId();
+          }
+
+          @Provides
+          @LazySingleton
+          @Named(DataSourceTaskIdHolder.LOOKUPS_TO_LOAD_FOR_TASK)
+          public List<String> getLookupsToLoad(final Task task)
+          {
+            return task.getLookupsToLoad();
           }
         },
         new QueryablePeonModule(),
@@ -507,6 +517,8 @@ public class CliPeon extends GuiceRunnable
           .in(LazySingleton.class);
 
     binder.bind(RetryPolicyFactory.class).in(LazySingleton.class);
+
+//    binder.bindConstant().annotatedWith(Names.named("lookupInjectedName")).to("lookupInjectedNameValue");
   }
 
   static void bindRealtimeCache(Binder binder)

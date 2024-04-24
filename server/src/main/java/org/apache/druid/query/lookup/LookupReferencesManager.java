@@ -70,6 +70,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * This class provide a basic {@link LookupExtractorFactory} references manager. It allows basic operations fetching,
@@ -120,6 +121,8 @@ public class LookupReferencesManager implements LookupExtractorFactoryContainerP
 
   private ExecutorService lookupUpdateExecutorService;
 
+//  private String lookupInjectedName;
+
   @Inject
   public LookupReferencesManager(
       LookupConfig lookupConfig,
@@ -154,11 +157,16 @@ public class LookupReferencesManager implements LookupExtractorFactoryContainerP
         lookupConfig.getNumLookupLoadingThreads(),
         "LookupExtractorFactoryContainerProvider-Update-%s"
     );
+//    this.lookupInjectedName = lookupInjectedName;
   }
 
   @LifecycleStart
   public void start() throws IOException
   {
+    System.out.println("LookupReferencesManager.start");
+//    System.out.println("lookupInjectedName = " + lookupInjectedName);
+    List<String> lookupsToLoad = lookupListeningAnnouncerConfig.getLookupsToLoad();
+    System.out.println("lookupListeningAnnouncerConfig.getLookupsToLoad() = " + lookupsToLoad);
     if (!lifecycleLock.canStart()) {
       throw new ISE("can't start.");
     }
@@ -167,7 +175,7 @@ public class LookupReferencesManager implements LookupExtractorFactoryContainerP
       if (!Strings.isNullOrEmpty(lookupConfig.getSnapshotWorkingDir())) {
         FileUtils.mkdirp(new File(lookupConfig.getSnapshotWorkingDir()));
       }
-      loadAllLookupsAndInitStateRef();
+      loadAllLookupsAndInitStateRef(lookupsToLoad);
       if (!testMode) {
         mainThread = Execs.makeThread(
             "LookupExtractorFactoryContainerProvider-MainThread",
@@ -373,10 +381,35 @@ public class LookupReferencesManager implements LookupExtractorFactoryContainerP
     }
   }
 
-  private void loadAllLookupsAndInitStateRef()
+  private void loadAllLookupsAndInitStateRef(List<String> lookupsToLoad)
   {
+    System.out.println("LookupReferencesManager.loadAllLookupsAndInitStateRef");
+    System.out.println("lookupsToLoad = " + lookupsToLoad);
+//    String lookupInjectedName = LookupModule.lookupInjectedName;
+//    System.out.println("lookupInjectedName = " + lookupInjectedName);
     List<LookupBean> lookupBeanList = getLookupsList();
-    if (lookupBeanList != null) {
+
+    List<LookupBean> lookupBeansToLoad = null;
+    if(lookupsToLoad != null){
+      lookupBeansToLoad = new ArrayList<>();
+      if(lookupBeanList != null){
+        lookupBeansToLoad = lookupBeanList.stream()
+                                          .filter(lookupBean -> lookupsToLoad.contains(lookupBean.getName()))
+                                          .collect(Collectors.toList());
+      }
+    }
+
+    System.out.println("[Complete] lookupBeanList = " + lookupBeanList);
+    System.out.println("[Filtered] lookupBeansToLoad = " + lookupBeansToLoad);
+
+    // [todo][Akshat]: if lookupBeansToLoad is not null, use it. Else use lookupBeanList.
+
+    if(lookupBeansToLoad != null){
+      LOG.info("Loading filtered list of lookup beans");
+      startLookups(lookupBeansToLoad);
+    }
+    else if (lookupBeanList != null) {
+      LOG.info("Loading all lookup beans");
       startLookups(lookupBeanList);
     } else {
       LOG.debug("No lookups to be loaded at this point.");

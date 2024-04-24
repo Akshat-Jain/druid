@@ -79,6 +79,7 @@ public abstract class QueryResultPusher
       Map<String, String> extraHeaders
   )
   {
+    System.out.println("QueryResultPusher.QueryResultPusher");
     this.request = request;
     this.queryId = queryId;
     this.jsonMapper = jsonMapper;

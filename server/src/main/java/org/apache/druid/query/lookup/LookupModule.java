@@ -19,12 +19,17 @@
 
 package org.apache.druid.query.lookup;
 
+import com.fasterxml.jackson.annotation.JacksonInject;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
+import com.google.inject.Inject;
 import com.google.inject.Provides;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 import org.apache.druid.discovery.LookupNodeService;
 import org.apache.druid.guice.ExpressionModule;
 import org.apache.druid.guice.Jerseys;
@@ -46,6 +51,14 @@ public class LookupModule implements DruidModule
   public static final String FAILED_UPDATES_KEY = "failedUpdates";
   public static final int LOOKUP_LISTENER_QOS_MAX_REQUESTS = 2;
 
+//  @Inject
+//  @Named("lookupInjectedName")
+//  public static final String lookupInjectedName = "";
+
+//  public LookupModule()
+//  {
+//  }
+
   @Override
   public List<? extends Module> getJacksonModules()
   {
@@ -61,6 +74,7 @@ public class LookupModule implements DruidModule
   @Override
   public void configure(Binder binder)
   {
+    System.out.println("LookupModule.configure");
     JsonConfigProvider.bind(binder, PROPERTY_BASE, LookupConfig.class);
     binder.bind(LookupExtractorFactoryContainerProvider.class).to(LookupReferencesManager.class);
     LifecycleModule.register(binder, LookupReferencesManager.class);
@@ -73,6 +87,7 @@ public class LookupModule implements DruidModule
         ListenerResource.BASE_PATH + "/" + LookupCoordinatorManager.LOOKUP_LISTEN_ANNOUNCE_KEY,
         LOOKUP_LISTENER_QOS_MAX_REQUESTS // 1 for "normal" operation and 1 for "emergency" or other
     );
+//    binder.bindConstant().annotatedWith(Names.named("lookupInjectedName")).to("lookupInjectedNameValueFromLookupModuleFile");
   }
 
   @Provides

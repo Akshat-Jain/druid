@@ -33,6 +33,7 @@ import org.apache.druid.java.util.common.StringUtils;
 import org.apache.druid.java.util.common.granularity.Granularities;
 import org.apache.druid.java.util.common.granularity.Granularity;
 import org.apache.druid.java.util.common.guava.Sequences;
+import org.apache.druid.math.expr.Expr;
 import org.apache.druid.msq.exec.MSQTasks;
 import org.apache.druid.msq.indexing.MSQControllerTask;
 import org.apache.druid.msq.indexing.MSQSpec;
@@ -48,9 +49,12 @@ import org.apache.druid.msq.util.MultiStageQueryContext;
 import org.apache.druid.query.QueryContext;
 import org.apache.druid.query.QueryContexts;
 import org.apache.druid.query.aggregation.AggregatorFactory;
+import org.apache.druid.query.expression.LookupExprMacro;
 import org.apache.druid.rpc.indexing.OverlordClient;
 import org.apache.druid.segment.IndexSpec;
+import org.apache.druid.segment.VirtualColumn;
 import org.apache.druid.segment.column.ColumnType;
+import org.apache.druid.segment.virtual.ExpressionVirtualColumn;
 import org.apache.druid.server.QueryResponse;
 import org.apache.druid.sql.calcite.parser.DruidSqlIngest;
 import org.apache.druid.sql.calcite.parser.DruidSqlInsert;
@@ -291,6 +295,22 @@ public class MSQTaskQueryMaker implements QueryMaker
         columnTypeList,
         null
     );
+
+    System.out.println("controllerTask.getQuerySpec().getQuery().getVirtualColumns() = " + controllerTask.getQuerySpec().getQuery().getVirtualColumns());
+    System.out.println("controllerTask.getQuerySpec().getQuery().getVirtualColumns().getVirtualColumns() = " + controllerTask.getQuerySpec().getQuery().getVirtualColumns().getVirtualColumns());
+    System.out.println("controllerTask.getQuerySpec().getQuery().getVirtualColumns().getColumnNames() = " + controllerTask.getQuerySpec().getQuery().getVirtualColumns().getColumnNames());
+
+    for (VirtualColumn virtualColumn : controllerTask.getQuerySpec()
+                                                     .getQuery()
+                                                     .getVirtualColumns()
+                                                     .getVirtualColumns()) {
+      if (virtualColumn instanceof ExpressionVirtualColumn){
+        System.out.println("((ExpressionVirtualColumn) virtualColumn).getParsedExpression().get() = "
+                           + ((ExpressionVirtualColumn) virtualColumn).getParsedExpression().get());
+        System.out.println("((ExpressionVirtualColumn) virtualColumn).getParsedExpression().get().getClass() = "
+                           + ((ExpressionVirtualColumn) virtualColumn).getParsedExpression().get().getClass());
+      }
+    }
 
     FutureUtils.getUnchecked(overlordClient.runTask(taskId, controllerTask), true);
     return QueryResponse.withEmptyContext(Sequences.simple(Collections.singletonList(new Object[]{taskId})));

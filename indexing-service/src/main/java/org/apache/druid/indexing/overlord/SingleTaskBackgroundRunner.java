@@ -264,6 +264,7 @@ public class SingleTaskBackgroundRunner implements TaskRunner, QuerySegmentWalke
   @Override
   public ListenableFuture<TaskStatus> run(final Task task)
   {
+    System.out.println("SingleTaskBackgroundRunner.run");
     if (runningItem == null) {
       final TaskToolbox toolbox = toolboxFactory.build(task);
       final Object taskPriorityObj = task.getContextValue(TaskThreadPriority.CONTEXT_KEY);

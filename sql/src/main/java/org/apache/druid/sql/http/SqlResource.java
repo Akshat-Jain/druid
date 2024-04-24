@@ -92,6 +92,7 @@ public class SqlResource
       @Self DruidNode selfNode
   )
   {
+    System.out.println("SqlResource.SqlResource");
     this.jsonMapper = Preconditions.checkNotNull(jsonMapper, "jsonMapper");
     this.authorizerMapper = Preconditions.checkNotNull(authorizerMapper, "authorizerMapper");
     this.sqlStatementFactory = Preconditions.checkNotNull(sqlStatementFactory, "sqlStatementFactory");
@@ -110,6 +111,7 @@ public class SqlResource
       @Context final HttpServletRequest req
   )
   {
+    System.out.println("SqlResource.doPost");
     final HttpStatement stmt = sqlStatementFactory.httpStatement(sqlQuery, req);
     final String sqlQueryId = stmt.sqlQueryId();
     final String currThreadName = Thread.currentThread().getName();

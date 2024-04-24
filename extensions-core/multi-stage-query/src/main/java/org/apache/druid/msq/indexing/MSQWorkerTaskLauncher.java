@@ -455,7 +455,10 @@ public class MSQWorkerTaskLauncher
    */
   private void runNewTasks()
   {
+    System.out.println("MSQWorkerTaskLauncher.runNewTasks");
     final Map<String, Object> taskContext = new HashMap<>();
+
+    System.out.println("taskContextOverrides = " + taskContextOverrides);
 
     for (Map.Entry<String, Object> taskContextOverride : taskContextOverrides.entrySet()) {
       if (taskContextOverride.getKey() == null || taskContextOverride.getValue() == null) {
@@ -463,6 +466,11 @@ public class MSQWorkerTaskLauncher
       }
       taskContext.put(taskContextOverride.getKey(), taskContextOverride.getValue());
     }
+
+    System.out.println("taskContext = " + taskContext);
+
+    // [todo][Akshat]: Lookups need to be added here to pass from controller to worker's task context
+    taskContext.put("akshat-in-msq-worker-task-launcher", "some value");
 
     final int firstTask;
     final int taskCount;

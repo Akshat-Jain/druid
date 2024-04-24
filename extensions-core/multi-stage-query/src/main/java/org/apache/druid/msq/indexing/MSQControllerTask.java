@@ -132,7 +132,7 @@ public class MSQControllerTask extends AbstractTask implements ClientTaskQuery, 
         getDataSourceForTaskMetadata(querySpec),
         context
     );
-
+    System.out.println("MSQControllerTask.MSQControllerTask");
     this.querySpec = querySpec;
     this.sqlQuery = sqlQuery;
     this.sqlQueryContext = sqlQueryContext;
@@ -141,6 +141,13 @@ public class MSQControllerTask extends AbstractTask implements ClientTaskQuery, 
     this.nativeTypeNames = nativeTypeNames;
 
     addToContext(Tasks.FORCE_TIME_CHUNK_LOCK_KEY, true);
+
+    System.out.println("sqlQuery = " + sqlQuery);
+    System.out.println("sqlQueryContext = " + sqlQueryContext);
+    System.out.println("context = " + context);
+
+    // [todo][Akshat]: Lookups need to be added here to reflect in controller's context. So probably not needed? (in favor of MSQControllerTask.addToContext that adds to sqlQueryContext)
+    addToContext("akshat", "testing");
   }
 
   @Override

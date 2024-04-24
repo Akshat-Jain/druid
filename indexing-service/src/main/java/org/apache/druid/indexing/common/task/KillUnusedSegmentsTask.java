@@ -52,6 +52,9 @@ import org.joda.time.Interval;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -338,5 +341,18 @@ public class KillUnusedSegmentsTask extends AbstractFixedIntervalTask
         }
     );
     return taskLockMap;
+  }
+
+  @Override
+  public List<String> getLookupsToLoad(){
+    // [todo][Akshat]: need to return list of lookups from here somehow. Returning hard-coded values for now.
+    ArrayList<String> lookupsToLoad = new ArrayList<>();
+//    String currentTime = ZonedDateTime
+//        .now(ZoneId.systemDefault())
+//        .format(DateTimeFormatter.ofPattern("uuuu.MM.dd.HH.mm.ss"));
+//    lookupsToLoad.add("killTaskLookupToLoad1-" + currentTime);
+//    lookupsToLoad.add("killTaskLookupToLoad2-" + currentTime);
+//    lookupsToLoad.add("tablewithouttimestamp");
+    return lookupsToLoad;
   }
 }

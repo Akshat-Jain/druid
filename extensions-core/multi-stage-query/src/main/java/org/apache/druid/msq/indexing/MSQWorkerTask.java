@@ -82,6 +82,11 @@ public class MSQWorkerTask extends AbstractTask implements PendingSegmentAllocat
     this.controllerTaskId = controllerTaskId;
     this.workerNumber = workerNumber;
     this.retryCount = retryCount;
+
+    System.out.println("context = " + context);
+
+    // The below line adds context key-values to worker's context via the "context" passed as method param from MSQWorkerTaskLauncher. So no changes have to be done here.
+    // addToContext("akshat-in-worker", "testing-in-worker");
   }
 
   @JsonProperty
