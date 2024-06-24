@@ -585,6 +585,17 @@ public class ControllerImpl implements Controller
         context.jsonMapper()
     );
 
+    for (StageDefinition stageDefinition : queryDef.getStageDefinitions()) {
+      System.out.println("stageDefinition.getStageNumber() = " + stageDefinition.getStageNumber());
+      if (stageDefinition.doesShuffle()) {
+        System.out.println("stageDefinition.getShuffleSpec() = " + stageDefinition.getShuffleSpec());
+      }
+      else {
+        System.out.println("stageDefinition.getShuffleSpec(): null");
+      }
+      System.out.println("----------------------");
+    }
+
     if (log.isDebugEnabled()) {
       try {
         log.debug(
