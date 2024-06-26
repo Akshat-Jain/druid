@@ -1014,22 +1014,7 @@ public class TestDataBuilder
       );
 
       final IncrementalIndexSchema indexSchema = new IncrementalIndexSchema.Builder()
-          .withDimensionsSpec(
-//              new DimensionsSpec(
-//                  ImmutableList.of(
-//                      new LongDimensionSchema("col_int"),
-//                      new LongDimensionSchema("col_bgint"),
-//                      new StringDimensionSchema("col_char_2"),
-//                      new StringDimensionSchema("col_vchar_52"),
-//                      new LongDimensionSchema("col_tmstmp"), // Assuming timestamp as long
-//                      new LongDimensionSchema("col_dt"),     // Assuming date as long
-//                      new StringDimensionSchema("col_booln"), // Boolean can be stored as string
-//                      new DoubleDimensionSchema("col_dbl"),
-//                      new LongDimensionSchema("col_tm")      // Assuming time as long
-//                  )
-//              )
-              dimensionsSpec
-          )
+          .withDimensionsSpec(dimensionsSpec)
           .withRollup(false)
           .build();
 

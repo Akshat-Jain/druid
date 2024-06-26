@@ -626,7 +626,6 @@ public class BaseCalciteQueryTest extends CalciteTestBase
 
   public SqlTestFramework queryFramework()
   {
-    System.out.println("BaseCalciteQueryTest.queryFramework");
     try {
       return queryFrameworkRule.get();
     }

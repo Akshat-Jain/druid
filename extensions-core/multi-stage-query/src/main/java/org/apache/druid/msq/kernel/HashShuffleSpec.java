@@ -60,15 +60,6 @@ public class HashShuffleSpec implements ShuffleSpec
   }
 
   @Override
-  public String toString()
-  {
-    return "HashShuffleSpec{" +
-           "clusterBy=" + clusterBy +
-           ", numPartitions=" + numPartitions +
-           '}';
-  }
-
-  @Override
   @JsonProperty("partitions")
   public int partitionCount()
   {
