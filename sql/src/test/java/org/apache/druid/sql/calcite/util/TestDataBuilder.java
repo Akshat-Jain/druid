@@ -1040,7 +1040,7 @@ public class TestDataBuilder
           .rows(inputRows)
           .buildMMappedIndex();
       DataSegment dataSegment = DataSegment.builder()
-                                             .dataSource("drill_wf_smlTbl")
+                                             .dataSource("smlTbl.parquet")
                                              .interval(index.getDataInterval())
                                              .version("1")
                                              .shardSpec(new LinearShardSpec(0))

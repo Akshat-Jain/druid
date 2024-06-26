@@ -422,7 +422,7 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
       try {
         Assert.assertEquals(StringUtils.format("result count: %s", sql), expectedResultsText.size(), results.size());
         if (!isOrdered(queryResults)) {
-          // in case the resultset is not ordered; order via the same comparator before comparision
+          // in case the resultset is not ordered; order via the same comparator before comparison
           results.sort(new ArrayRowCmp());
           expectedResults.sort(new ArrayRowCmp());
         }

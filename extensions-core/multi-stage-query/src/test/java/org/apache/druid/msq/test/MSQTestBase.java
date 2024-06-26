@@ -412,6 +412,7 @@ public class MSQTestBase extends BaseCalciteQueryTest
   @BeforeEach
   public void setUp2() throws Exception
   {
+    System.out.println("MSQTestBase.setUp2");
     groupByBuffers = TestGroupByBuffers.createDefault();
 
     SqlTestFramework qf = queryFramework();
@@ -680,7 +681,7 @@ public class MSQTestBase extends BaseCalciteQueryTest
         case WIKIPEDIA:
           index = TestDataBuilder.makeWikipediaIndex(newTempFolder());
           break;
-        case "drill_wf_smlTbl":
+        case "smlTbl.parquet":
           final IncrementalIndexSchema indexSchema = new IncrementalIndexSchema.Builder()
               .withDimensionsSpec(
                   new DimensionsSpec(
