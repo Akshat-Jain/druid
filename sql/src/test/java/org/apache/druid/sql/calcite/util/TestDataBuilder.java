@@ -993,7 +993,7 @@ public class TestDataBuilder
       }
 
       ImmutableList<ImmutableMap<String, Object>> rawRows = builder.build();
-      List<InputRow> inputRows = rawRows.stream().map(TestDataBuilder::createRow).collect(Collectors.toList());
+      List<InputRow> inputRows = rawRows.stream().map(TestDataBuilder::createRowForWindowFunctionDrillTest).collect(Collectors.toList());
       System.out.println("inputRows = " + inputRows);
 
       DimensionsSpec dimensionsSpec = new DimensionsSpec(

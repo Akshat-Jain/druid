@@ -132,9 +132,9 @@ public class MSQWindowTest extends MSQTestBase
 //    );
     testSelectQuery()
 //        .setSql("select m1,SUM(m1) OVER(PARTITION BY m1) cc from foo group by m1")
-//        .setSql("SELECT col_vchar_52, col_int, PERCENT_RANK () OVER (PARTITION BY col_vchar_52 order by col_int) prcnt_rank FROM drill_wf_smlTbl")
+        .setSql("SELECT col_vchar_52, col_int, PERCENT_RANK () OVER (PARTITION BY col_vchar_52 order by col_int) prcnt_rank FROM drill_wf_smlTbl")
 //        .setSql("SELECT col_bgint, col_int, PERCENT_RANK () OVER (PARTITION BY col_bgint order by col_int) prcnt_rank FROM drill_wf_smlTbl")
-        .setSql("SELECT * FROM drill_wf_smlTbl")
+//        .setSql("SELECT * FROM drill_wf_smlTbl")
 //        .setExpectedMSQSpec(MSQSpec.builder()
 //                                   .query(query)
 //                                   .columnMappings(
@@ -147,13 +147,7 @@ public class MSQWindowTest extends MSQTestBase
 //                                   .build())
         .setExpectedRowSignature(rowSignature)
         .setExpectedResultRows(ImmutableList.of(
-//            AXXXXXXXXXXXXXXXXXXXXXXXXXCXXXXXXXXXXXXXXXXXXXXXXXXB	-184211	0.0
             new Object[]{"AXXXXXXXXXXXXXXXXXXXXXXXXXCXXXXXXXXXXXXXXXXXXXXXXXXB", -184211, 0.0}
-//            new Object[]{2.0f, 2.0},
-//            new Object[]{3.0f, 3.0},
-//            new Object[]{4.0f, 4.0},
-//            new Object[]{5.0f, 5.0},
-//            new Object[]{6.0f, 6.0}
         ))
         .setQueryContext(context)
 //        .setExpectedCountersForStageWorkerChannel(
