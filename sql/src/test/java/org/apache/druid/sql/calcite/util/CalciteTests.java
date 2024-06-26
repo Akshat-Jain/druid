@@ -301,6 +301,7 @@ public class CalciteTests
       final File tmpDir
   )
   {
+    System.out.println("CalciteTests.createMockWalker");
     return TestDataBuilder.createMockWalker(INJECTOR, conglomerate, tmpDir);
   }
 
@@ -310,6 +311,7 @@ public class CalciteTests
       final QueryScheduler scheduler
   )
   {
+    System.out.println("CalciteTests.createMockWalker");
     return TestDataBuilder.createMockWalker(INJECTOR, conglomerate, tmpDir, scheduler);
   }
 
@@ -320,6 +322,7 @@ public class CalciteTests
       final JoinableFactory joinableFactory
   )
   {
+    System.out.println("CalciteTests.createMockWalker");
     return TestDataBuilder.createMockWalker(
         INJECTOR,
         conglomerate,
@@ -336,6 +339,7 @@ public class CalciteTests
       final JoinableFactoryWrapper joinableFactoryWrapper
   )
   {
+    System.out.println("CalciteTests.createMockWalker");
     return TestDataBuilder.createMockWalker(
         INJECTOR,
         conglomerate,

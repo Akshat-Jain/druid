@@ -690,6 +690,7 @@ public class TestDataBuilder
       final File tmpDir
   )
   {
+    System.out.println("TestDataBuilder.createMockWalker");
     return createMockWalker(
         injector,
         conglomerate,
@@ -1042,7 +1043,7 @@ public class TestDataBuilder
       DataSegment dataSegment = DataSegment.builder()
                                              .dataSource("smlTbl.parquet")
                                              .interval(index.getDataInterval())
-                                             .version("1")
+                                             .version("2")
                                              .shardSpec(new LinearShardSpec(0))
                                              .size(0)
                                              .build();

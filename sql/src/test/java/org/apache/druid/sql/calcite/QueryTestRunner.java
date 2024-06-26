@@ -364,7 +364,7 @@ public class QueryTestRunner
     )
     {
       this.execStep = execStep;
-      this.verifyRowSignature = verifyRowSignature;
+      this.verifyRowSignature = true;
     }
 
     @Override
@@ -377,6 +377,7 @@ public class QueryTestRunner
 
     private void verifyResults(QueryResults queryResults)
     {
+      System.out.println("VerifyResults.verifyResults");
       if (queryResults.exception != null) {
         return;
       }
@@ -386,6 +387,7 @@ public class QueryTestRunner
       }
 
       QueryTestBuilder builder = execStep.builder();
+      System.out.println("verifyRowSignature = " + verifyRowSignature);
       if (verifyRowSignature) {
         builder.expectedResultsVerifier.verifyRowSignature(queryResults.signature);
       }

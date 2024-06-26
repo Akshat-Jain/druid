@@ -700,13 +700,6 @@ public class MSQTestBase extends BaseCalciteQueryTest
               )
               .withRollup(false)
               .build();
-//          index = IndexBuilder
-//              .create()
-//              .tmpDir(new File(tempFolderProducer.apply("tmpDir"), "1"))
-//              .segmentWriteOutMediumFactory(OffHeapMemorySegmentWriteOutMediumFactory.instance())
-//              .schema(indexSchema)
-//              .rows(ROWS1)
-//              .buildMMappedIndex();
           List<InputRow> inputRowsForDrillDatasource = TestDataBuilder.getInputRowsForDrillDatasource();
           index = IndexBuilder
               .create()
