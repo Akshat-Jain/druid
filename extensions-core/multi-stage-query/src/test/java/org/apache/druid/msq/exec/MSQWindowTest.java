@@ -132,8 +132,9 @@ public class MSQWindowTest extends MSQTestBase
 //    );
     testSelectQuery()
 //        .setSql("select m1,SUM(m1) OVER(PARTITION BY m1) cc from foo group by m1")
-        .setSql("SELECT col_bgint, col_int, PERCENT_RANK () OVER (PARTITION BY col_bgint order by col_int) prcnt_rank FROM drill_wf_smlTbl")
-//        .setSql("SELECT * FROM drill_wf_smlTbl")
+//        .setSql("SELECT col_vchar_52, col_int, PERCENT_RANK () OVER (PARTITION BY col_vchar_52 order by col_int) prcnt_rank FROM drill_wf_smlTbl")
+//        .setSql("SELECT col_bgint, col_int, PERCENT_RANK () OVER (PARTITION BY col_bgint order by col_int) prcnt_rank FROM drill_wf_smlTbl")
+        .setSql("SELECT * FROM drill_wf_smlTbl")
 //        .setExpectedMSQSpec(MSQSpec.builder()
 //                                   .query(query)
 //                                   .columnMappings(

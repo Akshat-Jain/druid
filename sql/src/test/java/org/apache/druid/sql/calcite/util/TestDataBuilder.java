@@ -996,21 +996,38 @@ public class TestDataBuilder
       List<InputRow> inputRows = rawRows.stream().map(TestDataBuilder::createRow).collect(Collectors.toList());
       System.out.println("inputRows = " + inputRows);
 
+      DimensionsSpec dimensionsSpec = new DimensionsSpec(
+          ImmutableList.<DimensionSchema>builder()
+                       .addAll(DimensionsSpec.getDefaultSchemas(ImmutableList.of(
+                           "col_char_2",
+                           "col_vchar_52",
+                           "col_booln"
+                       )))
+                       .add(new LongDimensionSchema("col_int"))
+                       .add(new LongDimensionSchema("col_bgint"))
+                       .add(new LongDimensionSchema("col_tmstmp"))
+                       .add(new LongDimensionSchema("col_dt"))
+                       .add(new DoubleDimensionSchema("col_dbl"))
+                       .add(new LongDimensionSchema("col_tm"))
+                       .build()
+      );
+
       final IncrementalIndexSchema indexSchema = new IncrementalIndexSchema.Builder()
           .withDimensionsSpec(
-              new DimensionsSpec(
-                  ImmutableList.of(
-                      new LongDimensionSchema("col_int"),
-                      new LongDimensionSchema("col_bgint"),
-                      new StringDimensionSchema("col_char_2"),
-                      new StringDimensionSchema("col_vchar_52"),
-                      new LongDimensionSchema("col_tmstmp"), // Assuming timestamp as long
-                      new LongDimensionSchema("col_dt"),     // Assuming date as long
-                      new StringDimensionSchema("col_booln"), // Boolean can be stored as string
-                      new DoubleDimensionSchema("col_dbl"),
-                      new LongDimensionSchema("col_tm")      // Assuming time as long
-                  )
-              )
+//              new DimensionsSpec(
+//                  ImmutableList.of(
+//                      new LongDimensionSchema("col_int"),
+//                      new LongDimensionSchema("col_bgint"),
+//                      new StringDimensionSchema("col_char_2"),
+//                      new StringDimensionSchema("col_vchar_52"),
+//                      new LongDimensionSchema("col_tmstmp"), // Assuming timestamp as long
+//                      new LongDimensionSchema("col_dt"),     // Assuming date as long
+//                      new StringDimensionSchema("col_booln"), // Boolean can be stored as string
+//                      new DoubleDimensionSchema("col_dbl"),
+//                      new LongDimensionSchema("col_tm")      // Assuming time as long
+//                  )
+//              )
+              dimensionsSpec
           )
           .withRollup(false)
           .build();
@@ -1052,7 +1069,7 @@ public class TestDataBuilder
       }
 
       ImmutableList<ImmutableMap<String, Object>> rawRows = builder.build();
-      List<InputRow> inputRows = rawRows.stream().map(TestDataBuilder::createRow).collect(Collectors.toList());
+      List<InputRow> inputRows = rawRows.stream().map(TestDataBuilder::createRowForWindowFunctionDrillTest).collect(Collectors.toList());
       System.out.println("inputRows = " + inputRows);
       return inputRows;
     }
@@ -1065,6 +1082,18 @@ public class TestDataBuilder
   private static MapBasedInputRow toRow(String time, List<String> dimensions, Map<String, Object> event)
   {
     return new MapBasedInputRow(DateTimes.ISO_DATE_OPTIONAL_TIME.parse(time), dimensions, event);
+  }
+
+  public static InputRow createRowForWindowFunctionDrillTest(final ImmutableMap<String, ?> map)
+  {
+    final InputRowSchema wfschema = new InputRowSchema(
+        new TimestampSpec(TIMESTAMP_COLUMN, "iso", null),
+        new DimensionsSpec(
+            DimensionsSpec.getDefaultSchemas(ImmutableList.of())
+        ),
+        null
+    );
+    return MapInputRowParser.parse(wfschema, (Map<String, Object>) map);
   }
 
   public static InputRow createRow(final ImmutableMap<String, ?> map)
