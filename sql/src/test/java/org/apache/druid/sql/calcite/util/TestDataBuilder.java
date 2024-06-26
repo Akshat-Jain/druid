@@ -1043,7 +1043,7 @@ public class TestDataBuilder
       DataSegment dataSegment = DataSegment.builder()
                                              .dataSource("smlTbl.parquet")
                                              .interval(index.getDataInterval())
-                                             .version("2")
+                                             .version("1")
                                              .shardSpec(new LinearShardSpec(0))
                                              .size(0)
                                              .build();

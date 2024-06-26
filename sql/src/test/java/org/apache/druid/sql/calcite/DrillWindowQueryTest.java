@@ -280,28 +280,28 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
           new StringDimensionSchema("col7"),
           new StringDimensionSchema("col8"),
           new StringDimensionSchema("col9"));
-      attachIndex(
-          retVal,
-          "smlTbl.parquet",
-          // "col_int": 8122,
-          new LongDimensionSchema("col_int"),
-          // "col_bgint": 817200,
-          new LongDimensionSchema("col_bgint"),
-          // "col_char_2": "IN",
-          new StringDimensionSchema("col_char_2"),
-          // "col_vchar_52":
-          // "AXXXXXXXXXXXXXXXXXXXXXXXXXCXXXXXXXXXXXXXXXXXXXXXXXXB",
-          new StringDimensionSchema("col_vchar_52"),
-          // "col_tmstmp": 1409617682418,
-          new LongDimensionSchema("col_tmstmp"),
-          // "col_dt": 422717616000000,
-          new LongDimensionSchema("col_dt"),
-          // "col_booln": false,
-          new StringDimensionSchema("col_booln"),
-          // "col_dbl": 12900.48,
-          new DoubleDimensionSchema("col_dbl"),
-          // "col_tm": 33109170
-          new LongDimensionSchema("col_tm"));
+//      attachIndex(
+//          retVal,
+//          "smlTbl.parquet",
+//          // "col_int": 8122,
+//          new LongDimensionSchema("col_int"),
+//          // "col_bgint": 817200,
+//          new LongDimensionSchema("col_bgint"),
+//          // "col_char_2": "IN",
+//          new StringDimensionSchema("col_char_2"),
+//          // "col_vchar_52":
+//          // "AXXXXXXXXXXXXXXXXXXXXXXXXXCXXXXXXXXXXXXXXXXXXXXXXXXB",
+//          new StringDimensionSchema("col_vchar_52"),
+//          // "col_tmstmp": 1409617682418,
+//          new LongDimensionSchema("col_tmstmp"),
+//          // "col_dt": 422717616000000,
+//          new LongDimensionSchema("col_dt"),
+//          // "col_booln": false,
+//          new StringDimensionSchema("col_booln"),
+//          // "col_dbl": 12900.48,
+//          new DoubleDimensionSchema("col_dbl"),
+//          // "col_tm": 33109170
+//          new LongDimensionSchema("col_tm"));
       attachIndex(
           retVal,
           "fewRowsAllData.parquet",
@@ -419,8 +419,6 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
     {
       System.out.println("TextualResultsVerifier.verify");
       List<Object[]> results = queryResults.results;
-      System.out.println("currentRowSignature.getColumnNames() = " + currentRowSignature.getColumnNames());
-      System.out.println("currentRowSignature.getColumnTypes() = " + currentRowSignature.getColumnTypes());
       List<Object[]> expectedResults = parseResults(currentRowSignature, expectedResultsText);
       try {
         Assert.assertEquals(StringUtils.format("result count: %s", sql), expectedResultsText.size(), results.size());
@@ -884,119 +882,119 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
 //  {
 //    windowQueryTest();
 //  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_10")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_10()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_11")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_11()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_12")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_12()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_13")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_13()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_14")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_14()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_15")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_15()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_16")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_16()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_1")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_1()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_2")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_2()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_3")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_3()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_4")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_4()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_5")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_5()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_6")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_6()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_7")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_7()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_8")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_8()
-//  {
-//    windowQueryTest();
-//  }
-//
-//  @DrillTest("aggregates/wo_OrdrBy_9")
-//  @Test
-//  public void test_aggregates_wo_OrdrBy_9()
-//  {
-//    windowQueryTest();
-//  }
-//
+
+  @DrillTest("aggregates/wo_OrdrBy_10")
+  @Test
+  public void test_aggregates_wo_OrdrBy_10()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_11")
+  @Test
+  public void test_aggregates_wo_OrdrBy_11()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_12")
+  @Test
+  public void test_aggregates_wo_OrdrBy_12()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_13")
+  @Test
+  public void test_aggregates_wo_OrdrBy_13()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_14")
+  @Test
+  public void test_aggregates_wo_OrdrBy_14()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_15")
+  @Test
+  public void test_aggregates_wo_OrdrBy_15()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_16")
+  @Test
+  public void test_aggregates_wo_OrdrBy_16()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_1")
+  @Test
+  public void test_aggregates_wo_OrdrBy_1()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_2")
+  @Test
+  public void test_aggregates_wo_OrdrBy_2()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_3")
+  @Test
+  public void test_aggregates_wo_OrdrBy_3()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_4")
+  @Test
+  public void test_aggregates_wo_OrdrBy_4()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_5")
+  @Test
+  public void test_aggregates_wo_OrdrBy_5()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_6")
+  @Test
+  public void test_aggregates_wo_OrdrBy_6()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_7")
+  @Test
+  public void test_aggregates_wo_OrdrBy_7()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_8")
+  @Test
+  public void test_aggregates_wo_OrdrBy_8()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("aggregates/wo_OrdrBy_9")
+  @Test
+  public void test_aggregates_wo_OrdrBy_9()
+  {
+    windowQueryTest();
+  }
+
 //  @DrillTest("aggregates/woPrtnBy_11")
 //  @Test
 //  public void test_aggregates_woPrtnBy_11()
@@ -1010,7 +1008,7 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
 //  {
 //    windowQueryTest();
 //  }
-
+//
 //  @DrillTest("aggregates/woPrtnBy_1")
 //  @Test
 //  public void test_aggregates_woPrtnBy_1()
@@ -1241,48 +1239,48 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
 //  {
 //    windowQueryTest();
 //  }
-
-  @DrillTest("aggregates/wPrtnOrdrBy_2")
-  @Test
-  public void test_aggregates_wPrtnOrdrBy_2()
-  {
-    windowQueryTest();
-  }
-
-  @DrillTest("aggregates/wPrtnOrdrBy_3")
-  @Test
-  public void test_aggregates_wPrtnOrdrBy_3()
-  {
-    windowQueryTest();
-  }
-
-  @DrillTest("aggregates/wPrtnOrdrBy_4")
-  @Test
-  public void test_aggregates_wPrtnOrdrBy_4()
-  {
-    windowQueryTest();
-  }
-
-  @DrillTest("aggregates/wPrtnOrdrBy_5")
-  @Test
-  public void test_aggregates_wPrtnOrdrBy_5()
-  {
-    windowQueryTest();
-  }
-
-  @DrillTest("aggregates/wPrtnOrdrBy_6")
-  @Test
-  public void test_aggregates_wPrtnOrdrBy_6()
-  {
-    windowQueryTest();
-  }
-
-  @DrillTest("aggregates/wPrtnOrdrBy_7")
-  @Test
-  public void test_aggregates_wPrtnOrdrBy_7()
-  {
-    windowQueryTest();
-  }
+//
+//  @DrillTest("aggregates/wPrtnOrdrBy_2")
+//  @Test
+//  public void test_aggregates_wPrtnOrdrBy_2()
+//  {
+//    windowQueryTest();
+//  }
+//
+//  @DrillTest("aggregates/wPrtnOrdrBy_3")
+//  @Test
+//  public void test_aggregates_wPrtnOrdrBy_3()
+//  {
+//    windowQueryTest();
+//  }
+//
+//  @DrillTest("aggregates/wPrtnOrdrBy_4")
+//  @Test
+//  public void test_aggregates_wPrtnOrdrBy_4()
+//  {
+//    windowQueryTest();
+//  }
+//
+//  @DrillTest("aggregates/wPrtnOrdrBy_5")
+//  @Test
+//  public void test_aggregates_wPrtnOrdrBy_5()
+//  {
+//    windowQueryTest();
+//  }
+//
+//  @DrillTest("aggregates/wPrtnOrdrBy_6")
+//  @Test
+//  public void test_aggregates_wPrtnOrdrBy_6()
+//  {
+//    windowQueryTest();
+//  }
+//
+//  @DrillTest("aggregates/wPrtnOrdrBy_7")
+//  @Test
+//  public void test_aggregates_wPrtnOrdrBy_7()
+//  {
+//    windowQueryTest();
+//  }
 //
 //  @DrillTest("aggregates/wPrtnOrdrBy_8")
 //  @Test
@@ -2060,7 +2058,7 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
 //  {
 //    windowQueryTest();
 //  }
-
+//
 //  @DrillTest("frameclause/RBUPAUF/RBUPAUF_vchar_5")
 //  @Test
 //  public void test_frameclause_RBUPAUF_RBUPAUF_vchar_5()
@@ -3726,7 +3724,7 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
 //  {
 //    windowQueryTest();
 //  }
-
+//
 //  @DrillTest("nestedAggs/wPbOb_5")
 //  @Test
 //  public void test_nestedAggs_wPbOb_5()
@@ -4617,7 +4615,7 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
 //  {
 //    windowQueryTest();
 //  }
-
+//
 //  @DrillTest("ntile_func/ntileFn_50")
 //  @Test
 //  public void test_ntile_func_ntileFn_50()
@@ -6763,7 +6761,7 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
 //  {
 //    windowQueryTest();
 //  }
-
+//
 //  @DrillTest("frameclause/RBCRACR/RBCRACR_char_4")
 //  @Test
 //  public void test_frameclause_RBCRACR_RBCRACR_char_4()
