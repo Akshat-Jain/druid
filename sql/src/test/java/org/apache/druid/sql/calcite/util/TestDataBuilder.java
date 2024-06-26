@@ -19,10 +19,13 @@
 
 package org.apache.druid.sql.calcite.util;
 
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Injector;
+import org.apache.druid.common.config.NullHandling;
 import org.apache.druid.data.input.InputRow;
 import org.apache.druid.data.input.InputRowSchema;
 import org.apache.druid.data.input.MapBasedInputRow;
@@ -36,6 +39,7 @@ import org.apache.druid.data.input.impl.LongDimensionSchema;
 import org.apache.druid.data.input.impl.MapInputRowParser;
 import org.apache.druid.data.input.impl.StringDimensionSchema;
 import org.apache.druid.data.input.impl.TimestampSpec;
+import org.apache.druid.jackson.DefaultObjectMapper;
 import org.apache.druid.java.util.common.DateTimes;
 import org.apache.druid.java.util.common.Intervals;
 import org.apache.druid.java.util.common.StringUtils;
@@ -102,6 +106,12 @@ import java.util.stream.Collectors;
  */
 public class TestDataBuilder
 {
+  static {
+    NullHandling.initializeForTests();
+  }
+
+  private static final ObjectMapper MAPPER = new DefaultObjectMapper();
+
   public static final String TIMESTAMP_COLUMN = "t";
   public static final GlobalTableDataSource CUSTOM_TABLE = new GlobalTableDataSource(CalciteTests.BROADCAST_DATASOURCE);
 
@@ -739,6 +749,7 @@ public class TestDataBuilder
       final JoinableFactoryWrapper joinableFactoryWrapper
   )
   {
+    // [Ak's notes]: This gets called by MSQTestBase -> setup2() -> queryFramework() method by some guice thing.
     final QueryableIndex index1 = IndexBuilder
         .create()
         .tmpDir(new File(tmpDir, "1"))
@@ -835,7 +846,7 @@ public class TestDataBuilder
         .inputTmpDir(new File(tmpDir, "9-input"))
         .buildMMappedIndex();
 
-    return SpecificSegmentsQuerySegmentWalker.createWalker(
+    SpecificSegmentsQuerySegmentWalker querySegmentWalker = SpecificSegmentsQuerySegmentWalker.createWalker(
         injector,
         conglomerate,
         injector.getInstance(SegmentWrangler.class),
@@ -942,14 +953,14 @@ public class TestDataBuilder
                    .build(),
         makeWikipediaIndex(tmpDir)
     ).add(
-      DataSegment.builder()
-                 .dataSource(CalciteTests.WIKIPEDIA_FIRST_LAST)
-                 .interval(Intervals.of("2015-09-12/2015-09-13"))
-                 .version("1")
-                 .shardSpec(new NumberedShardSpec(0, 0))
-                 .size(0)
-                 .build(),
-      makeWikipediaIndexWithAggregation(tmpDir)
+        DataSegment.builder()
+                   .dataSource(CalciteTests.WIKIPEDIA_FIRST_LAST)
+                   .interval(Intervals.of("2015-09-12/2015-09-13"))
+                   .version("1")
+                   .shardSpec(new NumberedShardSpec(0, 0))
+                   .size(0)
+                   .build(),
+        makeWikipediaIndexWithAggregation(tmpDir)
     ).add(
         DataSegment.builder()
                    .dataSource(CalciteTests.ARRAYS_DATASOURCE)
@@ -960,6 +971,95 @@ public class TestDataBuilder
                    .build(),
         arraysIndex
     );
+
+    getDataBuilderForWindowFunctionDrillTests(querySegmentWalker, tmpDir);
+
+    return querySegmentWalker;
+  }
+
+  private static void getDataBuilderForWindowFunctionDrillTests(SpecificSegmentsQuerySegmentWalker segmentWalker, final File tmpDir)
+  {
+    try {
+      MappingIterator<Map<String, Object>> iterator = MAPPER.readerFor(Map.class)
+                                                            .readValues(
+                                                                ClassLoader.getSystemResource(
+                                                                    "drill/window/datasources/smltbl.parquet.json"));
+
+      ImmutableList.Builder<ImmutableMap<String, Object>> builder = ImmutableList.builder();
+      while (iterator.hasNext()) {
+        Map<String, Object> row = iterator.next();
+        row.put(TIMESTAMP_COLUMN, DateTimes.EPOCH);
+        builder.add(ImmutableMap.copyOf(row));
+      }
+
+      ImmutableList<ImmutableMap<String, Object>> rawRows = builder.build();
+      List<InputRow> inputRows = rawRows.stream().map(TestDataBuilder::createRow).collect(Collectors.toList());
+      System.out.println("inputRows = " + inputRows);
+
+      final IncrementalIndexSchema indexSchema = new IncrementalIndexSchema.Builder()
+          .withDimensionsSpec(
+              new DimensionsSpec(
+                  ImmutableList.of(
+                      new LongDimensionSchema("col_int"),
+                      new LongDimensionSchema("col_bgint"),
+                      new StringDimensionSchema("col_char_2"),
+                      new StringDimensionSchema("col_vchar_52"),
+                      new LongDimensionSchema("col_tmstmp"), // Assuming timestamp as long
+                      new LongDimensionSchema("col_dt"),     // Assuming date as long
+                      new StringDimensionSchema("col_booln"), // Boolean can be stored as string
+                      new DoubleDimensionSchema("col_dbl"),
+                      new LongDimensionSchema("col_tm")      // Assuming time as long
+                  )
+              )
+          )
+          .withRollup(false)
+          .build();
+
+      final QueryableIndex index = IndexBuilder
+          .create()
+          .tmpDir(new File(tmpDir, "msq-wf-drill-1"))
+          .segmentWriteOutMediumFactory(OffHeapMemorySegmentWriteOutMediumFactory.instance())
+          .schema(indexSchema)
+          .rows(inputRows)
+          .buildMMappedIndex();
+      DataSegment dataSegment = DataSegment.builder()
+                                             .dataSource("drill_wf_smlTbl")
+                                             .interval(index.getDataInterval())
+                                             .version("1")
+                                             .shardSpec(new LinearShardSpec(0))
+                                             .size(0)
+                                             .build();
+      segmentWalker.add(dataSegment, index);
+    }
+    catch (Exception e) {
+      System.out.println("error in reading input file for MSQ window functions drill tests = " + e);
+    }
+  }
+
+  public static List<InputRow> getInputRowsForDrillDatasource()
+  {
+    try {
+      MappingIterator<Map<String, Object>> iterator = MAPPER.readerFor(Map.class)
+                                                            .readValues(
+                                                                ClassLoader.getSystemResource(
+                                                                    "drill/window/datasources/smltbl.parquet.json"));
+
+      ImmutableList.Builder<ImmutableMap<String, Object>> builder = ImmutableList.builder();
+      while (iterator.hasNext()) {
+        Map<String, Object> row = iterator.next();
+        row.put(TIMESTAMP_COLUMN, DateTimes.EPOCH);
+        builder.add(ImmutableMap.copyOf(row));
+      }
+
+      ImmutableList<ImmutableMap<String, Object>> rawRows = builder.build();
+      List<InputRow> inputRows = rawRows.stream().map(TestDataBuilder::createRow).collect(Collectors.toList());
+      System.out.println("inputRows = " + inputRows);
+      return inputRows;
+    }
+    catch (Exception e) {
+      System.out.println("TestDataBuilder.getInputRowsForDrillDatasource: error in reading input file for MSQ window functions drill tests = " + e);
+    }
+    return null;
   }
 
   private static MapBasedInputRow toRow(String time, List<String> dimensions, Map<String, Object> event)

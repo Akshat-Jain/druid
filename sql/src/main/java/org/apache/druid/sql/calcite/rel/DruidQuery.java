@@ -1496,7 +1496,7 @@ public class DruidQuery
         plannerContext.queryContextMap(),
         windowing.getSignature(),
         operators,
-        plannerContext.featureAvailable(EngineFeature.WINDOW_LEAF_OPERATOR) ? ImmutableList.of() : null
+        ImmutableList.of()
     );
   }
 

@@ -80,6 +80,98 @@ public class MSQWindowTest extends MSQTestBase
     return Arrays.asList(data);
   }
 
+  @MethodSource("data")
+  @ParameterizedTest(name = "{index}:with context {0}")
+  public void testWindowFunctionDrillTest1(String contextName, Map<String, Object> context)
+  {
+    RowSignature rowSignature = RowSignature.builder()
+                                            .add("col_int", ColumnType.LONG)
+                                            .add("col_bgint", ColumnType.LONG)
+                                            .add("col_char_2", ColumnType.STRING)
+                                            .add("col_vchar_52", ColumnType.STRING)
+                                            .add("col_tmstmp", ColumnType.LONG) // Assuming timestamp as long
+                                            .add("col_dt", ColumnType.LONG)     // Assuming date as long
+                                            .add("col_booln", ColumnType.STRING) // Boolean can be stored as string
+                                            .add("col_dbl", ColumnType.DOUBLE)
+                                            .add("col_tm", ColumnType.LONG)      // Assuming time as long
+                                            .build();
+
+//    final Query groupByQuery = GroupByQuery.builder()
+//                                           .setDataSource("drill_wf_smlTbl")
+//                                           .setInterval(querySegmentSpec(Filtration
+//                                                                             .eternity()))
+//                                           .setGranularity(Granularities.ALL)
+//                                           .setDimensions(dimensions(
+//                                               new DefaultDimensionSpec(
+//                                                   "m1",
+//                                                   "d0",
+//                                                   ColumnType.FLOAT
+//                                               )
+//                                           ))
+//                                           .setContext(context)
+//                                           .build();
+
+
+//    final WindowFrame theFrame = new WindowFrame(WindowFrame.PeerType.ROWS, true, 0, true, 0, null);
+//    final AggregatorFactory[] theAggs = {
+//        new DoubleSumAggregatorFactory("w0", "d0")
+//    };
+//    WindowFramedAggregateProcessor proc = new WindowFramedAggregateProcessor(theFrame, theAggs);
+
+//    final WindowOperatorQuery query = new WindowOperatorQuery(
+//        new QueryDataSource(groupByQuery),
+//        new LegacySegmentSpec(Intervals.ETERNITY),
+//        context,
+//        RowSignature.builder().add("d0", ColumnType.FLOAT).add("w0", ColumnType.DOUBLE).build(),
+//        ImmutableList.of(
+//            new NaiveSortOperatorFactory(ImmutableList.of(ColumnWithDirection.ascending("d0"))),
+//            new NaivePartitioningOperatorFactory(ImmutableList.of("d0")),
+//            new WindowOperatorFactory(proc)
+//        ),
+//        null
+//    );
+    testSelectQuery()
+//        .setSql("select m1,SUM(m1) OVER(PARTITION BY m1) cc from foo group by m1")
+        .setSql("SELECT col_bgint, col_int, PERCENT_RANK () OVER (PARTITION BY col_bgint order by col_int) prcnt_rank FROM drill_wf_smlTbl")
+//        .setSql("SELECT * FROM drill_wf_smlTbl")
+//        .setExpectedMSQSpec(MSQSpec.builder()
+//                                   .query(query)
+//                                   .columnMappings(
+//                                       new ColumnMappings(ImmutableList.of(
+//                                           new ColumnMapping("d0", "m1"),
+//                                           new ColumnMapping("w0", "cc")
+//                                       )
+//                                       ))
+//                                   .tuningConfig(MSQTuningConfig.defaultConfig())
+//                                   .build())
+        .setExpectedRowSignature(rowSignature)
+        .setExpectedResultRows(ImmutableList.of(
+//            AXXXXXXXXXXXXXXXXXXXXXXXXXCXXXXXXXXXXXXXXXXXXXXXXXXB	-184211	0.0
+            new Object[]{"AXXXXXXXXXXXXXXXXXXXXXXXXXCXXXXXXXXXXXXXXXXXXXXXXXXB", -184211, 0.0}
+//            new Object[]{2.0f, 2.0},
+//            new Object[]{3.0f, 3.0},
+//            new Object[]{4.0f, 4.0},
+//            new Object[]{5.0f, 5.0},
+//            new Object[]{6.0f, 6.0}
+        ))
+        .setQueryContext(context)
+//        .setExpectedCountersForStageWorkerChannel(
+//            CounterSnapshotMatcher
+//                .with().totalFiles(1),
+//            0, 0, "input0"
+//        )
+//        .setExpectedCountersForStageWorkerChannel(
+//            CounterSnapshotMatcher
+//                .with().rows(6).frames(1),
+//            0, 0, "output"
+//        )
+//        .setExpectedCountersForStageWorkerChannel(
+//            CounterSnapshotMatcher
+//                .with().rows(6).frames(1),
+//            0, 0, "shuffle"
+//        )
+        .verifyResults();
+  }
 
   @MethodSource("data")
   @ParameterizedTest(name = "{index}:with context {0}")
