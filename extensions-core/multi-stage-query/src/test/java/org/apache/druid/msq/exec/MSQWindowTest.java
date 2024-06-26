@@ -82,35 +82,6 @@ public class MSQWindowTest extends MSQTestBase
 
   @MethodSource("data")
   @ParameterizedTest(name = "{index}:with context {0}")
-  public void testWindowFunctionDrillTest1(String contextName, Map<String, Object> context)
-  {
-    RowSignature rowSignature = RowSignature.builder()
-                                            .add("col_int", ColumnType.LONG)
-                                            .add("col_bgint", ColumnType.LONG)
-                                            .add("col_char_2", ColumnType.STRING)
-                                            .add("col_vchar_52", ColumnType.STRING)
-                                            .add("col_tmstmp", ColumnType.LONG) // Assuming timestamp as long
-                                            .add("col_dt", ColumnType.LONG)     // Assuming date as long
-                                            .add("col_booln", ColumnType.STRING) // Boolean can be stored as string
-                                            .add("col_dbl", ColumnType.DOUBLE)
-                                            .add("col_tm", ColumnType.LONG)      // Assuming time as long
-                                            .build();
-
-    testSelectQuery()
-//        .setSql("select m1,SUM(m1) OVER(PARTITION BY m1) cc from foo group by m1")
-        .setSql("SELECT col_vchar_52, col_int, PERCENT_RANK () OVER (PARTITION BY col_vchar_52 order by col_int) prcnt_rank FROM drill_wf_smlTbl")
-//        .setSql("SELECT col_bgint, col_int, PERCENT_RANK () OVER (PARTITION BY col_bgint order by col_int) prcnt_rank FROM drill_wf_smlTbl")
-//        .setSql("SELECT * FROM drill_wf_smlTbl")
-        .setExpectedRowSignature(rowSignature)
-        .setExpectedResultRows(ImmutableList.of(
-            new Object[]{"AXXXXXXXXXXXXXXXXXXXXXXXXXCXXXXXXXXXXXXXXXXXXXXXXXXB", -184211, 0.0}
-        ))
-        .setQueryContext(context)
-        .verifyResults();
-  }
-
-  @MethodSource("data")
-  @ParameterizedTest(name = "{index}:with context {0}")
   public void testWindowOnFooWithPartitionByAndInnerGroupBy(String contextName, Map<String, Object> context)
   {
     RowSignature rowSignature = RowSignature.builder()
