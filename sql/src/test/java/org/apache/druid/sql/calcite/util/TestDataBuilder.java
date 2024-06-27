@@ -980,29 +980,8 @@ public class TestDataBuilder
 
 //    getDataBuilderForWindowFunctionDrillTests(querySegmentWalker, tmpDir);
 
-    attachIndex(
-        querySegmentWalker,
-        "smlTbl.parquet",
-        tmpDir,
-        // "col_int": 8122,
-        new LongDimensionSchema("col_int"),
-        // "col_bgint": 817200,
-        new LongDimensionSchema("col_bgint"),
-        // "col_char_2": "IN",
-        new StringDimensionSchema("col_char_2"),
-        // "col_vchar_52":
-        // "AXXXXXXXXXXXXXXXXXXXXXXXXXCXXXXXXXXXXXXXXXXXXXXXXXXB",
-        new StringDimensionSchema("col_vchar_52"),
-        // "col_tmstmp": 1409617682418,
-        new LongDimensionSchema("col_tmstmp"),
-        // "col_dt": 422717616000000,
-        new LongDimensionSchema("col_dt"),
-        // "col_booln": false,
-        new StringDimensionSchema("col_booln"),
-        // "col_dbl": 12900.48,
-        new DoubleDimensionSchema("col_dbl"),
-        // "col_tm": 33109170
-        new LongDimensionSchema("col_tm"));
+    attachIndex(querySegmentWalker, "smlTbl.parquet", tmpDir);
+    attachIndex(querySegmentWalker, "allTypsUniq.parquet", tmpDir);
 
     return querySegmentWalker;
   }
@@ -1012,8 +991,7 @@ public class TestDataBuilder
   private static void attachIndex(
       SpecificSegmentsQuerySegmentWalker segmentWalker,
       String dataSource,
-      File tmpDir,
-      DimensionSchema... dims
+      File tmpDir
   )
   {
 //    ArrayList<String> dimensionNames = new ArrayList<>(dims.length);
@@ -1059,26 +1037,18 @@ public class TestDataBuilder
 
   public static QueryableIndex getQueryableIndexForDrillDatasource(String datasource, File parentTempDir)
   {
-    final QueryableIndex index;
-    switch (datasource) {
-      case "smlTbl.parquet":
-        final IncrementalIndexSchema indexSchema = new IncrementalIndexSchema.Builder()
-            .withDimensionsSpec(getDimensionSpecForDrillDatasource(datasource))
-            .withRollup(false)
-            .build();
-        List<InputRow> inputRowsForDrillDatasource = getInputRowsForDrillDatasource(datasource);
-        index = IndexBuilder
-            .create()
-            .tmpDir(new File(parentTempDir, datasource))
-            .segmentWriteOutMediumFactory(OffHeapMemorySegmentWriteOutMediumFactory.instance())
-            .schema(indexSchema)
-            .rows(inputRowsForDrillDatasource)
-            .buildMMappedIndex();
-        break;
-      default:
-        throw new RuntimeException("SAf");
-    }
-    return index;
+    final IncrementalIndexSchema indexSchema = new IncrementalIndexSchema.Builder()
+        .withDimensionsSpec(getDimensionSpecForDrillDatasource(datasource))
+        .withRollup(false)
+        .build();
+    List<InputRow> inputRowsForDrillDatasource = getInputRowsForDrillDatasource(datasource);
+    return IndexBuilder
+        .create()
+        .tmpDir(new File(parentTempDir, datasource))
+        .segmentWriteOutMediumFactory(OffHeapMemorySegmentWriteOutMediumFactory.instance())
+        .schema(indexSchema)
+        .rows(inputRowsForDrillDatasource)
+        .buildMMappedIndex();
   }
 
   private static DimensionsSpec getDimensionSpecForDrillDatasource(String datasource)
@@ -1096,6 +1066,22 @@ public class TestDataBuilder
                 new StringDimensionSchema("col_booln"), // Boolean can be stored as string
                 new DoubleDimensionSchema("col_dbl"),
                 new LongDimensionSchema("col_tm")      // Assuming time as long
+            )
+        );
+      }
+      case "allTypsUniq.parquet": {
+        return new DimensionsSpec(
+            ImmutableList.of(
+                new LongDimensionSchema("col0"),
+                new LongDimensionSchema("col1"),
+                new DoubleDimensionSchema("col2"),
+                new DoubleDimensionSchema("col3"),
+                new LongDimensionSchema("col4"),
+                new LongDimensionSchema("col5"),
+                new LongDimensionSchema("col6"),
+                new StringDimensionSchema("col7"),
+                new StringDimensionSchema("col8"),
+                new StringDimensionSchema("col9")
             )
         );
       }

@@ -267,19 +267,19 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
           new StringDimensionSchema("c2"));
 
       // {"col0":1,"col1":65534,"col2":256.0,"col3":1234.9,"col4":73578580,"col5":1393720082338,"col6":421185052800000,"col7":false,"col8":"CA","col9":"AXXXXXXXXXXXXXXXXXXXXXXXXXCXXXXXXXXXXXXXXXXXXXXXXXXZ"}
-      attachIndex(
-          retVal,
-          "allTypsUniq.parquet",
-          new LongDimensionSchema("col0"),
-          new LongDimensionSchema("col1"),
-          new DoubleDimensionSchema("col2"),
-          new DoubleDimensionSchema("col3"),
-          new LongDimensionSchema("col4"),
-          new LongDimensionSchema("col5"),
-          new LongDimensionSchema("col6"),
-          new StringDimensionSchema("col7"),
-          new StringDimensionSchema("col8"),
-          new StringDimensionSchema("col9"));
+//      attachIndex(
+//          retVal,
+//          "allTypsUniq.parquet",
+//          new LongDimensionSchema("col0"),
+//          new LongDimensionSchema("col1"),
+//          new DoubleDimensionSchema("col2"),
+//          new DoubleDimensionSchema("col3"),
+//          new LongDimensionSchema("col4"),
+//          new LongDimensionSchema("col5"),
+//          new LongDimensionSchema("col6"),
+//          new StringDimensionSchema("col7"),
+//          new StringDimensionSchema("col8"),
+//          new StringDimensionSchema("col9"));
 //      attachIndex(
 //          retVal,
 //          "smlTbl.parquet",

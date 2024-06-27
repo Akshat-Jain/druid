@@ -395,32 +395,8 @@ public class CalciteMSQTestsHelper
         index = TestDataBuilder.makeWikipediaIndexWithAggregation(tempFolderProducer.apply("tmpDir"));
         break;
       case "smlTbl.parquet":
-//        final IncrementalIndexSchema indexSchema = new IncrementalIndexSchema.Builder()
-//            .withDimensionsSpec(
-//                new DimensionsSpec(
-//                    ImmutableList.of(
-//                        new LongDimensionSchema("col_int"),
-//                        new LongDimensionSchema("col_bgint"),
-//                        new StringDimensionSchema("col_char_2"),
-//                        new StringDimensionSchema("col_vchar_52"),
-//                        new LongDimensionSchema("col_tmstmp"), // Assuming timestamp as long
-//                        new LongDimensionSchema("col_dt"),     // Assuming date as long
-//                        new StringDimensionSchema("col_booln"), // Boolean can be stored as string
-//                        new DoubleDimensionSchema("col_dbl"),
-//                        new LongDimensionSchema("col_tm")      // Assuming time as long
-//                    )
-//                )
-//            )
-//            .withRollup(false)
-//            .build();
-//        List<InputRow> inputRowsForDrillDatasource = TestDataBuilder.getInputRowsForDrillDatasource();
-//        index = IndexBuilder
-//            .create()
-//            .tmpDir(new File(tempFolderProducer.apply("tmpDir"), "msq-wf-drill-1"))
-//            .segmentWriteOutMediumFactory(OffHeapMemorySegmentWriteOutMediumFactory.instance())
-//            .schema(indexSchema)
-//            .rows(inputRowsForDrillDatasource)
-//            .buildMMappedIndex();
+      case "allTypsUniq.parquet":
+        System.out.println("segmentId.getDataSource() = " + segmentId.getDataSource());
           index = TestDataBuilder.getQueryableIndexForDrillDatasource(segmentId.getDataSource(), tempFolderProducer.apply("tmpDir"));
         break;
       default:
