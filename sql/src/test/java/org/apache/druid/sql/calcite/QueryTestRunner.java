@@ -384,10 +384,7 @@ public class QueryTestRunner
       }
 
       QueryTestBuilder builder = execStep.builder();
-//      System.out.println("verifyRowSignature = " + verifyRowSignature);
-//      if (verifyRowSignature) {
       builder.expectedResultsVerifier.verifyRowSignature(queryResults.signature);
-//      }
       builder.expectedResultsVerifier.verify(builder.sql, queryResults);
     }
   }

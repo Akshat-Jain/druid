@@ -979,8 +979,6 @@ public class TestDataBuilder
         arraysIndex
     );
 
-//    getDataBuilderForWindowFunctionDrillTests(querySegmentWalker, tmpDir);
-
     attachIndex(querySegmentWalker, "tblWnulls.parquet", tmpDir);
     attachIndex(querySegmentWalker, "smlTbl.parquet", tmpDir);
     attachIndex(querySegmentWalker, "allTypsUniq.parquet", tmpDir);
@@ -990,7 +988,6 @@ public class TestDataBuilder
     return querySegmentWalker;
   }
 
-  // MSQ Drill Window Test: starts
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static void attachIndex(
       SpecificSegmentsQuerySegmentWalker segmentWalker,
@@ -1041,19 +1038,30 @@ public class TestDataBuilder
       case "smlTbl.parquet": {
         return new DimensionsSpec(
             ImmutableList.of(
+                // "col_int": 8122,
                 new LongDimensionSchema("col_int"),
+                // "col_bgint": 817200,
                 new LongDimensionSchema("col_bgint"),
+                // "col_char_2": "IN",
                 new StringDimensionSchema("col_char_2"),
+                // "col_vchar_52":
+                // "AXXXXXXXXXXXXXXXXXXXXXXXXXCXXXXXXXXXXXXXXXXXXXXXXXXB",
                 new StringDimensionSchema("col_vchar_52"),
+                // "col_tmstmp": 1409617682418,
                 new LongDimensionSchema("col_tmstmp"),
+                // "col_dt": 422717616000000,
                 new LongDimensionSchema("col_dt"),
+                // "col_booln": false,
                 new StringDimensionSchema("col_booln"),
+                // "col_dbl": 12900.48,
                 new DoubleDimensionSchema("col_dbl"),
+                // "col_tm": 33109170
                 new LongDimensionSchema("col_tm")
             )
         );
       }
       case "allTypsUniq.parquet": {
+        // {"col0":1,"col1":65534,"col2":256.0,"col3":1234.9,"col4":73578580,"col5":1393720082338,"col6":421185052800000,"col7":false,"col8":"CA","col9":"AXXXXXXXXXXXXXXXXXXXXXXXXXCXXXXXXXXXXXXXXXXXXXXXXXXZ"}
         return new DimensionsSpec(
             ImmutableList.of(
                 new LongDimensionSchema("col0"),
@@ -1118,13 +1126,12 @@ public class TestDataBuilder
         );
       }
       default:
-        throw new RuntimeException("todo: throw something here");
+        throw new RuntimeException("Invalid datasource supplied for drill tests");
     }
   }
 
   private static Iterable<InputRow> getInputRowsForDrillDatasource(String datasource)
   {
-//    try {
     DimensionsSpec dimensionSpecForDrillDatasource = getDimensionSpecForDrillDatasource(datasource);
     return () -> {
         try {
@@ -1139,107 +1146,11 @@ public class TestDataBuilder
           throw new RE(e, "problem reading file");
         }
       };
-//      MappingIterator<Map<String, Object>> iterator = MAPPER.readerFor(Map.class)
-//                                                            .readValues(
-//                                                                ClassLoader.getSystemResource(
-//                                                                    "drill/window/datasources/" + datasource + ".json"));
-//
-//      ImmutableList.Builder<ImmutableMap<String, Object>> builder = ImmutableList.builder();
-//      while (iterator.hasNext()) {
-//        Map<String, Object> row = iterator.next();
-//        row.put(TIMESTAMP_COLUMN, DateTimes.EPOCH);
-//        builder.add(ImmutableMap.copyOf(row));
-//      }
-//
-//      ImmutableList<ImmutableMap<String, Object>> rawRows = builder.build();
-//      List<InputRow> inputRows = rawRows.stream().map(TestDataBuilder::createRowForWindowFunctionDrillTest).collect(Collectors.toList());
-//      System.out.println("inputRows = " + inputRows);
-//      return inputRows;
-//    }
-//    catch (Exception e) {
-//      System.out.println("datasource = " + datasource);
-//      System.out.println("TestDataBuilder.getInputRowsForDrillDatasource: error in reading input file for MSQ window functions drill tests = " + e);
-//    }
-//    return null;
-  }
-  // MSQ Drill Window Test: ends
-
-  private static void getDataBuilderForWindowFunctionDrillTests(SpecificSegmentsQuerySegmentWalker segmentWalker, final File tmpDir)
-  {
-    try {
-      MappingIterator<Map<String, Object>> iterator = MAPPER.readerFor(Map.class)
-                                                            .readValues(
-                                                                ClassLoader.getSystemResource(
-                                                                    "drill/window/datasources/smltbl.parquet.json"));
-
-      ImmutableList.Builder<ImmutableMap<String, Object>> builder = ImmutableList.builder();
-      while (iterator.hasNext()) {
-        Map<String, Object> row = iterator.next();
-        row.put(TIMESTAMP_COLUMN, DateTimes.EPOCH);
-        builder.add(ImmutableMap.copyOf(row));
-      }
-
-      ImmutableList<ImmutableMap<String, Object>> rawRows = builder.build();
-      List<InputRow> inputRows = rawRows.stream().map(TestDataBuilder::createRowForWindowFunctionDrillTest).collect(Collectors.toList());
-      System.out.println("inputRows = " + inputRows);
-
-      DimensionsSpec dimensionsSpec = new DimensionsSpec(
-          ImmutableList.<DimensionSchema>builder()
-                       .addAll(DimensionsSpec.getDefaultSchemas(ImmutableList.of(
-                           "col_char_2",
-                           "col_vchar_52",
-                           "col_booln"
-                       )))
-                       .add(new LongDimensionSchema("col_int"))
-                       .add(new LongDimensionSchema("col_bgint"))
-                       .add(new LongDimensionSchema("col_tmstmp"))
-                       .add(new LongDimensionSchema("col_dt"))
-                       .add(new DoubleDimensionSchema("col_dbl"))
-                       .add(new LongDimensionSchema("col_tm"))
-                       .build()
-      );
-
-      final IncrementalIndexSchema indexSchema = new IncrementalIndexSchema.Builder()
-          .withDimensionsSpec(dimensionsSpec)
-          .withRollup(false)
-          .build();
-
-      final QueryableIndex index = IndexBuilder
-          .create()
-          .tmpDir(new File(tmpDir, "msq-wf-drill-1"))
-          .segmentWriteOutMediumFactory(OffHeapMemorySegmentWriteOutMediumFactory.instance())
-          .schema(indexSchema)
-          .rows(inputRows)
-          .buildMMappedIndex();
-      DataSegment dataSegment = DataSegment.builder()
-                                             .dataSource("smlTbl.parquet")
-                                             .interval(index.getDataInterval())
-                                             .version("1")
-                                             .shardSpec(new LinearShardSpec(0))
-                                             .size(0)
-                                             .build();
-      segmentWalker.add(dataSegment, index);
-    }
-    catch (Exception e) {
-      System.out.println("error in reading input file for MSQ window functions drill tests = " + e);
-    }
   }
 
   private static MapBasedInputRow toRow(String time, List<String> dimensions, Map<String, Object> event)
   {
     return new MapBasedInputRow(DateTimes.ISO_DATE_OPTIONAL_TIME.parse(time), dimensions, event);
-  }
-
-  public static InputRow createRowForWindowFunctionDrillTest(final ImmutableMap<String, ?> map)
-  {
-    final InputRowSchema wfschema = new InputRowSchema(
-        new TimestampSpec(TIMESTAMP_COLUMN, "iso", null),
-        new DimensionsSpec(
-            DimensionsSpec.getDefaultSchemas(ImmutableList.of())
-        ),
-        null
-    );
-    return MapInputRowParser.parse(wfschema, (Map<String, Object>) map);
   }
 
   public static InputRow createRow(final ImmutableMap<String, ?> map)
