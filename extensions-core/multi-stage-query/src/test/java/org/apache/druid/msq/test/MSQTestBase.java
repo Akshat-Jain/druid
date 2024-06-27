@@ -681,34 +681,6 @@ public class MSQTestBase extends BaseCalciteQueryTest
         case WIKIPEDIA:
           index = TestDataBuilder.makeWikipediaIndex(newTempFolder());
           break;
-        case "smlTbl.parquet":
-          final IncrementalIndexSchema indexSchema = new IncrementalIndexSchema.Builder()
-              .withDimensionsSpec(
-                  new DimensionsSpec(
-                      ImmutableList.of(
-                          new LongDimensionSchema("col_int"),
-                          new LongDimensionSchema("col_bgint"),
-                          new StringDimensionSchema("col_char_2"),
-                          new StringDimensionSchema("col_vchar_52"),
-                          new LongDimensionSchema("col_tmstmp"), // Assuming timestamp as long
-                          new LongDimensionSchema("col_dt"),     // Assuming date as long
-                          new StringDimensionSchema("col_booln"), // Boolean can be stored as string
-                          new DoubleDimensionSchema("col_dbl"),
-                          new LongDimensionSchema("col_tm")      // Assuming time as long
-                      )
-                  )
-              )
-              .withRollup(false)
-              .build();
-          List<InputRow> inputRowsForDrillDatasource = TestDataBuilder.getInputRowsForDrillDatasource();
-          index = IndexBuilder
-              .create()
-              .tmpDir(new File(tempFolderProducer.apply("tmpDir"), "msq-wf-drill-1"))
-              .segmentWriteOutMediumFactory(OffHeapMemorySegmentWriteOutMediumFactory.instance())
-              .schema(indexSchema)
-              .rows(inputRowsForDrillDatasource)
-              .buildMMappedIndex();
-          break;
         default:
           throw new ISE("Cannot query segment %s in test runner", segmentId);
 
