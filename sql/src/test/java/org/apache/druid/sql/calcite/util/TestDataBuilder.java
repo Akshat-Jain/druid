@@ -980,8 +980,11 @@ public class TestDataBuilder
 
 //    getDataBuilderForWindowFunctionDrillTests(querySegmentWalker, tmpDir);
 
+//    attachIndex(querySegmentWalker, "tblWnulls.parquet", tmpDir);
     attachIndex(querySegmentWalker, "smlTbl.parquet", tmpDir);
     attachIndex(querySegmentWalker, "allTypsUniq.parquet", tmpDir);
+    attachIndex(querySegmentWalker, "fewRowsAllData.parquet", tmpDir);
+//    attachIndex(querySegmentWalker, "t_alltype.parquet", tmpDir);
 
     return querySegmentWalker;
   }
@@ -994,34 +997,6 @@ public class TestDataBuilder
       File tmpDir
   )
   {
-//    ArrayList<String> dimensionNames = new ArrayList<>(dims.length);
-//    for (DimensionSchema dimension : dims) {
-//      dimensionNames.add(dimension.getName());
-//    }
-
-//    final QueryableIndex queryableIndex = IndexBuilder
-//        .create()
-//        .tmpDir(new File(tmpDir, dataSource))
-//        .segmentWriteOutMediumFactory(OnHeapMemorySegmentWriteOutMediumFactory.instance())
-//        .schema(new IncrementalIndexSchema.Builder()
-//                    .withRollup(false)
-//                    .withDimensionsSpec(new DimensionsSpec(Arrays.asList(dims)))
-//                    .build())
-//        .rows(
-//            () -> {
-//              try {
-//                return Iterators.transform(
-//                    MAPPER.readerFor(Map.class)
-//                          .readValues(
-//                              ClassLoader.getSystemResource("drill/window/datasources/" + dataSource + ".json")),
-//                    (Function<Map, InputRow>) input -> new MapBasedInputRow(0, dimensionNames, input));
-//              }
-//              catch (IOException e) {
-//                throw new RE(e, "problem reading file");
-//              }
-//            })
-//        .buildMMappedIndex();
-
     final QueryableIndex queryableIndex = getQueryableIndexForDrillDatasource(dataSource, tmpDir);
 
     segmentWalker.add(
@@ -1054,6 +1029,14 @@ public class TestDataBuilder
   private static DimensionsSpec getDimensionSpecForDrillDatasource(String datasource)
   {
     switch (datasource) {
+      case "tblWnulls.parquet": {
+        return new DimensionsSpec(
+            ImmutableList.of(
+                new LongDimensionSchema("c1"),
+                new StringDimensionSchema("c2")
+            )
+        );
+      }
       case "smlTbl.parquet": {
         return new DimensionsSpec(
             ImmutableList.of(
@@ -1061,11 +1044,11 @@ public class TestDataBuilder
                 new LongDimensionSchema("col_bgint"),
                 new StringDimensionSchema("col_char_2"),
                 new StringDimensionSchema("col_vchar_52"),
-                new LongDimensionSchema("col_tmstmp"), // Assuming timestamp as long
-                new LongDimensionSchema("col_dt"),     // Assuming date as long
-                new StringDimensionSchema("col_booln"), // Boolean can be stored as string
+                new LongDimensionSchema("col_tmstmp"),
+                new LongDimensionSchema("col_dt"),
+                new StringDimensionSchema("col_booln"),
                 new DoubleDimensionSchema("col_dbl"),
-                new LongDimensionSchema("col_tm")      // Assuming time as long
+                new LongDimensionSchema("col_tm")
             )
         );
       }
@@ -1082,6 +1065,54 @@ public class TestDataBuilder
                 new StringDimensionSchema("col7"),
                 new StringDimensionSchema("col8"),
                 new StringDimensionSchema("col9")
+            )
+        );
+      }
+      case "fewRowsAllData.parquet": {
+        return new DimensionsSpec(
+            ImmutableList.of(
+                // "col0":12024,
+                new LongDimensionSchema("col0"),
+                // "col1":307168,
+                new LongDimensionSchema("col1"),
+                // "col2":"VT",
+                new StringDimensionSchema("col2"),
+                // "col3":"DXXXXXXXXXXXXXXXXXXXXXXXXXEXXXXXXXXXXXXXXXXXXXXXXXXF",
+                new StringDimensionSchema("col3"),
+                // "col4":1338596882419,
+                new LongDimensionSchema("col4"),
+                // "col5":422705433600000,
+                new LongDimensionSchema("col5"),
+                // "col6":true,
+                new StringDimensionSchema("col6"),
+                // "col7":3.95110006277E8,
+                new DoubleDimensionSchema("col7"),
+                // "col8":67465430
+                new LongDimensionSchema("col8")
+            )
+        );
+      }
+      case "t_alltype.parquet": {
+        return new DimensionsSpec(
+            ImmutableList.of(
+                // "c1":1,
+                new LongDimensionSchema("c1"),
+                // "c2":592475043,
+                new LongDimensionSchema("c2"),
+                // "c3":616080519999272,
+                new LongDimensionSchema("c3"),
+                // "c4":"ObHeWTDEcbGzssDwPwurfs",
+                new StringDimensionSchema("c4"),
+                // "c5":"0sZxIfZ CGwTOaLWZ6nWkUNx",
+                new StringDimensionSchema("c5"),
+                // "c6":1456290852307,
+                new LongDimensionSchema("c6"),
+                // "c7":421426627200000,
+                new LongDimensionSchema("c7"),
+                // "c8":true,
+                new StringDimensionSchema("c8"),
+                // "c9":0.626179100469
+                new DoubleDimensionSchema("c9")
             )
         );
       }
@@ -1111,6 +1142,7 @@ public class TestDataBuilder
       return inputRows;
     }
     catch (Exception e) {
+      System.out.println("datasource = " + datasource);
       System.out.println("TestDataBuilder.getInputRowsForDrillDatasource: error in reading input file for MSQ window functions drill tests = " + e);
     }
     return null;

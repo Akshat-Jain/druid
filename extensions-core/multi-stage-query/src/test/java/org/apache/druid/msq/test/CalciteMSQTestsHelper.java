@@ -394,9 +394,11 @@ public class CalciteMSQTestsHelper
       case CalciteTests.WIKIPEDIA_FIRST_LAST:
         index = TestDataBuilder.makeWikipediaIndexWithAggregation(tempFolderProducer.apply("tmpDir"));
         break;
+      case "tblWnulls.parquet":
       case "smlTbl.parquet":
       case "allTypsUniq.parquet":
-        System.out.println("segmentId.getDataSource() = " + segmentId.getDataSource());
+      case "fewRowsAllData.parquet":
+      case "t_alltype.parquet":
           index = TestDataBuilder.getQueryableIndexForDrillDatasource(segmentId.getDataSource(), tempFolderProducer.apply("tmpDir"));
         break;
       default:

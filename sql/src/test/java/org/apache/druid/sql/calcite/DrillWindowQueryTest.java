@@ -302,27 +302,27 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
 //          new DoubleDimensionSchema("col_dbl"),
 //          // "col_tm": 33109170
 //          new LongDimensionSchema("col_tm"));
-      attachIndex(
-          retVal,
-          "fewRowsAllData.parquet",
-          // "col0":12024,
-          new LongDimensionSchema("col0"),
-          // "col1":307168,
-          new LongDimensionSchema("col1"),
-          // "col2":"VT",
-          new StringDimensionSchema("col2"),
-          // "col3":"DXXXXXXXXXXXXXXXXXXXXXXXXXEXXXXXXXXXXXXXXXXXXXXXXXXF",
-          new StringDimensionSchema("col3"),
-          // "col4":1338596882419,
-          new LongDimensionSchema("col4"),
-          // "col5":422705433600000,
-          new LongDimensionSchema("col5"),
-          // "col6":true,
-          new StringDimensionSchema("col6"),
-          // "col7":3.95110006277E8,
-          new DoubleDimensionSchema("col7"),
-          // "col8":67465430
-          new LongDimensionSchema("col8"));
+//      attachIndex(
+//          retVal,
+//          "fewRowsAllData.parquet",
+//          // "col0":12024,
+//          new LongDimensionSchema("col0"),
+//          // "col1":307168,
+//          new LongDimensionSchema("col1"),
+//          // "col2":"VT",
+//          new StringDimensionSchema("col2"),
+//          // "col3":"DXXXXXXXXXXXXXXXXXXXXXXXXXEXXXXXXXXXXXXXXXXXXXXXXXXF",
+//          new StringDimensionSchema("col3"),
+//          // "col4":1338596882419,
+//          new LongDimensionSchema("col4"),
+//          // "col5":422705433600000,
+//          new LongDimensionSchema("col5"),
+//          // "col6":true,
+//          new StringDimensionSchema("col6"),
+//          // "col7":3.95110006277E8,
+//          new DoubleDimensionSchema("col7"),
+//          // "col8":67465430
+//          new LongDimensionSchema("col8"));
       attachIndex(
           retVal,
           "t_alltype.parquet",
