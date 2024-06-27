@@ -96,6 +96,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -980,11 +981,11 @@ public class TestDataBuilder
 
 //    getDataBuilderForWindowFunctionDrillTests(querySegmentWalker, tmpDir);
 
-//    attachIndex(querySegmentWalker, "tblWnulls.parquet", tmpDir);
+    attachIndex(querySegmentWalker, "tblWnulls.parquet", tmpDir);
     attachIndex(querySegmentWalker, "smlTbl.parquet", tmpDir);
     attachIndex(querySegmentWalker, "allTypsUniq.parquet", tmpDir);
     attachIndex(querySegmentWalker, "fewRowsAllData.parquet", tmpDir);
-//    attachIndex(querySegmentWalker, "t_alltype.parquet", tmpDir);
+    attachIndex(querySegmentWalker, "t_alltype.parquet", tmpDir);
 
     return querySegmentWalker;
   }
@@ -1016,7 +1017,7 @@ public class TestDataBuilder
         .withDimensionsSpec(getDimensionSpecForDrillDatasource(datasource))
         .withRollup(false)
         .build();
-    List<InputRow> inputRowsForDrillDatasource = getInputRowsForDrillDatasource(datasource);
+    Iterable<InputRow> inputRowsForDrillDatasource = getInputRowsForDrillDatasource(datasource);
     return IndexBuilder
         .create()
         .tmpDir(new File(parentTempDir, datasource))
@@ -1121,31 +1122,45 @@ public class TestDataBuilder
     }
   }
 
-  private static List<InputRow> getInputRowsForDrillDatasource(String datasource)
+  private static Iterable<InputRow> getInputRowsForDrillDatasource(String datasource)
   {
-    try {
-      MappingIterator<Map<String, Object>> iterator = MAPPER.readerFor(Map.class)
-                                                            .readValues(
-                                                                ClassLoader.getSystemResource(
-                                                                    "drill/window/datasources/" + datasource + ".json"));
-
-      ImmutableList.Builder<ImmutableMap<String, Object>> builder = ImmutableList.builder();
-      while (iterator.hasNext()) {
-        Map<String, Object> row = iterator.next();
-        row.put(TIMESTAMP_COLUMN, DateTimes.EPOCH);
-        builder.add(ImmutableMap.copyOf(row));
-      }
-
-      ImmutableList<ImmutableMap<String, Object>> rawRows = builder.build();
-      List<InputRow> inputRows = rawRows.stream().map(TestDataBuilder::createRowForWindowFunctionDrillTest).collect(Collectors.toList());
-      System.out.println("inputRows = " + inputRows);
-      return inputRows;
-    }
-    catch (Exception e) {
-      System.out.println("datasource = " + datasource);
-      System.out.println("TestDataBuilder.getInputRowsForDrillDatasource: error in reading input file for MSQ window functions drill tests = " + e);
-    }
-    return null;
+//    try {
+    DimensionsSpec dimensionSpecForDrillDatasource = getDimensionSpecForDrillDatasource(datasource);
+    return () -> {
+        try {
+          return Iterators.transform(
+              MAPPER.readerFor(Map.class)
+                    .readValues(
+                        ClassLoader.getSystemResource("drill/window/datasources/" + datasource + ".json")),
+              (Function<Map, InputRow>) input -> new MapBasedInputRow(0, dimensionSpecForDrillDatasource.getDimensionNames(), input)
+          );
+        }
+        catch (IOException e) {
+          throw new RE(e, "problem reading file");
+        }
+      };
+//      MappingIterator<Map<String, Object>> iterator = MAPPER.readerFor(Map.class)
+//                                                            .readValues(
+//                                                                ClassLoader.getSystemResource(
+//                                                                    "drill/window/datasources/" + datasource + ".json"));
+//
+//      ImmutableList.Builder<ImmutableMap<String, Object>> builder = ImmutableList.builder();
+//      while (iterator.hasNext()) {
+//        Map<String, Object> row = iterator.next();
+//        row.put(TIMESTAMP_COLUMN, DateTimes.EPOCH);
+//        builder.add(ImmutableMap.copyOf(row));
+//      }
+//
+//      ImmutableList<ImmutableMap<String, Object>> rawRows = builder.build();
+//      List<InputRow> inputRows = rawRows.stream().map(TestDataBuilder::createRowForWindowFunctionDrillTest).collect(Collectors.toList());
+//      System.out.println("inputRows = " + inputRows);
+//      return inputRows;
+//    }
+//    catch (Exception e) {
+//      System.out.println("datasource = " + datasource);
+//      System.out.println("TestDataBuilder.getInputRowsForDrillDatasource: error in reading input file for MSQ window functions drill tests = " + e);
+//    }
+//    return null;
   }
   // MSQ Drill Window Test: ends
 

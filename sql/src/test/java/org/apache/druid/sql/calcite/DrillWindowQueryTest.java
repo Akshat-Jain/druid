@@ -260,11 +260,11 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
           joinableFactory,
           injector);
 
-      attachIndex(
-          retVal,
-          "tblWnulls.parquet",
-          new LongDimensionSchema("c1"),
-          new StringDimensionSchema("c2"));
+//      attachIndex(
+//          retVal,
+//          "tblWnulls.parquet",
+//          new LongDimensionSchema("c1"),
+//          new StringDimensionSchema("c2"));
 
       // {"col0":1,"col1":65534,"col2":256.0,"col3":1234.9,"col4":73578580,"col5":1393720082338,"col6":421185052800000,"col7":false,"col8":"CA","col9":"AXXXXXXXXXXXXXXXXXXXXXXXXXCXXXXXXXXXXXXXXXXXXXXXXXXZ"}
 //      attachIndex(
@@ -323,27 +323,27 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
 //          new DoubleDimensionSchema("col7"),
 //          // "col8":67465430
 //          new LongDimensionSchema("col8"));
-      attachIndex(
-          retVal,
-          "t_alltype.parquet",
-          // "c1":1,
-          new LongDimensionSchema("c1"),
-          // "c2":592475043,
-          new LongDimensionSchema("c2"),
-          // "c3":616080519999272,
-          new LongDimensionSchema("c3"),
-          // "c4":"ObHeWTDEcbGzssDwPwurfs",
-          new StringDimensionSchema("c4"),
-          // "c5":"0sZxIfZ CGwTOaLWZ6nWkUNx",
-          new StringDimensionSchema("c5"),
-          // "c6":1456290852307,
-          new LongDimensionSchema("c6"),
-          // "c7":421426627200000,
-          new LongDimensionSchema("c7"),
-          // "c8":true,
-          new StringDimensionSchema("c8"),
-          // "c9":0.626179100469
-          new DoubleDimensionSchema("c9"));
+//      attachIndex(
+//          retVal,
+//          "t_alltype.parquet",
+//          // "c1":1,
+//          new LongDimensionSchema("c1"),
+//          // "c2":592475043,
+//          new LongDimensionSchema("c2"),
+//          // "c3":616080519999272,
+//          new LongDimensionSchema("c3"),
+//          // "c4":"ObHeWTDEcbGzssDwPwurfs",
+//          new StringDimensionSchema("c4"),
+//          // "c5":"0sZxIfZ CGwTOaLWZ6nWkUNx",
+//          new StringDimensionSchema("c5"),
+//          // "c6":1456290852307,
+//          new LongDimensionSchema("c6"),
+//          // "c7":421426627200000,
+//          new LongDimensionSchema("c7"),
+//          // "c8":true,
+//          new StringDimensionSchema("c8"),
+//          // "c9":0.626179100469
+//          new DoubleDimensionSchema("c9"));
 
       return retVal;
     }
