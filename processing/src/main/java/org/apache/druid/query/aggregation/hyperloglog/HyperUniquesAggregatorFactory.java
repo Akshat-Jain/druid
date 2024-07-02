@@ -136,6 +136,10 @@ public class HyperUniquesAggregatorFactory extends AggregatorFactory
   public VectorAggregator factorizeVector(final VectorColumnSelectorFactory selectorFactory)
   {
     final ColumnCapabilities capabilities = selectorFactory.getColumnCapabilities(fieldName);
+    if (!Objects.equals(capabilities.toColumnType().getComplexTypeName(), TYPE.getComplexTypeName())
+        && !Objects.equals(capabilities.toColumnType().getComplexTypeName(), PRECOMPUTED_TYPE.getComplexTypeName())) {
+      throw new UnsupportedOperationException("Using APPROX_COUNT_DISTINCT() or enabling approximation with COUNT(DISTINCT) is not supported for " + capabilities.getType() + "<" + capabilities.getComplexTypeName() + "> column. You can disable approximation and use COUNT(DISTINCT " + fieldName + ") and run the query again.");
+    }
     if (!Types.is(capabilities, ValueType.COMPLEX)) {
       return NoopVectorAggregator.instance();
     } else {
