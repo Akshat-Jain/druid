@@ -121,6 +121,10 @@ public class CountSqlAggregator implements SqlAggregator
       return Aggregation.create(new CountAggregatorFactory(name));
     } else if (aggregateCall.isDistinct()) {
       // COUNT(DISTINCT x)
+      // whether column is complex
+      // if column is complex, then type of complex<???>
+      // type of approxAggregator
+//      approxCountDistinctAggregator.validateComplexType()
       if (plannerContext.getPlannerConfig().isUseApproximateCountDistinct()) {
         return approxCountDistinctAggregator.toDruidAggregation(
             plannerContext,

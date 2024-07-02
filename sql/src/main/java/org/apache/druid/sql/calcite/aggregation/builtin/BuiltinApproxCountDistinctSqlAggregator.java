@@ -53,6 +53,7 @@ import org.apache.druid.sql.calcite.rel.VirtualColumnRegistry;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class BuiltinApproxCountDistinctSqlAggregator implements SqlAggregator
 {
@@ -88,13 +89,15 @@ public class BuiltinApproxCountDistinctSqlAggregator implements SqlAggregator
       return null;
     }
 
-    final AggregatorFactory aggregatorFactory;
+    AggregatorFactory aggregatorFactory = null;
     final String aggregatorName = finalizeAggregations ? Calcites.makePrefixedName(name, "a") : name;
 
     if (arg.isDirectColumnAccess()
         && inputAccessor.getInputRowSignature()
             .getColumnType(arg.getDirectColumn())
-            .map(type -> type.is(ValueType.COMPLEX))
+            .map(type -> type.is(ValueType.COMPLEX)
+                         && (Objects.equals(type.getComplexTypeName(), HyperUniquesAggregatorFactory.TYPE.getComplexTypeName()) || Objects.equals(type.getComplexTypeName(), HyperUniquesAggregatorFactory.PRECOMPUTED_TYPE.getComplexTypeName()))
+            )
             .orElse(false)) {
       aggregatorFactory = new HyperUniquesAggregatorFactory(aggregatorName, arg.getDirectColumn(), false, true);
     } else {
@@ -117,14 +120,15 @@ public class BuiltinApproxCountDistinctSqlAggregator implements SqlAggregator
         dimensionSpec = new DefaultDimensionSpec(virtualColumnName, null, inputType);
       }
 
-      if (inputType.is(ValueType.COMPLEX)) {
+      if (inputType.is(ValueType.COMPLEX) && (Objects.equals(inputType.getComplexTypeName(), HyperUniquesAggregatorFactory.TYPE.getComplexTypeName()) || Objects.equals(inputType.getComplexTypeName(), HyperUniquesAggregatorFactory.PRECOMPUTED_TYPE.getComplexTypeName()))) {
+        // Add a check that it operates on incorrect column type. This is the SQL layer improvement.
         aggregatorFactory = new HyperUniquesAggregatorFactory(
             aggregatorName,
             dimensionSpec.getOutputName(),
             false,
             true
         );
-      } else {
+      } else if (Objects.equals(inputType.getComplexTypeName(), CardinalityAggregatorFactory.TYPE.getComplexTypeName())) {
         aggregatorFactory = new CardinalityAggregatorFactory(
             aggregatorName,
             null,
@@ -133,6 +137,11 @@ public class BuiltinApproxCountDistinctSqlAggregator implements SqlAggregator
             true
         );
       }
+    }
+
+    if (aggregatorFactory == null) {
+      plannerContext.setPlanningError("some custom planning error by akshat saying that no appropriate aggregator factory found for the column");
+      return null;
     }
 
     return Aggregation.create(
