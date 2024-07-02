@@ -59,6 +59,13 @@ public class CounterSnapshotsTree
 
   public void put(final int stageNumber, final int workerNumber, final CounterSnapshots snapshots)
   {
+    System.out.println("CounterSnapshotsTree.put");
+    System.out.println("stageNumber = "
+                       + stageNumber
+                       + ", workerNumber = "
+                       + workerNumber
+                       + ", snapshots = "
+                       + snapshots);
     synchronized (snapshotsMap) {
       snapshotsMap.computeIfAbsent(stageNumber, ignored -> new Int2ObjectAVLTreeMap<>())
                   .put(workerNumber, snapshots);

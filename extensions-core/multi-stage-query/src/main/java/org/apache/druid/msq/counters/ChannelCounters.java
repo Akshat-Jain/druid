@@ -100,6 +100,16 @@ public class ChannelCounters implements QueryCounter
       final long nFiles
   )
   {
+    System.out.println("partitionNumber = "
+                       + partitionNumber
+                       + ", nRows = "
+                       + nRows
+                       + ", nBytes = "
+                       + nBytes
+                       + ", nFrames = "
+                       + nFrames
+                       + ", nFiles = "
+                       + nFiles);
     synchronized (this) {
       ensureCapacityForPartition(partitionNumber);
       rows.set(partitionNumber, rows.getLong(partitionNumber) + nRows);
@@ -112,6 +122,7 @@ public class ChannelCounters implements QueryCounter
   @GuardedBy("this")
   private void ensureCapacityForPartition(final int partitionNumber)
   {
+//    System.out.println("ChannelCounters.ensureCapacityForPartition partitionNumber = " + partitionNumber);
     while (partitionNumber >= rows.size()) {
       rows.add(0);
     }

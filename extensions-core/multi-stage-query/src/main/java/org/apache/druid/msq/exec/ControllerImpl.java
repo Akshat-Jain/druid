@@ -1311,6 +1311,7 @@ public class ControllerImpl implements Controller
       @Nullable final List<SegmentIdWithShardSpec> segmentsToGenerate
   )
   {
+    System.out.println("ControllerImpl.startWorkForStage stageNumber = " + stageNumber);
     final Int2ObjectMap<Object> extraInfos = makeWorkerFactoryInfosForStage(
         queryDef,
         stageNumber,
