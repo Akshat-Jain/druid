@@ -28,7 +28,7 @@ public class CountingReadableFrameChannel implements ReadableFrameChannel
 {
   private final ReadableFrameChannel baseChannel;
   private final ChannelCounters channelCounters;
-  private final int partitionNumber;
+  public final int partitionNumber;
 
   public CountingReadableFrameChannel(
       ReadableFrameChannel baseChannel,

@@ -35,6 +35,8 @@ import org.apache.druid.frame.write.FrameWriter;
 import org.apache.druid.frame.write.FrameWriterFactory;
 import org.apache.druid.java.util.common.Unit;
 import org.apache.druid.java.util.common.logger.Logger;
+import org.apache.druid.msq.indexing.CountingReadableFrameChannel;
+import org.apache.druid.msq.indexing.CountingWritableFrameChannel;
 import org.apache.druid.msq.indexing.error.MSQException;
 import org.apache.druid.msq.indexing.error.TooManyRowsInAWindowFault;
 import org.apache.druid.query.groupby.ResultRow;
@@ -100,8 +102,17 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
       final int maxRowsMaterializedInWindow
   )
   {
+    System.out.println("WindowOperatorQueryFrameProcessor.WindowOperatorQueryFrameProcessor: " + inputChannel.getClass());
+//    if (inputChannel instanceof CountingReadableFrameChannel) {
+//      System.out.println("((CountingReadableFrameChannel) inputChannel).partitionNumber = "
+//                         + ((CountingReadableFrameChannel) inputChannel).partitionNumber);
+//    }
     this.inputChannel = inputChannel;
     this.outputChannel = outputChannel;
+    if (outputChannel instanceof CountingWritableFrameChannel) {
+      System.out.println("((CountingWritableFrameChannel) outputChannel).partitionNumber = "
+                         + ((CountingWritableFrameChannel) outputChannel).partitionNumber);
+    }
     this.frameWriterFactory = frameWriterFactory;
     this.operatorFactoryList = operatorFactoryList;
     this.jsonMapper = jsonMapper;
@@ -450,7 +461,11 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
       return 0;
     } else {
       final Frame frame = Frame.wrap(frameWriter.toByteArray());
-      Iterables.getOnlyElement(outputChannels()).write(new FrameWithPartition(frame, FrameWithPartition.NO_PARTITION));
+      WritableFrameChannel onlyElement = Iterables.getOnlyElement(outputChannels());
+//      onlyElement.write(frame);
+      onlyElement.write(new FrameWithPartition(frame, FrameWithPartition.NO_PARTITION));
+      // Question: Why are we using FrameWithPartition instead of Frame?
+      // Question: Using NO_PARTITION indicates that output channel can be only one (can contradict with us setting shuffleSpec=HASH in window stage)?
       frameWriter.close();
       frameWriter = null;
       return frame.numRows();

@@ -60,26 +60,31 @@ public class ChannelCounters implements QueryCounter
 
   public void incrementRowCount(int partition)
   {
+    System.out.println("ChannelCounters.incrementRowCount 1 with partition = " + partition);
     add(partition, 1, 0, 0, 0);
   }
 
   public void incrementBytes(long bytes)
   {
+    System.out.println("ChannelCounters.incrementRowCount 2 with bytes = " + bytes);
     add(NO_PARTITION, 0, bytes, 0, 0);
   }
 
   public void incrementFileCount()
   {
+    System.out.println("ChannelCounters.incrementFileCount");
     add(NO_PARTITION, 0, 0, 0, 1);
   }
 
   public void addFile(final long nRows, final long nBytes)
   {
+    System.out.println("ChannelCounters.addFile with nRows = " + nRows + ", nBytes = " + nBytes);
     add(NO_PARTITION, nRows, nBytes, 0, 1);
   }
 
   public void addFrame(final int partitionNumber, final Frame frame)
   {
+    System.out.println("ChannelCounters.addFrame with partitionNumber = " + partitionNumber + ", frame.numRows() = " + frame.numRows());
     add(partitionNumber, frame.numRows(), frame.numBytes(), 1, 0);
   }
 
@@ -100,16 +105,16 @@ public class ChannelCounters implements QueryCounter
       final long nFiles
   )
   {
-    System.out.println("partitionNumber = "
-                       + partitionNumber
-                       + ", nRows = "
-                       + nRows
-                       + ", nBytes = "
-                       + nBytes
-                       + ", nFrames = "
-                       + nFrames
-                       + ", nFiles = "
-                       + nFiles);
+//    System.out.println("partitionNumber = "
+//                       + partitionNumber
+//                       + ", nRows = "
+//                       + nRows
+//                       + ", nBytes = "
+//                       + nBytes
+//                       + ", nFrames = "
+//                       + nFrames
+//                       + ", nFiles = "
+//                       + nFiles);
     synchronized (this) {
       ensureCapacityForPartition(partitionNumber);
       rows.set(partitionNumber, rows.getLong(partitionNumber) + nRows);
@@ -122,7 +127,6 @@ public class ChannelCounters implements QueryCounter
   @GuardedBy("this")
   private void ensureCapacityForPartition(final int partitionNumber)
   {
-//    System.out.println("ChannelCounters.ensureCapacityForPartition partitionNumber = " + partitionNumber);
     while (partitionNumber >= rows.size()) {
       rows.add(0);
     }

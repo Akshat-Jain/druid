@@ -66,4 +66,12 @@ public class HashShuffleSpec implements ShuffleSpec
     return numPartitions;
   }
 
+  @Override
+  public String toString()
+  {
+    return "HashShuffleSpec{" +
+           "clusterBy=" + clusterBy +
+           ", numPartitions=" + numPartitions +
+           '}';
+  }
 }

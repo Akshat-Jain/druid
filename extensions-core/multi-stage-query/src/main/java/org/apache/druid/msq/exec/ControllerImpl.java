@@ -1774,11 +1774,23 @@ public class ControllerImpl implements Controller
       );
     }
     catch (MSQException e) {
+      System.out.println("e = " + e);
       // If the toolkit throws a MSQFault, don't wrap it in a more generic QueryNotSupportedFault
       throw e;
     }
     catch (Exception e) {
       throw new MSQException(e, QueryNotSupportedFault.INSTANCE);
+    }
+
+    for (StageDefinition stageDefinition : queryDef.getStageDefinitions()) {
+      System.out.println("stageDefinition.getStageNumber() = " + stageDefinition.getStageNumber());
+      if (stageDefinition.doesShuffle()) {
+        System.out.println("stageDefinition.getShuffleSpec() = " + stageDefinition.getShuffleSpec());
+      }
+      else {
+        System.out.println("stageDefinition.getShuffleSpec() = None");
+      }
+      System.out.println("---------------------------");
     }
 
     if (MSQControllerTask.isIngestion(querySpec)) {

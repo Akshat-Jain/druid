@@ -146,6 +146,8 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
 
     final Sequence<FrameProcessor<Object>> processors = readableInputs.map(
         readableInput -> {
+          System.out.println("readableInput.getStagePartition().getPartitionNumber() = "
+                             + readableInput.getStagePartition().getPartitionNumber());
           final OutputChannel outputChannel =
               outputChannels.get(readableInput.getStagePartition().getPartitionNumber());
 

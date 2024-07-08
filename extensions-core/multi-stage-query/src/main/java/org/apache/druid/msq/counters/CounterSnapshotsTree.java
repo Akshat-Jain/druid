@@ -59,8 +59,7 @@ public class CounterSnapshotsTree
 
   public void put(final int stageNumber, final int workerNumber, final CounterSnapshots snapshots)
   {
-    System.out.println("CounterSnapshotsTree.put");
-    System.out.println("stageNumber = "
+    System.out.println("CounterSnapshotsTree.put stageNumber = "
                        + stageNumber
                        + ", workerNumber = "
                        + workerNumber

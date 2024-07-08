@@ -65,20 +65,25 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
       int minStageNumber
   )
   {
-    // need to validate query first
-    // populate the group of operators to be processed as each stage
-    // the size of the operators is the number of serialized stages
-    // later we should also check if these can be parallelized
-    // check there is an empty over clause or not
+    // Need to validate query first.
+    // Populate the group of operators to be processed at each stage.
+    // The size of the operators is the number of serialized stages.
+    // Later we should also check if these can be parallelized.
+    // Check if there is an empty OVER() clause or not.
     List<List<OperatorFactory>> operatorList = new ArrayList<>();
-    boolean isEmptyOverFound = ifEmptyOverPresentInWindowOperstors(originalQuery, operatorList);
+    System.out.println("originalQuery.getOperators() = " + originalQuery.getOperators());
+    boolean isEmptyOverFound = isEmptyOverPresentInWindowOperators(originalQuery, operatorList);
+    System.out.println("isEmptyOverFound = " + isEmptyOverFound);
+    System.out.println("operatorList = " + operatorList);
 
     ShuffleSpec nextShuffleSpec = findShuffleSpecForNextWindow(operatorList.get(0), maxWorkerCount);
     // add this shuffle spec to the last stage of the inner query
+    // Question: What does "inner query" mean?
 
     final QueryDefinitionBuilder queryDefBuilder = QueryDefinition.builder(queryId);
     if (nextShuffleSpec != null) {
       final ClusterBy windowClusterBy = nextShuffleSpec.clusterBy();
+      System.out.println("windowClusterBy = " + windowClusterBy);
       originalQuery = (WindowOperatorQuery) originalQuery.withOverriddenContext(ImmutableMap.of(
           MultiStageQueryContext.NEXT_WINDOW_SHUFFLE_COL,
           windowClusterBy
@@ -104,8 +109,7 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
     final int maxRowsMaterialized;
     RowSignature rowSignature = queryToRun.getRowSignature();
     if (originalQuery.context() != null && originalQuery.context().containsKey(MultiStageQueryContext.MAX_ROWS_MATERIALIZED_IN_WINDOW)) {
-      maxRowsMaterialized = (int) originalQuery.context()
-                                                         .get(MultiStageQueryContext.MAX_ROWS_MATERIALIZED_IN_WINDOW);
+      maxRowsMaterialized = (int) originalQuery.context().get(MultiStageQueryContext.MAX_ROWS_MATERIALIZED_IN_WINDOW);
     } else {
       maxRowsMaterialized = Limits.MAX_ROWS_MATERIALIZED_IN_WINDOW;
     }
@@ -114,6 +118,7 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
     if (isEmptyOverFound) {
       // empty over clause found
       // moving everything to a single partition
+      // Question: Why? Is this why we get IndexOutOfBoundsException when mixing empty over() with non empty over()?
       queryDefBuilder.add(
           StageDefinition.builder(firstStageNumber)
                          .inputs(new StageInputSpec(firstStageNumber - 1))
@@ -129,10 +134,10 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
                          ))
       );
     } else {
-      // there are multiple windows present in the query
-      // Create stages for each window in the query
-      // These stages will be serialized
-      // the partition by clause of the next window will be the shuffle key for the previous window
+      // There are multiple windows present in the query.
+      // Create stages for each window in the query.
+      // These stages will be serialized.
+      // The partition by clause of the next window will be the shuffle key for the previous window.
       RowSignature.Builder bob = RowSignature.builder();
       final int numberOfWindows = operatorList.size();
       final int baseSize = rowSignature.size() - numberOfWindows;
@@ -187,7 +192,7 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
    * @param operatorList
    * @return true if the operator List has a partitioning operator with an empty OVER clause, false otherwise
    */
-  private boolean ifEmptyOverPresentInWindowOperstors(
+  private boolean isEmptyOverPresentInWindowOperators(
       WindowOperatorQuery originalQuery,
       List<List<OperatorFactory>> operatorList
   )
@@ -197,10 +202,12 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
     for (OperatorFactory of : operators) {
       operatorFactoryList.add(of);
       if (of instanceof WindowOperatorFactory) {
+        // Question: Why are we adding groups of operators ending with WindowOperatorFactory separately?
         operatorList.add(operatorFactoryList);
         operatorFactoryList = new ArrayList<>();
       } else if (of instanceof NaivePartitioningOperatorFactory) {
         if (((NaivePartitioningOperatorFactory) of).getPartitionColumns().isEmpty()) {
+          // Question: Why are we clearing everything on encountering an empty OVER()?
           operatorList.clear();
           operatorList.add(originalQuery.getOperators());
           return true;
@@ -212,30 +219,35 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
 
   private ShuffleSpec findShuffleSpecForNextWindow(List<OperatorFactory> operatorFactories, int maxWorkerCount)
   {
+    System.out.println("WindowOperatorQueryKit.findShuffleSpecForNextWindow");
     NaivePartitioningOperatorFactory partition = null;
     NaiveSortOperatorFactory sort = null;
-    List<KeyColumn> keyColsOfWindow = new ArrayList<>();
     for (OperatorFactory of : operatorFactories) {
+      System.out.println("of.hashCode() = " + of.hashCode());
       if (of instanceof NaivePartitioningOperatorFactory) {
         partition = (NaivePartitioningOperatorFactory) of;
       } else if (of instanceof NaiveSortOperatorFactory) {
         sort = (NaiveSortOperatorFactory) of;
       }
     }
-    Map<String, ColumnWithDirection.Direction> colMap = new HashMap<>();
+
+    Map<String, ColumnWithDirection.Direction> sortColumnsMap = new HashMap<>();
     if (sort != null) {
       for (ColumnWithDirection sortColumn : sort.getSortColumns()) {
-        colMap.put(sortColumn.getColumn(), sortColumn.getDirection());
+        sortColumnsMap.put(sortColumn.getColumn(), sortColumn.getDirection());
       }
     }
     assert partition != null;
     if (partition.getPartitionColumns().isEmpty()) {
+      // Question: Does this indicate to keep the shuffle spec from previous stage?
       return null;
     }
+
+    List<KeyColumn> keyColsOfWindow = new ArrayList<>();
     for (String partitionColumn : partition.getPartitionColumns()) {
       KeyColumn kc;
-      if (colMap.containsKey(partitionColumn)) {
-        if (colMap.get(partitionColumn) == ColumnWithDirection.Direction.ASC) {
+      if (sortColumnsMap.containsKey(partitionColumn)) {
+        if (sortColumnsMap.get(partitionColumn) == ColumnWithDirection.Direction.ASC) {
           kc = new KeyColumn(partitionColumn, KeyOrder.ASCENDING);
         } else {
           kc = new KeyColumn(partitionColumn, KeyOrder.DESCENDING);
@@ -245,6 +257,8 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
       }
       keyColsOfWindow.add(kc);
     }
+
+    System.out.println("keyColsOfWindow = " + keyColsOfWindow);
     return new HashShuffleSpec(new ClusterBy(keyColsOfWindow, 0), maxWorkerCount);
   }
 }
