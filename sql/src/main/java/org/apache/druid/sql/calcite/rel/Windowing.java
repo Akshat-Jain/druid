@@ -211,6 +211,11 @@ public class Windowing
     }
 
     List<OperatorFactory> ops = computeWindowOperations(partialQuery, sourceRowSignature, windowGroupProcessors);
+    System.out.println("===============");
+    for (OperatorFactory op : ops) {
+      System.out.println("op = " + op);
+    }
+    System.out.println("===============");
 
     // Apply windowProject, if present.
     if (partialQuery.getWindowProject() != null) {

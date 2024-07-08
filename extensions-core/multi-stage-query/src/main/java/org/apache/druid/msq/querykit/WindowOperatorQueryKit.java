@@ -71,12 +71,17 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
     // Later we should also check if these can be parallelized.
     // Check if there is an empty OVER() clause or not.
     List<List<OperatorFactory>> operatorList = new ArrayList<>();
-    System.out.println("originalQuery.getOperators() = " + originalQuery.getOperators());
+    System.out.println("==============\nPrinting originalQuery.getOperators() = ");
+    for (OperatorFactory operator : originalQuery.getOperators()) {
+      System.out.println("operator = " + operator);
+    }
+    System.out.println("==============");
     boolean isEmptyOverFound = isEmptyOverPresentInWindowOperators(originalQuery, operatorList);
     System.out.println("isEmptyOverFound = " + isEmptyOverFound);
     System.out.println("operatorList = " + operatorList);
 
     ShuffleSpec nextShuffleSpec = findShuffleSpecForNextWindow(operatorList.get(0), maxWorkerCount);
+    System.out.println("nextShuffleSpec 1 = " + nextShuffleSpec);
     // add this shuffle spec to the last stage of the inner query
     // Question: What does "inner query" mean?
 
@@ -150,11 +155,13 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
         // find the shuffle spec of the next stage
         // if it is the last stage set the next shuffle spec to single partition
         if (i + 1 == numberOfWindows) {
+          // todo: this can be replaced with ShuffleSpec.Mix directly
           nextShuffleSpec = ShuffleSpecFactories.singlePartition()
                                                 .build(ClusterBy.none(), false);
         } else {
           nextShuffleSpec = findShuffleSpecForNextWindow(operatorList.get(i + 1), maxWorkerCount);
         }
+        System.out.println("nextShuffleSpec 2 = " + nextShuffleSpec);
 
         final RowSignature intermediateSignature = bob.build();
         final RowSignature stageRowSignature;
