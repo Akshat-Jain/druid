@@ -244,8 +244,8 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
         sortColumnsMap.put(sortColumn.getColumn(), sortColumn.getDirection());
       }
     }
-    assert partition != null;
-    if (partition.getPartitionColumns().isEmpty()) {
+//    assert partition != null;
+    if (partition == null || partition.getPartitionColumns().isEmpty()) {
       // Question: Does this indicate to keep the shuffle spec from previous stage?
       return null;
     }

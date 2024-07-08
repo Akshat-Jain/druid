@@ -569,6 +569,14 @@ public class Windowing
       final RowSignature sourceRowSignature
   )
   {
+    // todo: check collation object, it might have different group by
+    // in MSQ, collation is empty list for:
+    // select countryName, cityName, channel,
+    //row_number() over (partition by countryName order by cityName, channel) as c1,
+    //count(channel) over (partition by countryName, cityName order by channel) as c2
+    //from wikipedia
+    //where countryName in ('Austria', 'Republic of Korea')
+    //group by countryName, cityName, channel
     final LinkedHashSet<ColumnWithDirection> retVal = new LinkedHashSet<>();
 
     for (RelFieldCollation fieldCollation : collation.getFieldCollations()) {
