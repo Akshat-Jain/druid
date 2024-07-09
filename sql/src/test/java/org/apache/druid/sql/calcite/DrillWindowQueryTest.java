@@ -179,10 +179,10 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
     {
       try {
         this.filename = filename;
-        this.query = "anything";
-        String resultsStr = "randomresultstring";
-//        this.query = readStringFromResource(".q");
-//        String resultsStr = readStringFromResource(".e");
+//        this.query = "anything";
+//        String resultsStr = "randomresultstring";
+        this.query = readStringFromResource(".q");
+        String resultsStr = readStringFromResource(".e");
         String[] lines = resultsStr.split("\n");
         results = new ArrayList<>();
         if (resultsStr.length() > 0) {
@@ -272,23 +272,23 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
     @Override
     public void verify(String sql, QueryResults queryResults)
     {
-//      List<Object[]> results = queryResults.results;
-//      List<Object[]> expectedResults = parseResults(currentRowSignature, expectedResultsText);
-//      try {
-//        Assert.assertEquals(StringUtils.format("result count: %s", sql), expectedResultsText.size(), results.size());
-//        if (!isOrdered(queryResults)) {
-//          // in case the resultset is not ordered; order via the same comparator before comparison
-//          results.sort(new ArrayRowCmp());
-//          expectedResults.sort(new ArrayRowCmp());
-//        }
-//        assertResultsValid(ResultMatchMode.EQUALS_RELATIVE_1000_ULPS, expectedResults, queryResults);
-//      }
-//      catch (AssertionError e) {
-//        log.info("query: %s", sql);
-//        log.info(resultsToString("Expected", expectedResults));
-//        log.info(resultsToString("Actual", results));
-//        throw new AssertionError(StringUtils.format("%s while processing: %s", e.getMessage(), sql), e);
-//      }
+      List<Object[]> results = queryResults.results;
+      List<Object[]> expectedResults = parseResults(currentRowSignature, expectedResultsText);
+      try {
+        Assert.assertEquals(StringUtils.format("result count: %s", sql), expectedResultsText.size(), results.size());
+        if (!isOrdered(queryResults)) {
+          // in case the resultset is not ordered; order via the same comparator before comparison
+          results.sort(new ArrayRowCmp());
+          expectedResults.sort(new ArrayRowCmp());
+        }
+        assertResultsValid(ResultMatchMode.EQUALS_RELATIVE_1000_ULPS, expectedResults, queryResults);
+      }
+      catch (AssertionError e) {
+        log.info("query: %s", sql);
+        log.info(resultsToString("Expected", expectedResults));
+        log.info(resultsToString("Actual", results));
+        throw new AssertionError(StringUtils.format("%s while processing: %s", e.getMessage(), sql), e);
+      }
     }
 
     private boolean isOrdered(QueryResults queryResults)
@@ -311,6 +311,8 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
 
   private static List<Object[]> parseResults(RowSignature rs, List<String[]> results)
   {
+    System.out.println("rs = " + rs);
+    System.out.println("results = " + results);
     List<Object[]> ret = new ArrayList<>();
     for (String[] row : results) {
       Object[] newRow = new Object[row.length];
@@ -439,7 +441,7 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
                             QueryContexts.ENABLE_DEBUG, true
                         )
           )
-          .sql(query)
+          .sql(testCase.getQueryString())
           .expectedResults(new TextualResultsVerifier(testCase.getExpectedResults(), null))
           .run();
     }

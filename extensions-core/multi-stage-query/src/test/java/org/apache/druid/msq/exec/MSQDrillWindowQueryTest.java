@@ -93,10 +93,10 @@ public class MSQDrillWindowQueryTest extends DrillWindowQueryTest
         .verifyNativeQueries(new VerifyMSQSupportedNativeQueriesPredicate());
   }
 
-  @DrillTest("anything")
-  @Test
-  public void test_wikipedia_1()
-  {
-    windowQueryTest();
-  }
+//  @DrillTest("anything")
+//  @Test
+//  public void test_wikipedia_1()
+//  {
+//    windowQueryTest();
+//  }
 }

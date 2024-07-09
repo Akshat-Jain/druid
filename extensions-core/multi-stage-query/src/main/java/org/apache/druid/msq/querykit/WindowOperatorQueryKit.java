@@ -77,18 +77,18 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
     }
     System.out.println("==============");
     boolean isEmptyOverFound = isEmptyOverPresentInWindowOperators(originalQuery, operatorList);
-    System.out.println("isEmptyOverFound = " + isEmptyOverFound);
-    System.out.println("operatorList = " + operatorList);
+//    System.out.println("isEmptyOverFound = " + isEmptyOverFound);
+//    System.out.println("operatorList = " + operatorList);
 
     ShuffleSpec nextShuffleSpec = findShuffleSpecForNextWindow(operatorList.get(0), maxWorkerCount);
-    System.out.println("nextShuffleSpec 1 = " + nextShuffleSpec);
+//    System.out.println("nextShuffleSpec 1 = " + nextShuffleSpec);
     // add this shuffle spec to the last stage of the inner query
     // Question: What does "inner query" mean?
 
     final QueryDefinitionBuilder queryDefBuilder = QueryDefinition.builder(queryId);
     if (nextShuffleSpec != null) {
       final ClusterBy windowClusterBy = nextShuffleSpec.clusterBy();
-      System.out.println("windowClusterBy = " + windowClusterBy);
+//      System.out.println("windowClusterBy = " + windowClusterBy);
       originalQuery = (WindowOperatorQuery) originalQuery.withOverriddenContext(ImmutableMap.of(
           MultiStageQueryContext.NEXT_WINDOW_SHUFFLE_COL,
           windowClusterBy
@@ -114,8 +114,8 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
     final WindowOperatorQuery queryToRun = (WindowOperatorQuery) originalQuery.withDataSource(dataSourcePlan.getNewDataSource());
     final int maxRowsMaterialized;
     RowSignature rowSignature = queryToRun.getRowSignature();
-    System.out.println("CHECK originalQuery.getRowSignature() = " + originalQuery.getRowSignature());
-    System.out.println("CHECK queryToRun.getRowSignature() = " + rowSignature);
+//    System.out.println("CHECK originalQuery.getRowSignature() = " + originalQuery.getRowSignature());
+//    System.out.println("CHECK queryToRun.getRowSignature() = " + rowSignature);
     if (originalQuery.context() != null && originalQuery.context().containsKey(MultiStageQueryContext.MAX_ROWS_MATERIALIZED_IN_WINDOW)) {
       maxRowsMaterialized = (int) originalQuery.context().get(MultiStageQueryContext.MAX_ROWS_MATERIALIZED_IN_WINDOW);
     } else {
@@ -184,14 +184,14 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
 
       // todo: bob = dataSourcePlan.getSubQueryDefBuilder() -> last stage's row signature
 
-      // try printing nextShuffleSpec.clusterBy().getColumns() and see if it could be used to populate partitionColumnsIndex
-      List<Integer> partitionColumnsIndex = new ArrayList<>();
-//      partitionColumnsIndex.add(0);
+      // try printing nextShuffleSpec.clusterBy().getColumns() and see if it could be used to populate partitionColumnsNames
+      List<String> partitionColumnsNames = new ArrayList<>();
+//      partitionColumnsNames.add(0);
       for (int i = 0; i < numberOfWindows; i++) {
         bob.add(rowSignature.getColumnName(baseSize + i), rowSignature.getColumnType(baseSize + i).get()).build();
         // find the shuffle spec of the next stage
         // if it is the last stage set the next shuffle spec to single partition
-        System.out.println("CHECK bob.build() = " + bob.build());
+//        System.out.println("CHECK bob.build() = " + bob.build());
         if (i + 1 == numberOfWindows) {
           // todo: this can be replaced with ShuffleSpec.Mix directly
           nextShuffleSpec = ShuffleSpecFactories.singlePartition()
@@ -200,27 +200,27 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
           nextShuffleSpec = findShuffleSpecForNextWindow(operatorList.get(i + 1), maxWorkerCount);
         }
 
-        boolean partitionOperatorExists = false;
-        List<Integer> currentPartitionColumns = new ArrayList<>();
-        for (OperatorFactory of : operatorList.get(i)) {
-          if (of instanceof NaivePartitioningOperatorFactory) {
-            for (String s : ((NaivePartitioningOperatorFactory) of).getPartitionColumns()) {
-              currentPartitionColumns.add(bob.build().indexOf(s)); // use bob here
-              partitionOperatorExists = true;
-            }
-          }
-        }
+//        boolean partitionOperatorExists = false;
+//        List<Integer> currentPartitionColumns = new ArrayList<>();
+//        for (OperatorFactory of : operatorList.get(i)) {
+//          if (of instanceof NaivePartitioningOperatorFactory) {
+//            for (String s : ((NaivePartitioningOperatorFactory) of).getPartitionColumns()) {
+//              currentPartitionColumns.add(bob.build().indexOf(s)); // use bob here
+//              partitionOperatorExists = true;
+//            }
+//          }
+//        }
+//
+//        System.out.println("partitionColumnsNames = " + partitionColumnsNames);
+//        System.out.println("partitionOperatorExists = " + partitionOperatorExists);
+//
+//        if (partitionOperatorExists) {
+//          partitionColumnsNames = currentPartitionColumns;
+//        }
 
-        System.out.println("partitionColumnsIndex = " + partitionColumnsIndex);
-        System.out.println("partitionOperatorExists = " + partitionOperatorExists);
+//        System.out.println("partitionColumnsNames = " + partitionColumnsNames);
 
-        if (partitionOperatorExists) {
-          partitionColumnsIndex = currentPartitionColumns;
-        }
-
-        System.out.println("partitionColumnsIndex = " + partitionColumnsIndex);
-
-        System.out.println("nextShuffleSpec 2 = " + nextShuffleSpec);
+//        System.out.println("nextShuffleSpec 2 = " + nextShuffleSpec);
 
         final RowSignature intermediateSignature = bob.build();
         System.out.println("intermediateSignature = " + intermediateSignature);
@@ -232,6 +232,22 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
               intermediateSignature,
               nextShuffleSpec.clusterBy().getColumns()
           );
+        }
+        System.out.println("stageRowSignature = " + stageRowSignature);
+
+        boolean partitionOperatorExists = false;
+        List<String> currentPartitionColumns = new ArrayList<>();
+        for (OperatorFactory of : operatorList.get(i)) {
+          if (of instanceof NaivePartitioningOperatorFactory) {
+            for (String s : ((NaivePartitioningOperatorFactory) of).getPartitionColumns()) {
+              currentPartitionColumns.add(s); // using stageRowSignature here instead of bob
+              partitionOperatorExists = true;
+            }
+          }
+        }
+
+        if (partitionOperatorExists) {
+          partitionColumnsNames = currentPartitionColumns;
         }
 
         // window 1: p1, s1
@@ -251,7 +267,7 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
 //            [1]
 //        WindowOP
 
-        System.out.println("partitionColumnsIndex being passed to WindowOperatorQueryFrameProcessorFactory = " + partitionColumnsIndex);
+        System.out.println("partitionColumnsNames being passed to WindowOperatorQueryFrameProcessorFactory = " + partitionColumnsNames);
 
         queryDefBuilder.add(
             StageDefinition.builder(firstStageNumber + i)
@@ -265,7 +281,7 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
                                stageRowSignature,
                                false,
                                maxRowsMaterialized,
-                               partitionColumnsIndex
+                               partitionColumnsNames
                            ))
         );
       }

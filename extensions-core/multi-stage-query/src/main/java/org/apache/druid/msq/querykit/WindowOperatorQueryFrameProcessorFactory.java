@@ -61,7 +61,7 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
   private final RowSignature stageRowSignature;
   private final boolean isEmptyOver;
   private final int maxRowsMaterializedInWindow;
-  private final List<Integer> partitionColumnsIndex;
+  private final List<String> partitionColumnsIndex;
 
   @JsonCreator
   public WindowOperatorQueryFrameProcessorFactory(
@@ -70,7 +70,7 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
       @JsonProperty("stageRowSignature") RowSignature stageRowSignature,
       @JsonProperty("emptyOver") boolean emptyOver,
       @JsonProperty("maxRowsMaterializedInWindow") int maxRowsMaterializedInWindow,
-      @JsonProperty("partitionColumnsIndex") List<Integer> partitionColumnsIndex
+      @JsonProperty("partitionColumnsIndex") List<String> partitionColumnsIndex
   )
   {
     this.query = Preconditions.checkNotNull(query, "query");
@@ -79,7 +79,6 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
     this.isEmptyOver = emptyOver;
     this.maxRowsMaterializedInWindow = maxRowsMaterializedInWindow;
     this.partitionColumnsIndex = partitionColumnsIndex;
-    System.out.println("partitionColumnsIndex in constructor = " + partitionColumnsIndex);
   }
 
   @JsonProperty("query")
@@ -95,7 +94,7 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
   }
 
   @JsonProperty("partitionColumnsIndex")
-  public List<Integer> getPartitionColumnsIndex()
+  public List<String> getPartitionColumnsIndex()
   {
     return partitionColumnsIndex;
   }
@@ -160,9 +159,7 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
           final OutputChannel outputChannel =
               outputChannels.get(readableInput.getStagePartition().getPartitionNumber());
 
-          System.out.println("At 2: partitionColumnsIndex = " + partitionColumnsIndex);
-
-          System.out.println("stageRowSignature = " + stageRowSignature);
+          System.out.println("WindowOperatorQueryFrameProcessorFactory.makeProcessors partitionColumnsIndex = " + partitionColumnsIndex);
 
           return new WindowOperatorQueryFrameProcessor(
               query,

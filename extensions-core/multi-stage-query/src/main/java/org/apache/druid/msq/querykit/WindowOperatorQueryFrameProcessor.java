@@ -75,7 +75,7 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
   private final WindowOperatorQuery query;
 
   private final List<OperatorFactory> operatorFactoryList;
-  private final List<Integer> partitionColumnsIndex;
+  private final List<String> partitionColumnsIndex;
   private final ObjectMapper jsonMapper;
   private final ArrayList<RowsAndColumns> frameRowsAndCols;
   private final ArrayList<RowsAndColumns> resultRowAndCols;
@@ -104,7 +104,7 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
       final RowSignature rowSignature,
       final boolean isOverEmpty,
       final int maxRowsMaterializedInWindow,
-      final List<Integer> partitionColumnsIndex
+      final List<String> partitionColumnsIndex
   )
   {
     System.out.println("WindowOperatorQueryFrameProcessor.WindowOperatorQueryFrameProcessor: " + inputChannel.getClass());
@@ -552,21 +552,22 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
    * In case the parition indices is empty or null compare entire row
    *
    */
-  private boolean comparePartitionKeys(ResultRow row1, ResultRow row2, List<Integer> partitionIndices)
+  private boolean comparePartitionKeys(ResultRow row1, ResultRow row2, List<String> partitionColumnNames)
   {
     System.out.println("WindowOperatorQueryFrameProcessor.comparePartitionKeys");
     System.out.println("row1 = " + row1);
     System.out.println("row2 = " + row2);
-    if (partitionIndices == null || partitionIndices.isEmpty()) {
+    if (partitionColumnNames == null || partitionColumnNames.isEmpty()) {
       return row1.equals(row2);
     } else {
       int match = 0;
-      for (int i : partitionIndices) {
+      for (String columnName : partitionColumnNames) {
+        int i = frameReader.signature().indexOf(columnName);
         if (Objects.equals(row1.get(i), row2.get(i))) {
           match++;
         }
       }
-      return match == partitionIndices.size();
+      return match == partitionColumnNames.size();
     }
   }
 }
