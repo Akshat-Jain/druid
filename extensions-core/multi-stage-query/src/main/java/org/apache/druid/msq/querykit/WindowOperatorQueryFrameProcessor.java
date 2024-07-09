@@ -49,6 +49,8 @@ import org.apache.druid.query.rowsandcols.ConcatRowsAndColumns;
 import org.apache.druid.query.rowsandcols.LazilyDecoratedRowsAndColumns;
 import org.apache.druid.query.rowsandcols.MapOfColumnsRowsAndColumns;
 import org.apache.druid.query.rowsandcols.RowsAndColumns;
+import org.apache.druid.query.rowsandcols.column.Column;
+import org.apache.druid.query.rowsandcols.column.ObjectArrayColumn;
 import org.apache.druid.query.rowsandcols.concrete.RowBasedFrameRowsAndColumns;
 import org.apache.druid.query.rowsandcols.semantic.ColumnSelectorFactoryMaker;
 import org.apache.druid.segment.ColumnSelectorFactory;
@@ -60,6 +62,7 @@ import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -72,6 +75,7 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
   private final WindowOperatorQuery query;
 
   private final List<OperatorFactory> operatorFactoryList;
+  private final List<Integer> partitionColumnsIndex;
   private final ObjectMapper jsonMapper;
   private final ArrayList<RowsAndColumns> frameRowsAndCols;
   private final ArrayList<RowsAndColumns> resultRowAndCols;
@@ -99,10 +103,12 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
       final List<OperatorFactory> operatorFactoryList,
       final RowSignature rowSignature,
       final boolean isOverEmpty,
-      final int maxRowsMaterializedInWindow
+      final int maxRowsMaterializedInWindow,
+      final List<Integer> partitionColumnsIndex
   )
   {
     System.out.println("WindowOperatorQueryFrameProcessor.WindowOperatorQueryFrameProcessor: " + inputChannel.getClass());
+    System.out.println("frameWriterFactory.signature() = " + frameWriterFactory.signature());
 //    if (inputChannel instanceof CountingReadableFrameChannel) {
 //      System.out.println("((CountingReadableFrameChannel) inputChannel).partitionNumber = "
 //                         + ((CountingReadableFrameChannel) inputChannel).partitionNumber);
@@ -124,6 +130,7 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
     this.partitionColsIndex = new ArrayList<>();
     this.isOverEmpty = isOverEmpty;
     this.maxRowsMaterialized = maxRowsMaterializedInWindow;
+    this.partitionColumnsIndex = partitionColumnsIndex;
   }
 
   @Override
@@ -229,6 +236,7 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
           final Frame frame = inputChannel.read();
           frameCursor = FrameProcessors.makeCursor(frame, frameReader);
           final ColumnSelectorFactory frameColumnSelectorFactory = frameCursor.getColumnSelectorFactory();
+          System.out.println("CHECK frameReader.signature() = " + frameReader.signature());
           partitionColsIndex = findPartitionColumns(frameReader.signature());
           final Supplier<Object>[] fieldSuppliers = new Supplier[frameReader.signature().size()];
           for (int i = 0; i < fieldSuppliers.length; i++) {
@@ -258,6 +266,15 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
                 frameReader.signature()
             );
             System.out.println("Printing at 1: rac = " + rac);
+            for (String columnName : rac.getColumnNames()) {
+              Column column = rac.findColumn(columnName);
+              if (column instanceof ObjectArrayColumn) {
+                System.out.println(columnName + " = " + Arrays.toString(((ObjectArrayColumn) column).getObjects()));
+              }
+              else {
+                System.out.println(columnName + " = " + rac.findColumn(columnName));
+              }
+            }
             runAllOpsOnSingleRac(rac);
             objectsOfASingleRac.clear();
           }
@@ -272,7 +289,8 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
           outputRow = currentRow;
           objectsOfASingleRac.add(currentRow);
           System.out.println("Printing at 2: currentRow = " + currentRow);
-        } else if (comparePartitionKeys(outputRow, currentRow, partitionColsIndex)) {
+//        } else if (comparePartitionKeys(outputRow, currentRow, partitionColsIndex)) {
+        } else if (comparePartitionKeys(outputRow, currentRow, partitionColumnsIndex)) {
           // if they have the same partition key
           // keep adding them after checking
           // guardrails
@@ -502,6 +520,10 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
     frameRowsAndCols.add(ldrc);
   }
 
+  // todo: This method is the root cause. Without a partition operator factory, it doesn't know which column is being partitioned on.
+  /*
+
+   */
   private List<Integer> findPartitionColumns(RowSignature rowSignature)
   {
     List<Integer> indexList = new ArrayList<>();
@@ -513,6 +535,15 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
       }
     }
     return indexList;
+    /**
+     * sort
+     * p
+     * window1
+     * window2
+     *
+     *
+     * window1:
+     */
   }
 
   /**
@@ -523,6 +554,9 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
    */
   private boolean comparePartitionKeys(ResultRow row1, ResultRow row2, List<Integer> partitionIndices)
   {
+    System.out.println("WindowOperatorQueryFrameProcessor.comparePartitionKeys");
+    System.out.println("row1 = " + row1);
+    System.out.println("row2 = " + row2);
     if (partitionIndices == null || partitionIndices.isEmpty()) {
       return row1.equals(row2);
     } else {

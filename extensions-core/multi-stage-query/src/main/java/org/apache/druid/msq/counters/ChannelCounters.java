@@ -60,31 +60,31 @@ public class ChannelCounters implements QueryCounter
 
   public void incrementRowCount(int partition)
   {
-    System.out.println("ChannelCounters.incrementRowCount 1 with partition = " + partition);
+//    System.out.println("ChannelCounters.incrementRowCount 1 with partition = " + partition);
     add(partition, 1, 0, 0, 0);
   }
 
   public void incrementBytes(long bytes)
   {
-    System.out.println("ChannelCounters.incrementRowCount 2 with bytes = " + bytes);
+//    System.out.println("ChannelCounters.incrementRowCount 2 with bytes = " + bytes);
     add(NO_PARTITION, 0, bytes, 0, 0);
   }
 
   public void incrementFileCount()
   {
-    System.out.println("ChannelCounters.incrementFileCount");
+//    System.out.println("ChannelCounters.incrementFileCount");
     add(NO_PARTITION, 0, 0, 0, 1);
   }
 
   public void addFile(final long nRows, final long nBytes)
   {
-    System.out.println("ChannelCounters.addFile with nRows = " + nRows + ", nBytes = " + nBytes);
+//    System.out.println("ChannelCounters.addFile with nRows = " + nRows + ", nBytes = " + nBytes);
     add(NO_PARTITION, nRows, nBytes, 0, 1);
   }
 
   public void addFrame(final int partitionNumber, final Frame frame)
   {
-    System.out.println("ChannelCounters.addFrame with partitionNumber = " + partitionNumber + ", frame.numRows() = " + frame.numRows());
+//    System.out.println("ChannelCounters.addFrame with partitionNumber = " + partitionNumber + ", frame.numRows() = " + frame.numRows());
     add(partitionNumber, frame.numRows(), frame.numBytes(), 1, 0);
   }
 

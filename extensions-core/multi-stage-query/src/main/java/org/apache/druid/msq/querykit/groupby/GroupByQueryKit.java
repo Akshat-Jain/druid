@@ -76,6 +76,8 @@ public class GroupByQueryKit implements QueryKit<GroupByQuery>
       final int minStageNumber
   )
   {
+    System.out.println("GroupByQueryKit.makeQueryDefinition");
+    System.out.println("originalQuery.getResultRowSignature() = " + originalQuery.getResultRowSignature());
     validateQuery(originalQuery);
 
     final QueryDefinitionBuilder queryDefBuilder = QueryDefinition.builder(queryId);
@@ -240,6 +242,12 @@ public class GroupByQueryKit implements QueryKit<GroupByQuery>
       }
     }
 
+    for (StageDefinition stageDefinition : queryDefBuilder.build().getStageDefinitions()) {
+      System.out.println("stageDefinition.getProcessorFactory().getClass() = " + stageDefinition.getProcessorFactory()
+                                                                                                .getClass());
+      System.out.println("stageDefinition.getSignature() = " + stageDefinition.getSignature());
+    }
+    System.out.println("===============");
     return queryDefBuilder.build();
   }
 

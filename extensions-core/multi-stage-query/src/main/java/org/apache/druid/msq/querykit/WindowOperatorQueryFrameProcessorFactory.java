@@ -61,6 +61,7 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
   private final RowSignature stageRowSignature;
   private final boolean isEmptyOver;
   private final int maxRowsMaterializedInWindow;
+  private final List<Integer> partitionColumnsIndex;
 
   @JsonCreator
   public WindowOperatorQueryFrameProcessorFactory(
@@ -68,7 +69,8 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
       @JsonProperty("operatorList") List<OperatorFactory> operatorFactoryList,
       @JsonProperty("stageRowSignature") RowSignature stageRowSignature,
       @JsonProperty("emptyOver") boolean emptyOver,
-      @JsonProperty("maxRowsMaterializedInWindow") int maxRowsMaterializedInWindow
+      @JsonProperty("maxRowsMaterializedInWindow") int maxRowsMaterializedInWindow,
+      @JsonProperty("partitionColumnsIndex") List<Integer> partitionColumnsIndex
   )
   {
     this.query = Preconditions.checkNotNull(query, "query");
@@ -76,6 +78,8 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
     this.stageRowSignature = Preconditions.checkNotNull(stageRowSignature, "stageSignature");
     this.isEmptyOver = emptyOver;
     this.maxRowsMaterializedInWindow = maxRowsMaterializedInWindow;
+    this.partitionColumnsIndex = partitionColumnsIndex;
+    System.out.println("partitionColumnsIndex in constructor = " + partitionColumnsIndex);
   }
 
   @JsonProperty("query")
@@ -88,6 +92,12 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
   public List<OperatorFactory> getOperators()
   {
     return operatorList;
+  }
+
+  @JsonProperty("partitionColumnsIndex")
+  public List<Integer> getPartitionColumnsIndex()
+  {
+    return partitionColumnsIndex;
   }
 
   @JsonProperty("stageRowSignature")
@@ -123,6 +133,7 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
       final boolean removeNullBytes
   )
   {
+    System.out.println("At 1: partitionColumnsIndex = " + partitionColumnsIndex);
     // Expecting a single input slice from some prior stage.
     final StageInputSlice slice = (StageInputSlice) Iterables.getOnlyElement(inputSlices);
     final Int2ObjectSortedMap<OutputChannel> outputChannels = new Int2ObjectAVLTreeMap<>();
@@ -146,10 +157,12 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
 
     final Sequence<FrameProcessor<Object>> processors = readableInputs.map(
         readableInput -> {
-          System.out.println("readableInput.getStagePartition().getPartitionNumber() = "
-                             + readableInput.getStagePartition().getPartitionNumber());
           final OutputChannel outputChannel =
               outputChannels.get(readableInput.getStagePartition().getPartitionNumber());
+
+          System.out.println("At 2: partitionColumnsIndex = " + partitionColumnsIndex);
+
+          System.out.println("stageRowSignature = " + stageRowSignature);
 
           return new WindowOperatorQueryFrameProcessor(
               query,
@@ -161,7 +174,8 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
               operatorList,
               stageRowSignature,
               isEmptyOver,
-              maxRowsMaterializedInWindow
+              maxRowsMaterializedInWindow,
+              partitionColumnsIndex
           );
         }
     );

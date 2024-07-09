@@ -395,6 +395,42 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
                    + "where countryName in ('Guatemala')\n"
                    + "group by countryName, cityName, channel";
 
+
+      String query2 = "select countryName, cityName, channel, \n"
+                     + "row_number() over (partition by countryName order by countryName, cityName, channel) as c1, \n"
+                     + "count(channel) over (partition by countryName order by countryName, cityName, channel) as c2\n"
+//                   + ", row_number() over (partition by countryName order by countryName, cityName, channel) as c3\n"
+                     + "from wikipedia\n"
+                     + "where countryName in ('Guatemala')\n"
+                     + "group by countryName, cityName, channel";
+
+      String queryWithoutSelectProjections = "select "
+                     + "row_number() over (partition by countryName order by countryName, cityName, channel) as c1, \n"
+                     + "count(channel) over (partition by countryName order by countryName, cityName, channel) as c2\n"
+//                   + ", row_number() over (partition by countryName order by countryName, cityName, channel) as c3\n"
+                     + "from wikipedia\n"
+                     + "where countryName in ('Guatemala')\n"
+                     + "group by countryName, cityName, channel";
+
+      String consoleQuery = "select countryName, cityName, channel, \n"
+                            + "row_number() over (partition by cityName order by countryName, cityName, channel) as c1, \n"
+                            + "count(channel) over (partition by cityName order by countryName, cityName, channel) as c2\n"
+                            + "from wikipedia\n"
+                            + "where countryName in ('Republic of Korea')\n"
+                            + "group by countryName, cityName, channel";
+
+      // 1, 1
+      // 2, 1
+      // 3, 1
+
+      String queryToUnderstandGroupByResults = "select countryName, cityName, channel, \n"
+                     + "row_number() over (partition by countryName order by countryName, cityName, channel) as c1, \n"
+                     + "count(channel) over (partition by countryName order by countryName, cityName, channel) as c2\n"
+//                   + ", row_number() over (partition by countryName order by countryName, cityName, channel) as c3\n"
+                     + "from wikipedia\n"
+//                     + "where countryName in ('Guatemala')\n"
+                     + "group by countryName, cityName, channel";
+
       testBuilder()
           .skipVectorize(true)
           .queryContext(ImmutableMap.of(

@@ -47,7 +47,7 @@ public class CountingWritableFrameChannel implements WritableFrameChannel
   @Override
   public void write(FrameWithPartition frame) throws IOException
   {
-    System.out.println("CountingWritableFrameChannel.write: this.hashcode() = " + this.hashCode() + ", frame.partition() = " + frame.partition() + ", partitionNumber = " + partitionNumber);
+//    System.out.println("CountingWritableFrameChannel.write: this.hashcode() = " + this.hashCode() + ", frame.partition() = " + frame.partition() + ", partitionNumber = " + partitionNumber);
     baseChannel.write(frame);
 //    if (frame.partition() == -1) {
 //      channelCounters.addFrame(0, frame.frame());
