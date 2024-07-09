@@ -230,7 +230,7 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
     NaivePartitioningOperatorFactory partition = null;
     NaiveSortOperatorFactory sort = null;
     for (OperatorFactory of : operatorFactories) {
-      System.out.println("of.hashCode() = " + of.hashCode());
+//      System.out.println("of.hashCode() = " + of.hashCode());
       if (of instanceof NaivePartitioningOperatorFactory) {
         partition = (NaivePartitioningOperatorFactory) of;
       } else if (of instanceof NaiveSortOperatorFactory) {

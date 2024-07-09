@@ -38,6 +38,7 @@ import org.apache.druid.sql.calcite.QueryTestBuilder;
 import org.apache.druid.sql.calcite.SqlTestFrameworkConfig;
 import org.apache.druid.sql.calcite.TempDirProducer;
 import org.apache.druid.sql.calcite.run.SqlEngine;
+import org.junit.jupiter.api.Test;
 
 @SqlTestFrameworkConfig.ComponentSupplier(DrillWindowQueryMSQComponentSupplier.class)
 public class MSQDrillWindowQueryTest extends DrillWindowQueryTest
@@ -90,5 +91,12 @@ public class MSQDrillWindowQueryTest extends DrillWindowQueryTest
         .addCustomRunner(new ExtractResultsFactory(() -> (MSQTestOverlordServiceClient) ((MSQTaskSqlEngine) queryFramework().engine()).overlordClient()))
         .skipVectorize(true)
         .verifyNativeQueries(new VerifyMSQSupportedNativeQueriesPredicate());
+  }
+
+  @DrillTest("anything")
+  @Test
+  public void test_wikipedia_1()
+  {
+    windowQueryTest();
   }
 }

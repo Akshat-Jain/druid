@@ -257,6 +257,7 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
                 objectsOfASingleRac,
                 frameReader.signature()
             );
+            System.out.println("Printing at 1: rac = " + rac);
             runAllOpsOnSingleRac(rac);
             objectsOfASingleRac.clear();
           }
@@ -270,6 +271,7 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
         if (outputRow == null) {
           outputRow = currentRow;
           objectsOfASingleRac.add(currentRow);
+          System.out.println("Printing at 2: currentRow = " + currentRow);
         } else if (comparePartitionKeys(outputRow, currentRow, partitionColsIndex)) {
           // if they have the same partition key
           // keep adding them after checking
@@ -281,6 +283,7 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
             ));
           }
           objectsOfASingleRac.add(currentRow);
+          System.out.println("Printing at 3: currentRow = " + currentRow);
 
         } else {
           // key change noted

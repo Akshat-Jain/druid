@@ -1784,6 +1784,7 @@ public class ControllerImpl implements Controller
 
     for (StageDefinition stageDefinition : queryDef.getStageDefinitions()) {
       System.out.println("stageDefinition.getStageNumber() = " + stageDefinition.getStageNumber());
+      System.out.println("stageDefinition.getProcessorFactory() = " + stageDefinition.getProcessorFactory());
       if (stageDefinition.doesShuffle()) {
         System.out.println("stageDefinition.getShuffleSpec() = " + stageDefinition.getShuffleSpec());
       }
