@@ -116,17 +116,9 @@ public class DruidWindowQueryTest extends WindowQueryTestBase
     windowQueryTest();
   }
 
-//  @DruidTest("aggregates/aggOWnFn_16")
-//  @Test
-//  public void test_aggregates_aggOWnFn_16() {
-//    windowQueryTest();
-//  }
-//
-//  @DruidTest("aggregates/aggOWnFn_1")
-//  @Test
-//  public void test_aggregates_aggOWnFn_1() {
-//    windowQueryTest();
-//  }
-
-  // Add more test methods as needed...
+  @DruidTest("aggregates/akshat")
+  @Test
+  public void test_akshat_custom_query() {
+    windowQueryTest();
+  }
 }
