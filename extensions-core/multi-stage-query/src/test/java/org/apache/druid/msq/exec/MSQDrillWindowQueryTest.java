@@ -93,7 +93,7 @@ public class MSQDrillWindowQueryTest extends DrillWindowQueryTest
         .verifyNativeQueries(new VerifyMSQSupportedNativeQueriesPredicate());
   }
 
-//  @DrillTest("anything")
+//  @DrillTest("frameclause/subQueries/frmInSubQry_53")
 //  @Test
 //  public void test_wikipedia_1()
 //  {

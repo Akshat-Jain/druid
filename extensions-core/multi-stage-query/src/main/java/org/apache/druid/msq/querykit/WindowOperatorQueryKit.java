@@ -71,6 +71,7 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
     // Later we should also check if these can be parallelized.
     // Check if there is an empty OVER() clause or not.
     List<List<OperatorFactory>> operatorList = new ArrayList<>();
+    System.out.println("originalQuery.getRowSignature() = " + originalQuery.getRowSignature());
     System.out.println("==============\nPrinting originalQuery.getOperators() = ");
     for (OperatorFactory operator : originalQuery.getOperators()) {
       System.out.println("operator = " + operator);
@@ -78,7 +79,20 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
     System.out.println("==============");
     boolean isEmptyOverFound = isEmptyOverPresentInWindowOperators(originalQuery, operatorList);
 //    System.out.println("isEmptyOverFound = " + isEmptyOverFound);
-//    System.out.println("operatorList = " + operatorList);
+    System.out.println("Printing each index of operatorList");
+    for (List<OperatorFactory> operatorFactories : operatorList) {
+      System.out.println("operatorFactories = " + operatorFactories);
+    }
+
+    System.out.println("Printing output column names for WindowOperatorFactory in the operatorList");
+    for (List<OperatorFactory> operatorFactories : operatorList) {
+      for (OperatorFactory operatorFactory : operatorFactories) {
+        if (operatorFactory instanceof WindowOperatorFactory) {
+          System.out.println("((WindowOperatorFactory) operatorFactory).getProcessor().getColumnNames() = "
+                             + ((WindowOperatorFactory) operatorFactory).getProcessor().getColumnNames());
+        }
+      }
+    }
 
     ShuffleSpec nextShuffleSpec = findShuffleSpecForNextWindow(operatorList.get(0), maxWorkerCount);
 //    System.out.println("nextShuffleSpec 1 = " + nextShuffleSpec);
@@ -114,6 +128,7 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
     final WindowOperatorQuery queryToRun = (WindowOperatorQuery) originalQuery.withDataSource(dataSourcePlan.getNewDataSource());
     final int maxRowsMaterialized;
     RowSignature rowSignature = queryToRun.getRowSignature();
+    System.out.println("rowSignature = " + rowSignature);
 //    System.out.println("CHECK originalQuery.getRowSignature() = " + originalQuery.getRowSignature());
 //    System.out.println("CHECK queryToRun.getRowSignature() = " + rowSignature);
     if (originalQuery.context() != null && originalQuery.context().containsKey(MultiStageQueryContext.MAX_ROWS_MATERIALIZED_IN_WINDOW)) {
@@ -148,8 +163,8 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
       // These stages will be serialized.
       // The partition by clause of the next window will be the shuffle key for the previous window.
       RowSignature.Builder bob = RowSignature.builder();
-      final int numberOfWindows = operatorList.size();
-      final int baseSize = rowSignature.size() - numberOfWindows;
+//      final int numberOfWindows = operatorList.size();
+//      final int baseSize = rowSignature.size() - numberOfWindows;
 //      System.out.println("baseSize = " + baseSize);
 //      for (int i = 0; i < baseSize; i++) {
 //        bob.add(rowSignature.getColumnName(i), rowSignature.getColumnType(i).get());
@@ -177,6 +192,7 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
 //      RowSignature signatureFromInput = finalStageDefinition.getSignature();
       RowSignature signatureFromInput = dataSourcePlan.getSubQueryDefBuilder().get().build().getFinalStageDefinition()
                                                       .getSignature();
+      System.out.println("signatureFromInput = " + signatureFromInput);
 
       for (int i = 0; i < signatureFromInput.getColumnNames().size(); i++) {
         bob.add(signatureFromInput.getColumnName(i), signatureFromInput.getColumnType(i).get());
@@ -187,12 +203,62 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
       // try printing nextShuffleSpec.clusterBy().getColumns() and see if it could be used to populate partitionColumnsNames
       List<String> partitionColumnsNames = new ArrayList<>();
 //      partitionColumnsNames.add(0);
-      for (int i = 0; i < numberOfWindows; i++) {
-        bob.add(rowSignature.getColumnName(baseSize + i), rowSignature.getColumnType(baseSize + i).get()).build();
+
+      /*
+      test_frameclause_subQueries_frmInSubQry_53
+
+            SELECT
+                  *
+            FROM
+            (
+                SELECT
+                    COUNT(c1) OVER W as count_c1 ,
+                    COUNT(c2) OVER W as count_c2 ,
+                    COUNT(c3) OVER W as count_c3 ,
+                    COUNT(c4) OVER W as count_c4 ,
+                    COUNT(c5) OVER W as count_c5 ,
+                    COUNT(c6) OVER W as count_c6 ,
+                    COUNT(c7) OVER W as count_c7 ,
+                    COUNT(c8) OVER W as count_c8 ,
+                    COUNT(c9) OVER W as count_c9
+                FROM "t_alltype.parquet"
+                    WINDOW W AS ( PARTITION BY c8 ORDER BY c1 RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING )
+            ) subQry
+
+            ==============
+            Printing originalQuery.getOperators() =
+            operator = NaiveSortOperatorFactory{sortColumns=[ColumnWithDirection{columnName='c8', direction=ASC}, ColumnWithDirection{columnName='c1', direction=ASC}]}
+            operator = NaivePartitioningOperatorFactory{partitionColumns=[c8]}
+            operator = WindowOperatorFactory{processor=WindowFramedAggregateProcessor{frame=WindowFrame{peerType=ROWS, lowerUnbounded=true, lowerOffset=0, upperUnbounded=true, upperOffset=0, orderBy=null}, aggregations=[FilteredAggregatorFactory{delegate=CountAggregatorFactory{name='w0'}, dimFilter=!c1 IS NULL, name='w0'}, FilteredAggregatorFactory{delegate=CountAggregatorFactory{name='w1'}, dimFilter=!c2 IS NULL, name='w1'}, FilteredAggregatorFactory{delegate=CountAggregatorFactory{name='w2'}, dimFilter=!c3 IS NULL, name='w2'}, FilteredAggregatorFactory{delegate=CountAggregatorFactory{name='w3'}, dimFilter=!c4 IS NULL, name='w3'}, FilteredAggregatorFactory{delegate=CountAggregatorFactory{name='w4'}, dimFilter=!c5 IS NULL, name='w4'}, FilteredAggregatorFactory{delegate=CountAggregatorFactory{name='w5'}, dimFilter=!c6 IS NULL, name='w5'}, FilteredAggregatorFactory{delegate=CountAggregatorFactory{name='w6'}, dimFilter=!c7 IS NULL, name='w6'}, FilteredAggregatorFactory{delegate=CountAggregatorFactory{name='w7'}, dimFilter=!c8 IS NULL, name='w7'}, FilteredAggregatorFactory{delegate=CountAggregatorFactory{name='w8'}, dimFilter=!c9 IS NULL, name='w8'}]}}
+            ==============
+
+            numberOfWindows=1 is wrong, or shouldn't be used to determine which column names to append to the row signature.
+            baseSize is also wrong.
+       */
+
+      for (int i = 0; i < operatorList.size(); i++) {
+        System.out.println("\ni = " + i);
+        System.out.println("bob.build() before adding columns to it = " + bob.build());
+        for (OperatorFactory operatorFactory : operatorList.get(i)) {
+          if (operatorFactory instanceof WindowOperatorFactory) {
+            List<String> columnNames = ((WindowOperatorFactory) operatorFactory).getProcessor().getColumnNames();
+
+            // Need to add column names which are present in columnNames and rowSignature but not in bob
+            for (String columnName : columnNames) {
+              int indexInRowSignature = rowSignature.indexOf(columnName);
+              if (indexInRowSignature != -1 && bob.build().indexOf(columnName) == -1) {
+                bob.add(rowSignature.getColumnName(indexInRowSignature), rowSignature.getColumnType(indexInRowSignature).get()).build();
+              }
+            }
+          }
+        }
+        System.out.println("bob.build() after adding columns to it = " + bob.build());
+
+//        bob.add(rowSignature.getColumnName(baseSize + i), rowSignature.getColumnType(baseSize + i).get()).build();
         // find the shuffle spec of the next stage
         // if it is the last stage set the next shuffle spec to single partition
 //        System.out.println("CHECK bob.build() = " + bob.build());
-        if (i + 1 == numberOfWindows) {
+        if (i + 1 == operatorList.size()) {
           // todo: this can be replaced with ShuffleSpec.Mix directly
           nextShuffleSpec = ShuffleSpecFactories.singlePartition()
                                                 .build(ClusterBy.none(), false);
@@ -340,7 +406,7 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
 
   private ShuffleSpec findShuffleSpecForNextWindow(List<OperatorFactory> operatorFactories, int maxWorkerCount)
   {
-    System.out.println("WindowOperatorQueryKit.findShuffleSpecForNextWindow");
+//    System.out.println("WindowOperatorQueryKit.findShuffleSpecForNextWindow");
     NaivePartitioningOperatorFactory partition = null;
     NaiveSortOperatorFactory sort = null;
     for (OperatorFactory of : operatorFactories) {
@@ -379,7 +445,7 @@ public class WindowOperatorQueryKit implements QueryKit<WindowOperatorQuery>
       keyColsOfWindow.add(kc);
     }
 
-    System.out.println("keyColsOfWindow = " + keyColsOfWindow);
+//    System.out.println("keyColsOfWindow = " + keyColsOfWindow);
     return new HashShuffleSpec(new ClusterBy(keyColsOfWindow, 0), maxWorkerCount);
   }
 }
