@@ -23,8 +23,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import org.apache.druid.client.indexing.NoopOverlordClient;
 import org.apache.druid.guice.DruidInjectorBuilder;
 import org.apache.druid.msq.exec.MSQDrillWindowQueryTest.DrillWindowQueryMSQComponentSupplier;
+import org.apache.druid.msq.guice.MSQSqlModule;
 import org.apache.druid.msq.sql.MSQTaskSqlEngine;
 import org.apache.druid.msq.test.CalciteMSQTestsHelper;
 import org.apache.druid.msq.test.ExtractResultsFactory;
@@ -32,6 +34,7 @@ import org.apache.druid.msq.test.MSQTestOverlordServiceClient;
 import org.apache.druid.msq.test.MSQTestTaskActionClient;
 import org.apache.druid.msq.test.VerifyMSQSupportedNativeQueriesPredicate;
 import org.apache.druid.query.groupby.TestGroupByBuffers;
+import org.apache.druid.rpc.indexing.OverlordClient;
 import org.apache.druid.server.QueryLifecycleFactory;
 import org.apache.druid.sql.calcite.DrillWindowQueryTest;
 import org.apache.druid.sql.calcite.QueryTestBuilder;
@@ -55,6 +58,8 @@ public class MSQDrillWindowQueryTest extends DrillWindowQueryTest
     {
       super.configureGuice(builder);
       builder.addModules(CalciteMSQTestsHelper.fetchModules(tempDirProducer::newTempFolder, TestGroupByBuffers.createDefault()).toArray(new Module[0]));
+      builder.addModule(new MSQSqlModule());
+      builder.addModule(binder -> binder.bind(OverlordClient.class).to(NoopOverlordClient.class));
     }
 
     @Override
@@ -93,10 +98,10 @@ public class MSQDrillWindowQueryTest extends DrillWindowQueryTest
         .verifyNativeQueries(new VerifyMSQSupportedNativeQueriesPredicate());
   }
 
-//  @DrillTest("frameclause/subQueries/frmInSubQry_53")
-//  @Test
-//  public void test_wikipedia_1()
-//  {
-//    windowQueryTest();
-//  }
+  @DrillTest("frameclause/subQueries/frmInSubQry_53")
+  @Test
+  public void test_wikipedia_1()
+  {
+    windowQueryTest();
+  }
 }
