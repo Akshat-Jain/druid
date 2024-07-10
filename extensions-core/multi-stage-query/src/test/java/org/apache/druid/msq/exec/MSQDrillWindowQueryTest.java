@@ -38,7 +38,6 @@ import org.apache.druid.sql.calcite.QueryTestBuilder;
 import org.apache.druid.sql.calcite.SqlTestFrameworkConfig;
 import org.apache.druid.sql.calcite.TempDirProducer;
 import org.apache.druid.sql.calcite.run.SqlEngine;
-import org.junit.jupiter.api.Test;
 
 @SqlTestFrameworkConfig.ComponentSupplier(DrillWindowQueryMSQComponentSupplier.class)
 public class MSQDrillWindowQueryTest extends DrillWindowQueryTest
