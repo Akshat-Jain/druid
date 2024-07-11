@@ -69,10 +69,10 @@ public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
   }
 
   @RegisterExtension
-  public DisableUnless.DisableUnlessRule disableWhenNonSqlCompat = DisableUnless.SQL_COMPATIBLE;
+  private final DisableUnless.DisableUnlessRule disableWhenNonSqlCompat = DisableUnless.SQL_COMPATIBLE;
 
   @RegisterExtension
-  public NotYetSupported.NotYetSupportedProcessor ignoreProcessor = new NotYetSupported.NotYetSupportedProcessor();
+  private final NotYetSupported.NotYetSupportedProcessor ignoreProcessor = new NotYetSupported.NotYetSupportedProcessor();
 
   @RegisterExtension
   protected TestCaseLoaderRule testCaseLoaderRule;
@@ -83,7 +83,7 @@ public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
     protected String filename;
     protected String resourcePath;
 
-    public WindowTestCase(String filename, String resourcePath) {
+    protected WindowTestCase(String filename, String resourcePath) {
       try {
         this.filename = filename;
         this.resourcePath = resourcePath;
@@ -106,12 +106,12 @@ public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
     }
 
     @Nonnull
-    public String getQueryString() {
+    protected String getQueryString() {
       return query;
     }
 
     @Nonnull
-    public List<String[]> getExpectedResults() {
+    protected List<String[]> getExpectedResults() {
       return results;
     }
 
@@ -126,8 +126,8 @@ public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
     }
   }
 
-  public static abstract class TestCaseLoaderRule implements BeforeEachCallback {
-    public WindowTestCase testCase = null;
+  protected static abstract class TestCaseLoaderRule implements BeforeEachCallback {
+    protected WindowTestCase testCase = null;
 
     @Override
     public void beforeEach(ExtensionContext context) {
@@ -163,7 +163,7 @@ public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
     }
   }
 
-  public class TextualResultsVerifier implements ResultsVerifier
+  private class TextualResultsVerifier implements ResultsVerifier
   {
     protected final List<String[]> expectedResultsText;
     @Nullable
@@ -214,7 +214,7 @@ public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
     }
   }
 
-  static class ArrayRowCmp implements Comparator<Object[]>
+  private static class ArrayRowCmp implements Comparator<Object[]>
   {
     @Override
     public int compare(Object[] arg0, Object[] arg1)
@@ -261,7 +261,6 @@ public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
     }
     return ret;
   }
-
 
   private static Object parseLongValue(final String val)
   {

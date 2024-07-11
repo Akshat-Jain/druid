@@ -56,7 +56,7 @@ import static org.junit.Assert.fail;
 public class DrillWindowQueryTest extends WindowQueryTestBase
 {
   @RegisterExtension
-  public DrillTestCaseLoaderRule drillTestCaseRule = new DrillTestCaseLoaderRule();
+  private final DrillTestCaseLoaderRule drillTestCaseRule = new DrillTestCaseLoaderRule();
 
   public DrillWindowQueryTest() {
     this.testCaseLoaderRule = new DrillTestCaseLoaderRule();
@@ -115,7 +115,7 @@ public class DrillWindowQueryTest extends WindowQueryTestBase
     String value();
   }
 
-  static class DrillTestCaseLoaderRule extends TestCaseLoaderRule
+  private static class DrillTestCaseLoaderRule extends TestCaseLoaderRule
   {
     @Override
     protected WindowTestCase loadTestCase(Method method) {

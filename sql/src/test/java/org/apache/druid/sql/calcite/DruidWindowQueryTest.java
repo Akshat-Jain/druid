@@ -22,7 +22,7 @@ import static org.junit.Assert.fail;
 public class DruidWindowQueryTest extends WindowQueryTestBase
 {
   @RegisterExtension
-  public DruidTestCaseLoaderRule druidTestCaseRule = new DruidTestCaseLoaderRule();
+  private final DruidTestCaseLoaderRule druidTestCaseRule = new DruidTestCaseLoaderRule();
 
   public DruidWindowQueryTest() {
     this.testCaseLoaderRule = new DruidTestCaseLoaderRule();
@@ -81,7 +81,7 @@ public class DruidWindowQueryTest extends WindowQueryTestBase
     }
   }
 
-  static class DruidTestCaseLoaderRule extends TestCaseLoaderRule
+  private static class DruidTestCaseLoaderRule extends TestCaseLoaderRule
   {
     @Override
     protected WindowTestCase loadTestCase(Method method) {
