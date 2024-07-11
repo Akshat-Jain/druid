@@ -92,19 +92,39 @@ public class DruidWindowQueryTest extends WindowQueryTestBase
     windowQueryTest();
   }
 
-  /*
+  @DruidTest("shuffle_columns/wikipedia_query_1")
+  @Test
+  public void test_shuffle_columns_wikipedia_query_1() {
+    windowQueryTest();
+  }
 
-  same window across columns
-  - c1 over (xyz), c2 over (xyz)
-  - c1 over w, c2 over w, w (xyz) -- named window
+  @DruidTest("shuffle_columns/wikipedia_query_1_shuffle_1")
+  @Test
+  public void test_shuffle_columns_wikipedia_query_1_shuffle_1() {
+    windowQueryTest();
+  }
 
-  multiple windows
-  - over w1 over w2
+  @DruidTest("shuffle_columns/wikipedia_query_2")
+  @Test
+  public void test_shuffle_columns_wikipedia_query_2() {
+    windowQueryTest();
+  }
 
-  swapped columns
-  - c1, c2
-  - c2, c1
-  - the above 2 with non-window and window columns mixed and swapped
+  @DruidTest("shuffle_columns/wikipedia_query_2_shuffle_1")
+  @Test
+  public void test_shuffle_columns_wikipedia_query_2_shuffle_1() {
+    windowQueryTest();
+  }
 
-   */
+  @DruidTest("partition_by_multiple_columns/wikipedia_query_1")
+  @Test
+  public void test_partition_by_multiple_columns_wikipedia_query_1() {
+    windowQueryTest();
+  }
+
+  @DruidTest("partition_by_multiple_columns/wikipedia_query_2")
+  @Test
+  public void test_partition_by_multiple_columns_wikipedia_query_2() {
+    windowQueryTest();
+  }
 }
