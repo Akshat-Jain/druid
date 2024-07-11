@@ -34,7 +34,6 @@ import org.apache.druid.frame.util.SettableLongVirtualColumn;
 import org.apache.druid.frame.write.FrameWriter;
 import org.apache.druid.frame.write.FrameWriterFactory;
 import org.apache.druid.java.util.common.Unit;
-import org.apache.druid.msq.indexing.CountingReadableFrameChannel;
 import org.apache.druid.msq.querykit.QueryKitUtils;
 import org.apache.druid.query.aggregation.AggregatorFactory;
 import org.apache.druid.query.aggregation.PostAggregator;
@@ -97,11 +96,6 @@ public class GroupByPostShuffleFrameProcessor implements FrameProcessor<Object>
   {
     this.query = query;
     this.inputChannel = inputChannel;
-    System.out.println("GroupByPostShuffleFrameProcessor.GroupByPostShuffleFrameProcessor inputChannel.getClass() = " + inputChannel.getClass());
-    if (inputChannel instanceof CountingReadableFrameChannel) {
-      System.out.println("((CountingReadableFrameChannel) inputChannel).partitionNumber = "
-                         + ((CountingReadableFrameChannel) inputChannel).partitionNumber);
-    }
     this.outputChannel = outputChannel;
     this.frameReader = frameReader;
     this.frameWriterFactory = frameWriterFactory;

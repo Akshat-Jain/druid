@@ -109,16 +109,8 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
   {
     System.out.println("WindowOperatorQueryFrameProcessor.WindowOperatorQueryFrameProcessor: " + inputChannel.getClass());
     System.out.println("frameWriterFactory.signature() = " + frameWriterFactory.signature());
-//    if (inputChannel instanceof CountingReadableFrameChannel) {
-//      System.out.println("((CountingReadableFrameChannel) inputChannel).partitionNumber = "
-//                         + ((CountingReadableFrameChannel) inputChannel).partitionNumber);
-//    }
     this.inputChannel = inputChannel;
     this.outputChannel = outputChannel;
-    if (outputChannel instanceof CountingWritableFrameChannel) {
-      System.out.println("((CountingWritableFrameChannel) outputChannel).partitionNumber = "
-                         + ((CountingWritableFrameChannel) outputChannel).partitionNumber);
-    }
     this.frameWriterFactory = frameWriterFactory;
     this.operatorFactoryList = operatorFactoryList;
     this.jsonMapper = jsonMapper;

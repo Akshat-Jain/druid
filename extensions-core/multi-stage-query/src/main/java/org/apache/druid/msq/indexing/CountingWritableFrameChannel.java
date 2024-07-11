@@ -31,7 +31,7 @@ public class CountingWritableFrameChannel implements WritableFrameChannel
 {
   private final WritableFrameChannel baseChannel;
   private final ChannelCounters channelCounters;
-  public final Integer partitionNumber;
+  private final Integer partitionNumber;
 
   public CountingWritableFrameChannel(
       final WritableFrameChannel baseChannel,
@@ -47,14 +47,7 @@ public class CountingWritableFrameChannel implements WritableFrameChannel
   @Override
   public void write(FrameWithPartition frame) throws IOException
   {
-//    System.out.println("CountingWritableFrameChannel.write: this.hashcode() = " + this.hashCode() + ", frame.partition() = " + frame.partition() + ", partitionNumber = " + partitionNumber);
     baseChannel.write(frame);
-//    if (frame.partition() == -1) {
-//      channelCounters.addFrame(0, frame.frame());
-//    }
-//    else {
-//      channelCounters.addFrame(partitionNumber == null ? frame.partition() : partitionNumber, frame.frame());
-//    }
     channelCounters.addFrame(partitionNumber == null ? frame.partition() : partitionNumber, frame.frame());
   }
 
