@@ -19,25 +19,15 @@
 
 package org.apache.druid.sql.calcite;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.druid.sql.calcite.NotYetSupported.Modes;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import java.io.File;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * These test cases are borrowed from the drill-test-framework at
@@ -67,44 +57,6 @@ public class DrillWindowQueryTest extends WindowQueryTestBase
     return drillTestCaseRule.testCase;
   }
 
-  @Test
-  public void ensureAllDeclared() throws Exception
-  {
-    final URL windowQueriesUrl = ClassLoader.getSystemResource("drill/window/queries/");
-    Path windowFolder = new File(windowQueriesUrl.toURI()).toPath();
-
-    Set<String> allCases = FileUtils
-        .streamFiles(windowFolder.toFile(), true, "q")
-        .map(file -> {
-          return windowFolder.relativize(file.toPath()).toString();
-        })
-        .sorted().collect(Collectors.toSet());
-
-    for (Method method : DrillWindowQueryTest.class.getDeclaredMethods()) {
-      DrillTest ann = method.getAnnotation(DrillTest.class);
-      if (method.getAnnotation(Test.class) == null || ann == null) {
-        continue;
-      }
-      if (allCases.remove(ann.value() + ".q")) {
-        continue;
-      }
-      fail(String.format(Locale.ENGLISH, "Testcase [%s] references invalid file [%s].", method.getName(), ann.value()));
-    }
-
-    for (String string : allCases) {
-      string = string.substring(0, string.lastIndexOf('.'));
-      System.out.printf(Locale.ENGLISH, "@%s( \"%s\" )\n"
-          + "@Test\n"
-          + "public void test_%s() {\n"
-          + "    windowQueryTest();\n"
-          + "}\n",
-          DrillTest.class.getSimpleName(),
-          string,
-          string.replace('/', '_'));
-    }
-    assertEquals("Found some non-declared testcases; please add the new testcases printed to the console!", 0, allCases.size());
-  }
-
   @Retention(RetentionPolicy.RUNTIME)
   @Target({ElementType.METHOD})
   public @interface DrillTest
@@ -130,6 +82,11 @@ public class DrillWindowQueryTest extends WindowQueryTestBase
     }
   }
 
+  @Test
+  public void ensureAllDeclared() throws Exception
+  {
+    super.ensureAllDeclared("drill/window/queries/", DrillWindowQueryTest.class, DrillTest.class);
+  }
 
   // testcases_start
   @DrillTest("aggregates/aggOWnFn_11")

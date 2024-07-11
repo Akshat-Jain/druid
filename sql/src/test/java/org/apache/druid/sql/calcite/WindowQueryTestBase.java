@@ -25,6 +25,7 @@ import com.google.common.io.ByteStreams;
 import com.google.inject.Injector;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql2rel.SqlToRelConverter;
+import org.apache.commons.io.FileUtils;
 import org.apache.druid.common.config.NullHandling;
 import org.apache.druid.java.util.common.Numbers;
 import org.apache.druid.java.util.common.StringUtils;
@@ -44,6 +45,7 @@ import org.joda.time.LocalTime;
 import org.junit.Assert;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import javax.annotation.Nonnull;
@@ -51,15 +53,22 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 @SqlTestFrameworkConfig.ComponentSupplier(WindowQueryTestBase.DrillComponentSupplier.class)
 public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
@@ -91,7 +100,7 @@ public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
         String resultsStr = readStringFromResource(".e");
         String[] lines = resultsStr.split("\n");
         results = new ArrayList<>();
-        if (resultsStr.length() > 0) {
+        if (!resultsStr.isEmpty()) {
           for (String string : lines) {
             String[] cols = string.split("\t");
             results.add(cols);
@@ -326,4 +335,40 @@ public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
   }
 
   protected abstract WindowTestCase getCurrentTestCase();
+
+  protected void ensureAllDeclared(String resourcePath, Class<? extends WindowQueryTestBase> testClass, Class<? extends Annotation> annotationClass) throws Exception {
+    final URL windowQueriesUrl = ClassLoader.getSystemResource(resourcePath);
+    Path windowFolder = new File(windowQueriesUrl.toURI()).toPath();
+
+    Set<String> allCases = FileUtils
+        .streamFiles(windowFolder.toFile(), true, "q")
+        .map(file -> windowFolder.relativize(file.toPath()).toString())
+        .sorted()
+        .collect(Collectors.toSet());
+
+    for (Method method : testClass.getDeclaredMethods()) {
+      Annotation ann = method.getAnnotation(annotationClass);
+      if (method.getAnnotation(Test.class) == null || ann == null) {
+        continue;
+      }
+      String value = (String) annotationClass.getMethod("value").invoke(ann);
+      if (allCases.remove(value + ".q")) {
+        continue;
+      }
+      fail(String.format(Locale.ENGLISH, "Testcase [%s] references invalid file [%s].", method.getName(), value));
+    }
+
+    for (String string : allCases) {
+      string = string.substring(0, string.lastIndexOf('.'));
+      System.out.printf(Locale.ENGLISH, "@%s(\"%s\")\n"
+                                        + "@Test\n"
+                                        + "public void test_%s() {\n"
+                                        + "    windowQueryTest();\n"
+                                        + "}\n",
+                        annotationClass.getSimpleName(),
+                        string,
+                        string.replace('/', '_'));
+    }
+    assertEquals("Found some non-declared testcases; please add the new testcases printed to the console!", 0, allCases.size());
+  }
 }

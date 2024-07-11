@@ -1,23 +1,32 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.apache.druid.sql.calcite;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import java.io.File;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class DruidWindowQueryTest extends WindowQueryTestBase
 {
@@ -31,42 +40,6 @@ public class DruidWindowQueryTest extends WindowQueryTestBase
   @Override
   protected WindowTestCase getCurrentTestCase() {
     return druidTestCaseRule.testCase;
-  }
-
-  @Test
-  public void ensureAllDeclared() throws Exception {
-    final URL windowQueriesUrl = ClassLoader.getSystemResource("druid/window/");
-    Path windowFolder = new File(windowQueriesUrl.toURI()).toPath();
-
-    Set<String> allCases = FileUtils
-        .streamFiles(windowFolder.toFile(), true, "q")
-        .map(file -> windowFolder.relativize(file.toPath()).toString())
-        .sorted()
-        .collect(Collectors.toSet());
-
-    for (Method method : DruidWindowQueryTest.class.getDeclaredMethods()) {
-      DruidTest ann = method.getAnnotation(DruidTest.class);
-      if (method.getAnnotation(Test.class) == null || ann == null) {
-        continue;
-      }
-      if (allCases.remove(ann.value() + ".q")) {
-        continue;
-      }
-      fail(String.format(Locale.ENGLISH, "Testcase [%s] references invalid file [%s].", method.getName(), ann.value()));
-    }
-
-    for (String string : allCases) {
-      string = string.substring(0, string.lastIndexOf('.'));
-      System.out.printf(Locale.ENGLISH, "@%s(\"%s\")\n"
-                                        + "@Test\n"
-                                        + "public void test_%s() {\n"
-                                        + "    windowQueryTest();\n"
-                                        + "}\n",
-                        DruidTest.class.getSimpleName(),
-                        string,
-                        string.replace('/', '_'));
-    }
-    assertEquals("Found some non-declared testcases; please add the new testcases printed to the console!", 0, allCases.size());
   }
 
   @Retention(RetentionPolicy.RUNTIME)
@@ -88,6 +61,11 @@ public class DruidWindowQueryTest extends WindowQueryTestBase
       DruidTest annotation = method.getAnnotation(DruidTest.class);
       return (annotation == null) ? null : new DruidTestCase(annotation.value());
     }
+  }
+
+  @Test
+  public void ensureAllDeclared() throws Exception {
+    super.ensureAllDeclared("druid/window/", DruidWindowQueryTest.class, DruidTest.class);
   }
 
   @DruidTest("same_window_across_columns/wikipedia_query_1")
