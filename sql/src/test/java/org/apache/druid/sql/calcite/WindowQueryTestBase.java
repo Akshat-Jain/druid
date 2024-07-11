@@ -25,6 +25,7 @@ import com.google.common.io.ByteStreams;
 import com.google.inject.Injector;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql2rel.SqlToRelConverter;
+import org.apache.druid.common.config.NullHandling;
 import org.apache.druid.java.util.common.Numbers;
 import org.apache.druid.java.util.common.StringUtils;
 import org.apache.druid.java.util.common.parsers.TimestampParser;
@@ -41,12 +42,16 @@ import org.apache.druid.sql.calcite.util.TestDataBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 import org.junit.Assert;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,7 +64,20 @@ import static org.junit.Assert.assertNull;
 @SqlTestFrameworkConfig.ComponentSupplier(WindowQueryTestBase.DrillComponentSupplier.class)
 public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
 {
-  static class WindowTestCase {
+  static {
+    NullHandling.initializeForTests();
+  }
+
+  @RegisterExtension
+  public DisableUnless.DisableUnlessRule disableWhenNonSqlCompat = DisableUnless.SQL_COMPATIBLE;
+
+  @RegisterExtension
+  public NotYetSupported.NotYetSupportedProcessor ignoreProcessor = new NotYetSupported.NotYetSupportedProcessor();
+
+  @RegisterExtension
+  protected TestCaseLoaderRule testCaseLoaderRule;
+
+  protected static class WindowTestCase {
     protected final String query;
     protected final List<String[]> results;
     protected String filename;
@@ -106,6 +124,18 @@ public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
       }
       return query;
     }
+  }
+
+  public static abstract class TestCaseLoaderRule implements BeforeEachCallback {
+    public WindowTestCase testCase = null;
+
+    @Override
+    public void beforeEach(ExtensionContext context) {
+      Method method = context.getTestMethod().get();
+      testCase = loadTestCase(method);
+    }
+
+    protected abstract WindowTestCase loadTestCase(Method method);
   }
 
   protected static class DrillComponentSupplier extends SqlTestFramework.StandardComponentSupplier
@@ -266,7 +296,7 @@ public abstract class WindowQueryTestBase extends BaseCalciteQueryTest
     throw new RuntimeException("Can't parse input!");
   }
 
-  public void windowQueryTest()
+  protected void windowQueryTest()
   {
     WindowTestCase testCase = getCurrentTestCase();
     Thread thread = null;

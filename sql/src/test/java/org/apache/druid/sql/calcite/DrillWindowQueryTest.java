@@ -20,13 +20,8 @@
 package org.apache.druid.sql.calcite;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.druid.common.config.NullHandling;
-import org.apache.druid.sql.calcite.DisableUnless.DisableUnlessRule;
 import org.apache.druid.sql.calcite.NotYetSupported.Modes;
-import org.apache.druid.sql.calcite.NotYetSupported.NotYetSupportedProcessor;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.io.File;
@@ -60,18 +55,12 @@ import static org.junit.Assert.fail;
  */
 public class DrillWindowQueryTest extends WindowQueryTestBase
 {
-  static {
-    NullHandling.initializeForTests();
-  }
-
-  @RegisterExtension
-  public DisableUnlessRule disableWhenNonSqlCompat = DisableUnless.SQL_COMPATIBLE;
-
-  @RegisterExtension
-  public NotYetSupportedProcessor ignoreProcessor = new NotYetSupportedProcessor();
-
   @RegisterExtension
   public DrillTestCaseLoaderRule drillTestCaseRule = new DrillTestCaseLoaderRule();
+
+  public DrillWindowQueryTest() {
+    this.testCaseLoaderRule = new DrillTestCaseLoaderRule();
+  }
 
   @Override
   protected WindowTestCase getCurrentTestCase() {
@@ -126,16 +115,12 @@ public class DrillWindowQueryTest extends WindowQueryTestBase
     String value();
   }
 
-  static class DrillTestCaseLoaderRule implements BeforeEachCallback
+  static class DrillTestCaseLoaderRule extends TestCaseLoaderRule
   {
-    public DrillTestCase testCase = null;
-
     @Override
-    public void beforeEach(ExtensionContext context)
-    {
-      Method method = context.getTestMethod().get();
+    protected WindowTestCase loadTestCase(Method method) {
       DrillTest annotation = method.getAnnotation(DrillTest.class);
-      testCase = (annotation == null) ? null : new DrillTestCase(annotation.value());
+      return (annotation == null) ? null : new DrillTestCase(annotation.value());
     }
   }
 

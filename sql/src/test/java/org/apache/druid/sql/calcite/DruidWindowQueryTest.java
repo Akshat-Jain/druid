@@ -1,12 +1,7 @@
 package org.apache.druid.sql.calcite;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.druid.common.config.NullHandling;
-import org.apache.druid.sql.calcite.DisableUnless.DisableUnlessRule;
-import org.apache.druid.sql.calcite.NotYetSupported.NotYetSupportedProcessor;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.io.File;
@@ -26,18 +21,12 @@ import static org.junit.Assert.fail;
 
 public class DruidWindowQueryTest extends WindowQueryTestBase
 {
-  static {
-    NullHandling.initializeForTests();
-  }
-
-  @RegisterExtension
-  public DisableUnlessRule disableWhenNonSqlCompat = DisableUnless.SQL_COMPATIBLE;
-
-  @RegisterExtension
-  public NotYetSupportedProcessor ignoreProcessor = new NotYetSupportedProcessor();
-
   @RegisterExtension
   public DruidTestCaseLoaderRule druidTestCaseRule = new DruidTestCaseLoaderRule();
+
+  public DruidWindowQueryTest() {
+    this.testCaseLoaderRule = new DruidTestCaseLoaderRule();
+  }
 
   @Override
   protected WindowTestCase getCurrentTestCase() {
@@ -92,14 +81,12 @@ public class DruidWindowQueryTest extends WindowQueryTestBase
     }
   }
 
-  static class DruidTestCaseLoaderRule implements BeforeEachCallback {
-    public DruidTestCase testCase = null;
-
+  static class DruidTestCaseLoaderRule extends TestCaseLoaderRule
+  {
     @Override
-    public void beforeEach(ExtensionContext context) {
-      Method method = context.getTestMethod().get();
+    protected WindowTestCase loadTestCase(Method method) {
       DruidTest annotation = method.getAnnotation(DruidTest.class);
-      testCase = (annotation == null) ? null : new DruidTestCase(annotation.value());
+      return (annotation == null) ? null : new DruidTestCase(annotation.value());
     }
   }
 
