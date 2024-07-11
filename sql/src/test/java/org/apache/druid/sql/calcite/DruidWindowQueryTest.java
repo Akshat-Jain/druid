@@ -46,7 +46,7 @@ public class DruidWindowQueryTest extends WindowQueryTestBase
 
   @Test
   public void ensureAllDeclared() throws Exception {
-    final URL windowQueriesUrl = ClassLoader.getSystemResource("druid/window/queries/");
+    final URL windowQueriesUrl = ClassLoader.getSystemResource("druid/window/");
     Path windowFolder = new File(windowQueriesUrl.toURI()).toPath();
 
     Set<String> allCases = FileUtils
@@ -88,7 +88,7 @@ public class DruidWindowQueryTest extends WindowQueryTestBase
 
   static class DruidTestCase extends WindowTestCase {
     public DruidTestCase(String filename) {
-      super(filename, "druid/window/queries/");
+      super(filename, "druid/window/");
     }
   }
 
@@ -103,22 +103,25 @@ public class DruidWindowQueryTest extends WindowQueryTestBase
     }
   }
 
-  // Test methods
-  @DruidTest("aggregates/aggOWnFn_11")
+  @DruidTest("same_window_across_columns/wikipedia_query_1")
   @Test
-  public void test_aggregates_aggOWnFn_11() {
+  public void test_wikipedia_query_1() {
     windowQueryTest();
   }
 
-  @DruidTest("aggregates/aggOWnFn_13")
-  @Test
-  public void test_aggregates_aggOWnFn_13() {
-    windowQueryTest();
-  }
+  /*
 
-  @DruidTest("aggregates/akshat")
-  @Test
-  public void test_akshat_custom_query() {
-    windowQueryTest();
-  }
+  same window across columns
+  - c1 over (xyz), c2 over (xyz)
+  - c1 over w, c2 over w, w (xyz)
+
+  multiple windows
+  - over w1 over w2
+
+  swapped columns
+  - c1, c2
+  - c2, c1
+  - the above 2 with non-window and window columns mixed and swapped
+
+   */
 }
