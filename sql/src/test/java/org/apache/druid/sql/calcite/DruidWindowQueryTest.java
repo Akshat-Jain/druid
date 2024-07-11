@@ -105,7 +105,25 @@ public class DruidWindowQueryTest extends WindowQueryTestBase
 
   @DruidTest("same_window_across_columns/wikipedia_query_1")
   @Test
-  public void test_wikipedia_query_1() {
+  public void test_same_window_wikipedia_query_1() {
+    windowQueryTest();
+  }
+
+  @DruidTest("same_window_across_columns/wikipedia_query_1_named_window")
+  @Test
+  public void test_same_window_wikipedia_query_1_named_window() {
+    windowQueryTest();
+  }
+
+  @DruidTest("multiple_windows/wikipedia_query_1")
+  @Test
+  public void test_multiple_windows_wikipedia_query_1() {
+    windowQueryTest();
+  }
+
+  @DruidTest("multiple_windows/wikipedia_query_1_named_windows")
+  @Test
+  public void test_multiple_windows_wikipedia_query_1_named_windows() {
     windowQueryTest();
   }
 
@@ -113,7 +131,7 @@ public class DruidWindowQueryTest extends WindowQueryTestBase
 
   same window across columns
   - c1 over (xyz), c2 over (xyz)
-  - c1 over w, c2 over w, w (xyz)
+  - c1 over w, c2 over w, w (xyz) -- named window
 
   multiple windows
   - over w1 over w2
