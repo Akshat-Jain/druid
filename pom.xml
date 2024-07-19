@@ -1458,6 +1458,10 @@
                             <version>4.10.0</version>
                         </eclipse>
                         <removeUnusedImports/>
+                        <licenseHeader>
+                            <file>codestyle/LICENSE.txt</file>
+<!--                            <content>/* (C)$YEAR */</content>  &lt;!&ndash; or <file>${project.basedir}/license-header</file> &ndash;&gt;-->
+                        </licenseHeader>
                     </java>
                 </configuration>
                 <executions>
