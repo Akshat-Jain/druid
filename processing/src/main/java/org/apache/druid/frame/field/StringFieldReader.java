@@ -41,6 +41,7 @@ import org.apache.druid.segment.data.RangeIndexedInts;
 
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -295,6 +296,7 @@ public class StringFieldReader implements FieldReader
 
     private void updateCurrentUtf8Strings(final long fieldPosition)
     {
+      System.out.println("Selector.updateCurrentUtf8Strings");
       currentUtf8StringsIsNull = false;
       currentUtf8Strings.clear();
 
@@ -342,6 +344,7 @@ public class StringFieldReader implements FieldReader
                   currentUtf8Strings.add(null);
                 } else {
                   final ByteBuffer buf = FrameReaderUtils.readByteBuffer(memory, position, len);
+                  System.out.println("Added buf to currentUtf8Strings: " + StandardCharsets.UTF_8.decode(buf));
                   currentUtf8Strings.add(buf);
                 }
 

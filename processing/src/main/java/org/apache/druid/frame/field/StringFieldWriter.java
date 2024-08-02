@@ -25,6 +25,8 @@ import org.apache.druid.segment.DimensionSelector;
 
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -68,6 +70,11 @@ public class StringFieldWriter implements FieldWriter
   {
     // todo: check string value here
     final List<ByteBuffer> byteBuffers = FrameWriterUtils.getUtf8ByteBuffersFromStringSelector(selector, true);
+    System.out.println("StringFieldWriter.writeTo, byteBuffers.size() = " + byteBuffers.size());
+    for (ByteBuffer byteBuffer : byteBuffers) {
+      CharBuffer decodedByteBuffer = StandardCharsets.UTF_8.decode(byteBuffer);
+      System.out.println("decodedByteBuffer.length() = " + decodedByteBuffer.length() + ", decodedByteBuffer = " + decodedByteBuffer);
+    }
     return writeUtf8ByteBuffers(memory, position, maxSize, byteBuffers, removeNullBytes);
   }
 

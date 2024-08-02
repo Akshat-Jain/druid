@@ -117,6 +117,7 @@ public class FrameWriterUtils
     } else {
       // If !multivalue, always return exactly one buffer.
       if (size == 0) {
+        System.out.println("FrameWriterUtils.getUtf8ByteBuffersFromStringSelector: Found 0 sized row");
         return Collections.singletonList(ByteBuffer.wrap(NULL_STRING_MARKER_ARRAY));
       } else if (size == 1) {
         return Collections.singletonList(getUtf8ByteBufferFromStringSelector(selector, row.get(0)));

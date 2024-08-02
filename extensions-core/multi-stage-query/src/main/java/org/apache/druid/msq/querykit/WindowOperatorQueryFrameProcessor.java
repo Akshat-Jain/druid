@@ -415,6 +415,8 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
       final ColumnSelectorFactoryMaker csfm = ColumnSelectorFactoryMaker.fromRAC(rac);
       final ColumnSelectorFactory frameWriterColumnSelectorFactory = csfm.make(rowId);
       frameWriter = frameWriterFactory.newFrameWriter(frameWriterColumnSelectorFactory);
+      System.out.println("WindowOperatorQueryFrameProcessor.createFrameWriterIfNeeded frameWriterColumnSelectorFactory.getClass() = "
+                         + frameWriterColumnSelectorFactory.getClass());
       currentAllocatorCapacity = frameWriterFactory.allocatorCapacity();
     }
   }
