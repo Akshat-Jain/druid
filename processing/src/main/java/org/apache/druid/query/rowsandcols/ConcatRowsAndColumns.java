@@ -255,4 +255,16 @@ public class ConcatRowsAndColumns implements RowsAndColumns
       return null;
     }
   }
+
+  @Override
+  public String toString()
+  {
+    return "ConcatRowsAndColumns{" +
+           "racBuffer.getClass()=" + racBuffer.getClass() +
+           ", racBuffer=" + racBuffer +
+           ", columnCache=" + columnCache +
+           ", rowPointers=" + Arrays.toString(rowPointers) +
+           ", numRows=" + numRows +
+           '}';
+  }
 }

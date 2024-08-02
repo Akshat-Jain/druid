@@ -340,8 +340,10 @@ public class FrameWriterUtils
       final int dictionaryId
   )
   {
+    // todo look into this method
     if (selector.supportsLookupNameUtf8()) {
       final ByteBuffer buf = selector.lookupNameUtf8(dictionaryId);
+      // the above might have \0
 
       if (buf == null || (NullHandling.replaceWithDefault() && buf.remaining() == 0)) {
         return ByteBuffer.wrap(NULL_STRING_MARKER_ARRAY);

@@ -259,6 +259,8 @@ public class LazilyDecoratedRowsAndColumns implements RowsAndColumns
       final RowSignature signature = sigBob.build();
       siggy.set(signature);
 
+      // todo: compare column selectors
+
       List<KeyColumn> sortColumns = new ArrayList<>();
       if (ordering != null) {
         for (ColumnWithDirection columnWithDirection : ordering) {

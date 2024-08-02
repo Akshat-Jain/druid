@@ -66,6 +66,7 @@ public class StringFieldWriter implements FieldWriter
   @Override
   public long writeTo(final WritableMemory memory, final long position, final long maxSize)
   {
+    // todo: check string value here
     final List<ByteBuffer> byteBuffers = FrameWriterUtils.getUtf8ByteBuffersFromStringSelector(selector, true);
     return writeUtf8ByteBuffers(memory, position, maxSize, byteBuffers, removeNullBytes);
   }

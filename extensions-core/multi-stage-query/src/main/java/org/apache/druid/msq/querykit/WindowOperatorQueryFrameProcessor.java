@@ -119,6 +119,14 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
     for (int i = 0; i < frameReader.signature().size(); i++) {
       typeStrategies[i] = frameReader.signature().getColumnType(i).get().getNullableStrategy();
     }
+
+    System.out.println("\nWindowOperatorQueryFrameProcessor.WindowOperatorQueryFrameProcessor");
+    System.out.println("frameReader.signature() = " + frameReader.signature());
+    System.out.println("inputChannel.getClass() = " + inputChannel.getClass());
+    System.out.println("outputChannel.getClass() = " + outputChannel.getClass());
+    System.out.println("frameWriterFactory.getClass() = " + frameWriterFactory.getClass());
+    System.out.println("frameWriter.getClass() = " + (frameWriter == null ? "frameWriter is null" : frameWriter.getClass()));
+    System.out.println();
   }
 
   @Override
@@ -193,7 +201,9 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
      *     We might think to reimplement them in the MSQ way so that we do not have to materialize so much data
      */
 
-    if (partitionColumnNames.isEmpty()) {
+    boolean x = partitionColumnNames.isEmpty();
+
+    if (x) {
       // If we do not have any OVER() clause with PARTITION BY for this stage.
       // Bring all data to a single executor for processing.
       // Convert each frame to RAC.
@@ -237,7 +247,7 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
             return row;
           };
         } else if (inputChannel.isFinished()) {
-          // reaached end of channel
+          // reached end of channel
           // if there is data remaining
           // write it into a rac
           // and run operators on it
@@ -416,6 +426,13 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
    */
   public void writeRacToFrame(RowsAndColumns rac, AtomicInteger rowId) throws IOException
   {
+    System.out.println("\nWindowOperatorQueryFrameProcessor.writeRacToFrame");
+    System.out.println("rac.getClass() = " + rac.getClass());
+    System.out.println("rac = " + rac);
+    System.out.println("rac.getColumnNames() = " + rac.getColumnNames());
+    if (rac instanceof ConcatRowsAndColumns) {
+      ConcatRowsAndColumns x = (ConcatRowsAndColumns) rac;
+    }
     final int numRows = rac.numRows();
     rowId.set(0);
     while (rowId.get() < numRows) {
