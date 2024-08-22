@@ -108,6 +108,8 @@ public class WindowOperatorQueryFrameProcessor implements FrameProcessor<Object>
       final List<String> partitionColumnNames
   )
   {
+    System.out.println("WindowOperatorQueryFrameProcessor.WindowOperatorQueryFrameProcessor");
+    System.out.println("operatorFactoryList = " + operatorFactoryList);
     this.inputChannel = inputChannel;
     this.outputChannel = outputChannel;
     this.frameWriterFactory = frameWriterFactory;

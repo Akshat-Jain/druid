@@ -42,6 +42,7 @@ import org.apache.druid.sql.calcite.NotYetSupported.Modes;
 import org.apache.druid.sql.calcite.NotYetSupported.NotYetSupportedProcessor;
 import org.apache.druid.sql.calcite.QueryTestRunner.QueryResults;
 import org.apache.druid.sql.calcite.planner.PlannerCaptureHook;
+import org.apache.druid.sql.calcite.planner.PlannerConfig;
 import org.apache.druid.sql.calcite.planner.PlannerContext;
 import org.apache.druid.sql.calcite.util.SqlTestFramework.StandardComponentSupplier;
 import org.apache.druid.sql.calcite.util.TestDataBuilder;
@@ -74,6 +75,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.apache.druid.sql.calcite.planner.PlannerConfig.CTX_NATIVE_QUERY_SQL_PLANNING_MODE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -390,7 +392,8 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
           .queryContext(ImmutableMap.of(
                             PlannerContext.CTX_ENABLE_WINDOW_FNS, true,
                             PlannerCaptureHook.NEED_CAPTURE_HOOK, true,
-                            QueryContexts.ENABLE_DEBUG, true
+                            QueryContexts.ENABLE_DEBUG, true,
+                            PlannerConfig.CTX_NATIVE_QUERY_SQL_PLANNING_MODE, PlannerConfig.NATIVE_QUERY_SQL_PLANNING_MODE_DECOUPLED
                         )
           )
           .sql(testCase.getQueryString())

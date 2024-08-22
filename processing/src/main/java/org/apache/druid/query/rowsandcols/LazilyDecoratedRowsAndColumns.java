@@ -48,6 +48,7 @@ import org.apache.druid.segment.Cursor;
 import org.apache.druid.segment.CursorBuildSpec;
 import org.apache.druid.segment.CursorHolder;
 import org.apache.druid.segment.StorageAdapter;
+import org.apache.druid.segment.VirtualColumn;
 import org.apache.druid.segment.VirtualColumns;
 import org.apache.druid.segment.column.ColumnCapabilities;
 import org.apache.druid.segment.column.RowSignature;
@@ -185,6 +186,7 @@ public class LazilyDecoratedRowsAndColumns implements RowsAndColumns
       throw new ISE("Cannot reorder[%s] scan data right now", ordering);
     }
 
+    System.out.println("base.getClass() = " + base.getClass());
     final StorageAdapter as = base.as(StorageAdapter.class);
     if (as == null) {
       return naiveMaterialize(base);
@@ -350,6 +352,7 @@ public class LazilyDecoratedRowsAndColumns implements RowsAndColumns
     }
 
     if (virtualColumns != null) {
+//      // another approach could possibly be: if virtual column is constant, don't throw the error + also produce that column
       throw new UOE("Cannot apply virtual columns [%s] with naive apply.", virtualColumns);
     }
 
@@ -358,6 +361,7 @@ public class LazilyDecoratedRowsAndColumns implements RowsAndColumns
       columnsToGenerate.addAll(viewableColumns);
     } else {
       columnsToGenerate.addAll(rac.getColumnNames());
+//      columnsToGenerate.add("v0"); -- only this is not enough, we also need to add the virtual column expression (in the frame writer?) otherwise it won't know how to generate the virtual column
       // When/if we support virtual columns from here, we should auto-add them to the list here as well as they expand
       // the implicit project when no projection is defined
     }

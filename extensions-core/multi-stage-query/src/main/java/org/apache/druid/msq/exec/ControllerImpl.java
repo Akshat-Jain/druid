@@ -1863,6 +1863,18 @@ public class ControllerImpl implements Controller
 
       return builder.build();
     } else if (MSQControllerTask.writeFinalResultsToTaskReport(querySpec)) {
+      for (StageDefinition stageDefinition : queryDef.getStageDefinitions()) {
+        System.out.println("-------");
+        System.out.println("stageDefinition.getProcessorFactory() = " + stageDefinition.getProcessorFactory());
+        System.out.println("stageDefinition.getSignature() = " + stageDefinition.getSignature());
+        System.out.println("stageDefinition.getStageNumber() = " + stageDefinition.getStageNumber());
+        if (stageDefinition.doesShuffle()) {
+          System.out.println("stageDefinition.getShuffleSpec() = " + stageDefinition.getShuffleSpec());
+        }
+        else {
+          System.out.println("stageDefinition.getShuffleSpec() = None");
+        }
+      }
       return queryDef;
     } else if (MSQControllerTask.writeFinalStageResultsToDurableStorage(querySpec)) {
 

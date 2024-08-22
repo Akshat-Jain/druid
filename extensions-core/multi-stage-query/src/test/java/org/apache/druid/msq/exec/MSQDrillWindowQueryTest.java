@@ -83,3 +83,10 @@ public class MSQDrillWindowQueryTest extends DrillWindowQueryTest
     windowQueryTest();
   }
 }
+
+/*
+ todo: Debug in decoupled mode
+ Why is virtual column getting added? How is it getting created? Why it doesn't see post aggregator p1 field?
+
+ Why is row signature not using p1?
+ */

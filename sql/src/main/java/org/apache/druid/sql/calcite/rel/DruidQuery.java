@@ -1359,6 +1359,7 @@ public class DruidQuery
       havingSpec = null;
     }
     final List<PostAggregator> postAggregators = new ArrayList<>(grouping.getPostAggregators());
+    System.out.println("DruidQuery.toGroupByQuery grouping.getPostAggregators() = " + grouping.getPostAggregators());
     if (sorting != null && sorting.getProjection() != null) {
       postAggregators.addAll(sorting.getProjection().getPostAggregators());
     }
@@ -1472,6 +1473,16 @@ public class DruidQuery
     VirtualColumns virtualColumns = virtualColumnRegistry.build(Collections.emptySet());
     final List<OperatorFactory> operators;
 
+    System.out.println("windowing.getOperators() = " + windowing.getOperators());
+    if (dataSource instanceof QueryDataSource) {
+      if (((QueryDataSource) dataSource).getQuery() instanceof GroupByQuery) {
+        List<PostAggregator> postAggregatorSpecs = ((GroupByQuery) ((QueryDataSource) dataSource).getQuery()).getPostAggregatorSpecs();
+        for (PostAggregator postAggregatorSpec : postAggregatorSpecs) {
+          System.out.println("postAggregatorSpec = " + postAggregatorSpec);
+        }
+      }
+    }
+
     if (virtualColumns.isEmpty()) {
       operators = windowing.getOperators();
     } else {
@@ -1491,6 +1502,7 @@ public class DruidQuery
     // This would cause MSQ queries to plan as
     // Window over an inner scan and avoid
     // leaf operators
+    System.out.println("operators = " + operators);
     return new WindowOperatorQuery(
         dataSource,
         new LegacySegmentSpec(Intervals.ETERNITY),
