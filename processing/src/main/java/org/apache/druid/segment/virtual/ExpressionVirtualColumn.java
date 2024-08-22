@@ -125,6 +125,17 @@ public class ExpressionVirtualColumn implements VirtualColumn
       final Supplier<Expr> parsedExpression
   )
   {
+//    System.out.println("ExpressionVirtualColumn.ExpressionVirtualColumn name = "
+//                       + name
+//                       + ", expression = "
+//                       + expression
+//                       + ", outputType = "
+//                       + outputType
+//                       + ", parsedExpression = "
+//                       + parsedExpression);
+    if (name.equals("v0")) {
+      System.out.println("name is v0");
+    }
     this.name = Preconditions.checkNotNull(name, "name");
     this.expression = Preconditions.checkNotNull(expression, "expression");
     this.outputType = outputType;

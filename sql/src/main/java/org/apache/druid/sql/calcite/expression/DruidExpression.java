@@ -617,6 +617,9 @@ public class DruidExpression
     @Override
     public VirtualColumn create(String name, ColumnType outputType, String expression, ExpressionParser parser)
     {
+      // this is getting called twice
+      // 1. windowing#fromCalciteStuff
+      // 2. DruidQuery#toWindowQuery
       return new ExpressionVirtualColumn(name, expression, parser.parse(expression), outputType);
     }
   }
