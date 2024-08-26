@@ -285,6 +285,8 @@ public class DruidQuery
 
     if (partialQuery.getWindow() != null) {
       if (plannerContext.featureAvailable(EngineFeature.WINDOW_FUNCTIONS)) {
+        // We reach DruidExpression$ExpressionVirtualColumnCreator.create from here for the 1st time.
+        // This puts v0 in the virtualColumnRegistry.
         windowing = Preconditions.checkNotNull(
             Windowing.fromCalciteStuff(
                 partialQuery,
@@ -302,6 +304,7 @@ public class DruidQuery
       windowing = null;
     }
 
+    // We reach DruidExpression$ExpressionVirtualColumnCreator.create from here for the 2nd time with the same virtualColumnRegistry.
     return new DruidQuery(
         dataSource,
         plannerContext,

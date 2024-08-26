@@ -96,8 +96,10 @@ public class ArrayConcatSqlAggregator implements SqlAggregator
     }
     final String initialvalue = ExpressionType.fromColumnTypeStrict(druidType).asTypeString() + "[]";
     if (arg.isDirectColumnAccess()) {
+//      System.out.println("here 1"); - never called
       fieldName = arg.getDirectColumn();
     } else {
+//      System.out.println("here 2"); -- called once
       VirtualColumn vc = virtualColumnRegistry.getOrCreateVirtualColumnForExpression(plannerContext, arg, druidType);
       fieldName = vc.getOutputName();
     }
