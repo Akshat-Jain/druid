@@ -351,6 +351,7 @@ public class LazilyDecoratedRowsAndColumns implements RowsAndColumns
       }
     }
 
+    System.out.println("virtualColumns = " + virtualColumns);
     if (virtualColumns != null) {
 //      // another approach could possibly be: if virtual column is constant, don't throw the error + also produce that column
       throw new UOE("Cannot apply virtual columns [%s] with naive apply.", virtualColumns);

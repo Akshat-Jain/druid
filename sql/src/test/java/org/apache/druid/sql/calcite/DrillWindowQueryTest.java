@@ -392,8 +392,9 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
           .queryContext(ImmutableMap.of(
                             PlannerContext.CTX_ENABLE_WINDOW_FNS, true,
                             PlannerCaptureHook.NEED_CAPTURE_HOOK, true,
-                            QueryContexts.ENABLE_DEBUG, true,
-                            PlannerConfig.CTX_NATIVE_QUERY_SQL_PLANNING_MODE, PlannerConfig.NATIVE_QUERY_SQL_PLANNING_MODE_DECOUPLED
+                            QueryContexts.ENABLE_DEBUG, true
+//              ,
+//                            PlannerConfig.CTX_NATIVE_QUERY_SQL_PLANNING_MODE, PlannerConfig.NATIVE_QUERY_SQL_PLANNING_MODE_DECOUPLED
                         )
           )
           .sql(testCase.getQueryString())
@@ -7778,6 +7779,13 @@ public class DrillWindowQueryTest extends BaseCalciteQueryTest
   @DrillTest("druid_queries/partition_by_array/wikipedia_query_3")
   @Test
   public void test_partition_by_array_wikipedia_query_3()
+  {
+    windowQueryTest();
+  }
+
+  @DrillTest("druid_queries/empty_over_clause/single_empty_over_with_array_concat_agg")
+  @Test
+  public void test_empty_over_single_empty_over_with_array_concat_agg()
   {
     windowQueryTest();
   }

@@ -29,6 +29,7 @@ import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.rex.RexInputRef;
 import org.apache.calcite.rex.RexLiteral;
 import org.apache.calcite.rex.RexNode;
+import org.apache.calcite.rex.RexUtil;
 import org.apache.druid.segment.column.RowSignature;
 import org.apache.druid.sql.calcite.table.RowSignatures;
 
@@ -91,12 +92,40 @@ public class InputAccessor
     return null;
   }
 
+  /*
+  DruidProject($0=[$2], druid=[logical]): rowcount = 150.0, cumulative cost = {301.0 rows, 38.500001 cpu, 0.0 io}, id = 85
+    DruidWindow(window#0=[window(partition {0} aggs [ARRAY_CONCAT_AGG($1, $2)])]): rowcount = 150.0, cumulative cost = {301.0 rows, 38.5 cpu, 0.0 io}, id = 84
+      DruidProject(countryName=[$5], $1=[ARRAY('Guatemala':VARCHAR)], druid=[logical]): rowcount = 150.0, cumulative cost = {151.0 rows, 38.5 cpu, 0.0 io}, id = 83
+        DruidFilter(condition=[=($5, 'Guatemala')]): rowcount = 150.0, cumulative cost = {151.0 rows, 1.0 cpu, 0.0 io}, id = 82
+          DruidTableScan(table=[[druid, wikipedia]], druid=[logical]): rowcount = 1000.0, cumulative cost = {tiny}, id = 73
+
+
+  $1=[ARRAY('Guatemala':VARCHAR)] == constant but not a literal, array is not a real type in druid, so it's an expression
+
+  Before:
+  DruidWindow(window#0=[window(partition {0} aggs [ARRAY_CONCAT_AGG([ARRAY('Guatemala':VARCHAR)], $2)])]): rowcount = 150.0, cumulative cost = {301.0 rows, 38.5 cpu, 0.0 io}, id = 84
+
+  DruidWindow(window#0=[window(partition {0} aggs [ARRAY_CONCAT_AGG(v0, $2)])]): rowcount = 150.0, cumulative cost = {301.0 rows, 38.5 cpu, 0.0 io}, id = 84
+  v0 = [ARRAY('Guatemala':VARCHAR)]
+
+  Why we had virtual column? - Because array[] has an argument which is a literal. Druid has array implemented as a function. So we can't fold it into an array literal.
+  So we need a expression virtual column.
+
+  After: we retain
+  DruidWindow(window#0=[window(partition {0} aggs [ARRAY_CONCAT_AGG($1, $2)])]): rowcount = 150.0, cumulative cost = {301.0 rows, 38.5 cpu, 0.0 io}, id = 84
+  Now we don't have virtual columns in Windowing
+
+   */
+
   public RexNode getField(int argIndex)
   {
     if (argIndex < inputFieldCount) {
       RexInputRef inputRef = RexInputRef.of(argIndex, inputRelRowType);
       RexNode constant = predicates.constantMap.get(inputRef);
-      if (constant != null) {
+//      if (constant != null) {
+//        return constant; // commenting this line gives desired results
+//      }
+      if (constant != null && RexUtil.isLiteral(constant, false)) {
         return constant;
       }
       if (flattenedProject != null) {

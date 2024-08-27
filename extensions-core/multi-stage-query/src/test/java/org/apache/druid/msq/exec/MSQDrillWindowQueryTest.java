@@ -76,6 +76,7 @@ public class MSQDrillWindowQueryTest extends DrillWindowQueryTest
         .verifyNativeQueries(new VerifyMSQSupportedNativeQueriesPredicate());
   }
 
+  @Override
   @DrillTest("druid_queries/empty_over_clause/single_empty_over_with_array_concat_agg")
   @Test
   public void test_empty_over_single_empty_over_with_array_concat_agg()
@@ -90,3 +91,5 @@ public class MSQDrillWindowQueryTest extends DrillWindowQueryTest
 
  Why is row signature not using p1?
  */
+
+// todo: watch ppt of calcite, check with Sree
