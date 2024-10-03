@@ -29,6 +29,7 @@ import org.apache.druid.data.input.impl.systemfield.SystemFields;
 import org.apache.druid.error.DruidException;
 import org.apache.druid.java.util.common.ISE;
 import org.apache.druid.java.util.common.Intervals;
+import org.apache.druid.java.util.emitter.EmittingLogger;
 import org.apache.druid.msq.indexing.MSQSpec;
 import org.apache.druid.msq.indexing.MSQTuningConfig;
 import org.apache.druid.msq.indexing.destination.TaskReportMSQDestination;
@@ -42,6 +43,7 @@ import org.apache.druid.query.expression.TestExprMacroTable;
 import org.apache.druid.segment.column.ColumnType;
 import org.apache.druid.segment.column.RowSignature;
 import org.apache.druid.segment.virtual.ExpressionVirtualColumn;
+import org.apache.druid.server.metrics.NoopServiceEmitter;
 import org.apache.druid.sql.calcite.external.ExternalDataSource;
 import org.apache.druid.sql.calcite.filtration.Filtration;
 import org.apache.druid.sql.calcite.planner.ColumnMapping;
@@ -90,6 +92,8 @@ public class MSQArraysTest extends MSQTestBase
   @BeforeEach
   public void setup() throws IOException
   {
+    EmittingLogger.registerEmitter(new NoopServiceEmitter());
+
     // Read the file and make the name available to the tests
     File dataFile = newTempFile("dataFile");
     final InputStream resourceStream = NestedDataTestUtils.class.getClassLoader()
