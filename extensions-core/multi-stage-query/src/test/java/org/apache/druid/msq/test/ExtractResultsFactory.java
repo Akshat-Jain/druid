@@ -29,6 +29,7 @@ import org.apache.druid.sql.calcite.QueryTestRunner;
 import org.junit.Assert;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
