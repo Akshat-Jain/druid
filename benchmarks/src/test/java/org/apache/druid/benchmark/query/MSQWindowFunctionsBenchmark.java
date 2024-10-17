@@ -166,4 +166,14 @@ todo: try adding bigger datasource in the segment walker [done]
 todo: add a param for maxNumTasks
 todo: add different queries
 todo: remove these todos
+
+# Run complete. Total time: 01:59:06
+
+Benchmark                                   (maxNumTasks)  Mode  Cnt       Score      Error  Units
+MSQWindowFunctionsBenchmark.benchmarkTest1              2  avgt    5  101768.278 ± 3488.765  ms/op
+MSQWindowFunctionsBenchmark.benchmarkTest1              5  avgt    5  101551.508 ± 5248.099  ms/op
+MSQWindowFunctionsBenchmark.benchmarkTest2              2  avgt    5  175451.830 ± 7012.636  ms/op
+MSQWindowFunctionsBenchmark.benchmarkTest2              5  avgt    5  171531.370 ± 7201.760  ms/op
+MSQWindowFunctionsBenchmark.benchmarkTest3              2  avgt    5   62332.156 ± 1115.049  ms/op
+MSQWindowFunctionsBenchmark.benchmarkTest3              5  avgt    5   68790.699 ± 4459.277  ms/op
  */
