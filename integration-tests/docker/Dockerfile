@@ -16,16 +16,18 @@
 ARG JDK_VERSION=17-slim-buster
 FROM bitnami/kafka:3.9.0 as druidbase
 
+USER root
+
 # Bundle everything into one script so cleanup can reduce image size.
 # Otherwise docker's layered images mean that things are not actually deleted.
 
-COPY base-setup.sh /tmp/base-setup.sh
+COPY base-setup.sh /root/base-setup.sh
 ARG KAFKA_VERSION
 # ZooKeeper version to install in the base image
 # This is passed in by maven at build time to align with the client version we depend on in the pom file
 ARG ZK_VERSION
 ARG APACHE_ARCHIVE_MIRROR_HOST=https://downloads.apache.org
-RUN APACHE_ARCHIVE_MIRROR_HOST=${APACHE_ARCHIVE_MIRROR_HOST} /tmp/base-setup.sh && rm -f /tmp/base-setup.sh
+RUN APACHE_ARCHIVE_MIRROR_HOST=${APACHE_ARCHIVE_MIRROR_HOST} /root/base-setup.sh && rm -f /root/base-setup.sh
 
 
 FROM druidbase
