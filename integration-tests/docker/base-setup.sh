@@ -16,6 +16,7 @@
 
 set -e
 set -u
+set -xv
 
 export DEBIAN_FRONTEND=noninteractive
 APACHE_ARCHIVE_MIRROR_HOST=${APACHE_ARCHIVE_MIRROR_HOST:-https://downloads.apache.org}
