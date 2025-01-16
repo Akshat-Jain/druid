@@ -28,6 +28,7 @@ apt-get install -y wget
 
 # MySQL (Metadata store)
 apt-get install -y default-mysql-server
+ln -s /etc/init.d/mariadb /etc/init.d/mysql
 
 # Supervisor
 apt-get install -y supervisor
