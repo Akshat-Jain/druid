@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: ci-maven-cache-${{ hashFiles('**/pom.xml') }}
+          key: ci-maven-cache-${{ hashFiles('**/pom.xml', '.github/workflows/ci.yml') }}
 
       - name: Build and cache dependencies
         if: steps.cache-warmer.outputs.cache-hit != 'true'
