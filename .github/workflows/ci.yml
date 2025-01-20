@@ -41,7 +41,10 @@ jobs:
         if: steps.cache-warmer.outputs.cache-hit != 'true'
         run: |
           # Download dependencies without running tests
-          mvn -B verify -Dtest=nonexistingtest -Dsurefire.failIfNoSpecifiedTests=false
+          mvn -B verify -DskipTests
+          
+          # Run a specific test to ensure test dependencies are downloaded and included in the cache
+          mvn install -pl indexing-hadoop -Dtest="DetermineHashedPartitionsJobTest"
           
           # Clean project files and local artifacts
           rm -rf */target/
