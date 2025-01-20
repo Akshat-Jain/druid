@@ -35,8 +35,8 @@ jobs:
       - name: Build and cache dependencies
         if: steps.cache-warmer.outputs.cache-hit != 'true'
         run: |
-          # Full build to download all dependencies
-          mvn -B verify
+          # Download dependencies without running tests
+          mvn -B verify -Dtest=nonexistingtest
           
           # Clean project files and local artifacts
           rm -rf */target/
