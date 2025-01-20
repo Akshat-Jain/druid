@@ -26,3 +26,30 @@ jobs:
           java-version: '17'
           cache: 'maven'
 
+      - name: cache-warmer
+        id: cache-warmer
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+
+      - name: Build and cache dependencies
+        if: steps.cache-warmer.outputs.cache-hit != 'true'
+        run: |
+          # Full build to download all dependencies
+          mvn -B verify
+          
+          # Clean project files and local artifacts
+          rm -rf */target/
+          rm -rf */*/target/
+          rm -rf */*/*/target/
+          rm -rf ~/.m2/repository/org/apache/druid/
+
+      # Development only: Upload Maven repository for inspection
+      - name: Archive Maven repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-repository
+          path: ~/.m2/repository
+          retention-days: 2  # Limit retention to save space
+
