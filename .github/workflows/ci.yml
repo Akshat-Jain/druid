@@ -41,7 +41,7 @@ jobs:
         if: steps.cache-warmer.outputs.cache-hit != 'true'
         run: |
           # Download dependencies without running tests
-          mvn -B verify -Dtest=nonexistingtest
+          mvn -B verify -Dtest=nonexistingtest -Dsurefire.failIfNoSpecifiedTests=false
           
           # Clean project files and local artifacts
           rm -rf */target/
