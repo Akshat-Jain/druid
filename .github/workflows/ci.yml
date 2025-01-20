@@ -7,6 +7,11 @@ on:
     paths-ignore:
     branches: [ 'master' ]
 
+# Cancel any previous runs on the same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   newCI:
     name: New CI
