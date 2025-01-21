@@ -40,12 +40,10 @@ jobs:
       - name: Build and cache dependencies
         if: steps.cache-warmer.outputs.cache-hit != 'true'
         run: |
-          # Download dependencies without running tests
-          mvn -B verify -DskipTests
-          
-          # Run a specific test to ensure test dependencies are downloaded and included in the cache
-          mvn install -pl indexing-hadoop -Dtest="DetermineHashedPartitionsJobTest"
-          
+          # Download dependencies without running tests.
+          # ci-cache profile is used to download test related dependencies without running tests.
+          mvn -B verify -DskipTests -Pci-cache
+
           # Clean project files and local artifacts
           rm -rf */target/
           rm -rf */*/target/
