@@ -44,7 +44,7 @@ jobs:
           # ci-cache profile is used to download test related dependencies without running tests.
           # mvn -B verify -DskipTests -Pci-cache
           # mvn dependency:resolve-plugins dependency:go-offline -DskipTests -Pci-cache
-          mvn dependency:resolve-plugins dependency:go-offline verify -DskipTests -Pci-cache
+          mvn dependency:resolve-plugins dependency:go-offline verify -DskipTests -Pci-cache -T1C
 
           # Clean project files and local artifacts
           rm -rf */target/
