@@ -42,7 +42,7 @@ jobs:
         run: |
           # Download dependencies without running tests.
           # ci-cache profile is used to download test related dependencies without running tests.
-          mvn -B verify -DskipTests -Pci-cache
+          mvn dependency:resolve-plugins dependency:go-offline -DskipTests -Pci-cache
 
           # Clean project files and local artifacts
           rm -rf */target/
