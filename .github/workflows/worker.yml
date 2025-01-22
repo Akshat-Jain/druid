@@ -1,4 +1,4 @@
-name: "CI"
+name: "Worker"
 
 on:
   workflow_call:
@@ -10,16 +10,10 @@ on:
       args:
         required: false
         type: string
-        default: ''
         description: "Arguments for the script"
 
-# Cancel any previous runs on the same PR
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  setup:
+  execute:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -28,11 +22,9 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17'  # Fixed to JDK 17
+          java-version: '17'
 
-  run-worker:
-    needs: setup
-    uses: ./.github/workflows/worker.yml
-    with:
-      script: ${{ inputs.script }}
-      args: ${{ inputs.args }}
+      - name: Execute script
+        run: |
+          chmod +x ${{ inputs.script }}
+          ./${{ inputs.script }} ${{ inputs.args }} 
