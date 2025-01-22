@@ -230,13 +230,12 @@ jobs:
       script: ".github/scripts/run-tests.sh"
       args: "--dtest '${{ matrix.dtest }}'"
 
-  print-test-results:
+  print-unapproved-results:
     runs-on: ubuntu-latest
+    needs: [unit-tests-unapproved]
     if: always()
     steps:
       - name: Print Unapproved PR Test Results
-        if: always()
-        needs: unit-tests-unapproved
         run: |
           echo "=== Unapproved PR Tests Results ==="
           echo "Overall Status: ${{ needs.unit-tests-unapproved.result }}"
@@ -245,9 +244,12 @@ jobs:
           echo "C*,D* tests: ${{ needs.unit-tests-unapproved.result }}"
           echo "=== End of Unapproved PR Tests ==="
 
+  print-approved-results:
+    runs-on: ubuntu-latest
+    needs: [unit-tests-approved]
+    if: always()
+    steps:
       - name: Print Approved PR Test Results
-        if: always()
-        needs: unit-tests-approved
         run: |
           echo "=== Approved PR Tests Results ==="
           echo "Overall Status: ${{ needs.unit-tests-approved.result }}"
@@ -256,9 +258,12 @@ jobs:
           echo "C*,D* tests: ${{ needs.unit-tests-approved.result }}"
           echo "=== End of Approved PR Tests ==="
 
+  print-phase2-results:
+    runs-on: ubuntu-latest
+    needs: [unit-tests-phase2]
+    if: always()
+    steps:
       - name: Print Phase 2 Test Results
-        if: always()
-        needs: unit-tests-phase2
         run: |
           echo "=== Phase 2 Tests Results ==="
           echo "Overall Status: ${{ needs.unit-tests-phase2.result }}"
