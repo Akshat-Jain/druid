@@ -20,7 +20,7 @@ done
 # Execute tests
 if [ -n "$DTEST_PATTERN" ]; then
   echo "Using test pattern: $DTEST_PATTERN"
-  mvn test -Dtest="$DTEST_PATTERN -Dsurefire.failIfNoSpecifiedTests=false"
+  mvn test -Dtest="$DTEST_PATTERN" -Dsurefire.failIfNoSpecifiedTests=false
 else
   echo "No test pattern provided, running all tests"
   mvn test
