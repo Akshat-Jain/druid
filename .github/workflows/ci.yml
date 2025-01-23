@@ -9,9 +9,9 @@ on:
         default: '17'
 
 # Cancel any previous runs on the same PR
-#concurrency:
-#  group: ${{ github.workflow }}-${{ github.ref }}
-#  cancel-in-progress: true
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.run_id }}'
+  cancel-in-progress: true
 
 jobs:
   run-unit-tests:
