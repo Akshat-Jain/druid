@@ -194,7 +194,7 @@ jobs:
   unit-tests-unapproved:
     name: "unit tests - PR unapproved - (jdk17)"
     uses: ./.github/workflows/ci.yml
-    needs: [build, check-approval]
+    needs: [check-approval]
     if: ${{ needs.check-approval.outputs.approved != 'true' }}
     with:
       jdk: 17
@@ -202,7 +202,7 @@ jobs:
   unit-tests-approved:
     name: "unit tests - PR approved - (jdk17)"
     uses: ./.github/workflows/ci.yml
-    needs: [build, check-approval]
+    needs: [check-approval]
     if: ${{ needs.check-approval.outputs.approved == 'true' }}
     with:
       jdk: 17
