@@ -3,6 +3,10 @@ name: "Worker"
 on:
   workflow_call:
     inputs:
+      jdk:
+        required: false
+        type: string
+        default: '17'
       script:
         required: true
         type: string
@@ -22,9 +26,8 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: ${{ inputs.jdk }}
 
       - name: Execute script
         run: |
-          chmod +x ${{ inputs.script }}
           ./${{ inputs.script }} ${{ inputs.args }} 

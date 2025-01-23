@@ -24,4 +24,4 @@ if [ -n "$DTEST_PATTERN" ]; then
 else
   echo "No test pattern provided, running all tests"
   mvn test
-fi 
+fi
