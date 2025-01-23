@@ -203,6 +203,7 @@ jobs:
     with:
       script: ".github/scripts/run-tests.sh"
       args: "--dtest '${{ matrix.dtest }}'"
+      jdk: 17
 
   unit-tests-approved:
     strategy:
@@ -216,19 +217,23 @@ jobs:
     with:
       script: ".github/scripts/run-tests.sh"
       args: "--dtest '${{ matrix.dtest }}'"
+      jdk: 17
 
   unit-tests-phase2:
     strategy:
       fail-fast: false
       matrix:
         dtest: ["A*,B*", "C*,D*"]
-    name: "unit tests (${{ matrix.dtest }})"
+        # Use JDK 21.0.4 to work around https://github.com/apache/druid/issues/17429
+        jdk: [ '11', '21.0.4' ]
+    name: "unit tests (jdk${{ matrix.jdk }}, dtest${{ matrix.dtest }})"
     uses: ./.github/workflows/ci.yml
     needs: [unit-tests-unapproved, check-approval]
     if: ${{ always() && (needs.check-approval.outputs.approved == 'true' || needs.unit-tests-unapproved.result == 'success' || needs.unit-tests-unapproved.outputs.continue_tests) }}
     with:
       script: ".github/scripts/run-tests.sh"
       args: "--dtest '${{ matrix.dtest }}'"
+      jdk: ${{ matrix.jdk }}
 
   print-unapproved-results:
     runs-on: ubuntu-latest

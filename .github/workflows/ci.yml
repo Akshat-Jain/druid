@@ -3,6 +3,10 @@ name: "CI"
 on:
   workflow_call:
     inputs:
+      jdk:
+        required: false
+        type: string
+        default: '17'
       script:
         required: true
         type: string
@@ -28,7 +32,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17'  # Fixed to JDK 17
+          java-version: ${{ inputs.jdk }}
 
   run-worker:
     needs: setup
