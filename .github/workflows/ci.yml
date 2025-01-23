@@ -7,15 +7,6 @@ on:
         required: false
         type: string
         default: '17'
-      script:
-        required: true
-        type: string
-        description: "Script to execute"
-      args:
-        required: false
-        type: string
-        default: ''
-        description: "Arguments for the script"
 
 # Cancel any previous runs on the same PR
 #concurrency:
@@ -23,8 +14,12 @@ on:
 #  cancel-in-progress: true
 
 jobs:
-  run-worker:
-    needs: setup
+  run-unit-tests:
+    name: "unit tests"
+    strategy:
+      fail-fast: false
+      matrix:
+        dtest: [ "A*,B*", "C*,D*" ]
     uses: ./.github/workflows/worker.yml
     with:
       script: ${{ inputs.script }}

@@ -192,47 +192,32 @@ jobs:
         run: echo "::set-output name=isApproved::true"
 
   unit-tests-unapproved:
-    strategy:
-      fail-fast: false
-      matrix:
-        dtest: ["A*,B*", "C*,D*"]
     name: "unit tests - PR unapproved - (jdk17)"
     uses: ./.github/workflows/ci.yml
     needs: [build, check-approval]
     if: ${{ needs.check-approval.outputs.approved != 'true' }}
     with:
-      script: ".github/scripts/run-tests.sh"
-      args: "--dtest '${{ matrix.dtest }}'"
       jdk: 17
 
   unit-tests-approved:
-    strategy:
-      fail-fast: false
-      matrix:
-        dtest: ["A*,B*", "C*,D*"]
     name: "unit tests - PR approved - (jdk17)"
     uses: ./.github/workflows/ci.yml
     needs: [build, check-approval]
     if: ${{ needs.check-approval.outputs.approved == 'true' }}
     with:
-      script: ".github/scripts/run-tests.sh"
-      args: "--dtest '${{ matrix.dtest }}'"
       jdk: 17
 
   unit-tests-phase2:
     strategy:
       fail-fast: false
       matrix:
-        dtest: ["A*,B*", "C*,D*"]
         # Use JDK 21.0.4 to work around https://github.com/apache/druid/issues/17429
         jdk: [ '11', '21.0.4' ]
-    name: "unit tests (jdk${{ matrix.jdk }}, dtest${{ matrix.dtest }})"
+    name: "unit tests (jdk${{ matrix.jdk }})"
     uses: ./.github/workflows/ci.yml
     needs: [unit-tests-unapproved, check-approval]
     if: ${{ always() && (needs.check-approval.outputs.approved == 'true' || needs.unit-tests-unapproved.result == 'success' || needs.unit-tests-unapproved.outputs.continue_tests) }}
     with:
-      script: ".github/scripts/run-tests.sh"
-      args: "--dtest '${{ matrix.dtest }}'"
       jdk: ${{ matrix.jdk }}
 
   print-unapproved-results:
