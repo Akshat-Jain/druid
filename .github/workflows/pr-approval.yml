@@ -20,6 +20,5 @@ jobs:
 
       # Debugging: Print the value of review state
       - name: Print Review State
-        if: github.event_name == 'pull_request_review'
         run: |
           echo "Review state: ${{ github.event.review.state }}"
