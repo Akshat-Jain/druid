@@ -1,0 +1,25 @@
+name: Check PR Approval
+
+on:
+  pull_request:
+    types:
+      - synchronize
+      - opened
+  pull_request_review:
+    types:
+      - submitted
+
+jobs:
+  check-approval:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Debugging: Print the value of review state
+      - name: Print Review State
+        if: github.event_name == 'pull_request_review'
+        run: |
+          echo "Review state: ${{ github.event.review.state }}"
