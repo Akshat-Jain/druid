@@ -22,6 +22,6 @@ jobs:
         dtest: [ "A*,B*", "C*,D*" ]
     uses: ./.github/workflows/worker.yml
     with:
-      script: ${{ inputs.script }}
-      args: ${{ inputs.args }}
+      script: ".github/scripts/run-tests.sh"
+      args: "--dtest '${{ matrix.dtest }}'"
       jdk: ${{ inputs.jdk }}
