@@ -24,4 +24,4 @@ jobs:
     with:
       script: ${{ inputs.script }}
       args: ${{ inputs.args }}
-      java-version: ${{ inputs.jdk }}
+      jdk: ${{ inputs.jdk }}
