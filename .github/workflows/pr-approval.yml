@@ -22,3 +22,8 @@ jobs:
       - name: Print Review State
         run: |
           echo "Review state: ${{ github.event.review.state }}"
+
+      - name: Conditional Echo
+        if: github.event.review.state == 'approved'
+        run: |
+          echo "The PR is approved!"
