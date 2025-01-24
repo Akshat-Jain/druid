@@ -26,7 +26,7 @@ import org.apache.druid.segment.TestHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AkshatFailS3InputSourceConfigTest
+public class FailBS3InputSourceConfigTest
 {
   @Test
   public void testSerdeAccessSecretKey() throws Exception

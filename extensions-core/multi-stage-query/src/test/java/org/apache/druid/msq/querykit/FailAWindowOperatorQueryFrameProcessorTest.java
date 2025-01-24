@@ -64,7 +64,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AkshatFailWindowOperatorQueryFrameProcessorTest extends FrameProcessorTestBase
+public class FailAWindowOperatorQueryFrameProcessorTest extends FrameProcessorTestBase
 {
   private static final List<Map<String, Object>> INPUT_ROWS = ImmutableList.of(
       ImmutableMap.of("added", 1L, "cityName", "city1"),
