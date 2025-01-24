@@ -15,6 +15,10 @@ on:
         required: false
         type: string
         description: "Arguments for the script"
+      upload_surefire_reports:
+        required: false
+        type: boolean
+        description: "Upload surefire reports"
 
 jobs:
   execute:
@@ -31,3 +35,16 @@ jobs:
       - name: Execute script
         run: |
           ./${{ inputs.script }} ${{ inputs.args }} 
+
+      - name: Collect surefire reports
+        if: ${{ inputs.upload_surefire_reports }}
+        run: |
+          mkdir -p target/surefire-reports
+          find . -type f -name "TEST-*.xml" -exec cp {} target/surefire-reports \;
+
+      - name: Upload surefire reports
+        if: ${{ inputs.upload_surefire_reports }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: "surefire-reports-${{ github.run_id }}-${{ github.run_attempt }}"
+          path: target/surefire-reports

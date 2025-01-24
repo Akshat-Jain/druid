@@ -25,3 +25,4 @@ jobs:
       script: ".github/scripts/run-maven-command.sh"
       args: "test -Dtest='${{ matrix.Dtest }}' -Dsurefire.failIfNoSpecifiedTests=false -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true --fail-at-end"
       jdk: ${{ inputs.jdk }}
+      upload_surefire_reports: true
