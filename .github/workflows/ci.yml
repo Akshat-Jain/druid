@@ -25,19 +25,17 @@ jobs:
       script: ".github/scripts/run-maven-command.sh"
       args: "test -Dtest='${{ matrix.Dtest }}' -Dsurefire.failIfNoSpecifiedTests=false -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true -Dmaven.test.failure.ignore=true"
       jdk: ${{ inputs.jdk }}
-      upload_reports: true
-      artifact_prefix: "surefire-reports"
-      report_directory_pattern: "./**/surefire-reports/**/*.xml"
+      artifact_prefix: "unit-test-reports"
 
   reporting:
     name: "report-unit-test-failures"
     needs: run-unit-tests
     runs-on: ubuntu-latest
     steps:
-      - name: Download individual surefire reports
+      - name: Download reports for all unit test jobs
         uses: actions/download-artifact@v4
         with:
-          pattern: "surefire-reports-*"
+          pattern: "unit-test-reports-*"
           path: target/surefire-reports
 
       - name: Publish Test Report
