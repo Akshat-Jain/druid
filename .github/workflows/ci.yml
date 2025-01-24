@@ -19,9 +19,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dtest: [ "A*,B*", "C*,D*" ]
+        Dtest: [ "A*,B*", "C*,D*", "nonexistingtest" ]
     uses: ./.github/workflows/worker.yml
     with:
-      script: ".github/scripts/run-tests.sh"
-      args: "--dtest '${{ matrix.dtest }}'"
+      script: ".github/scripts/run-maven-command.sh"
+      args: "-Dtest='${{ matrix.Dtest }}' -Dsurefire.failIfNoSpecifiedTests=false -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true test"
       jdk: ${{ inputs.jdk }}
