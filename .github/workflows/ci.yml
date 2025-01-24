@@ -23,5 +23,5 @@ jobs:
     uses: ./.github/workflows/worker.yml
     with:
       script: ".github/scripts/run-maven-command.sh"
-      args: "-Dtest='${{ matrix.Dtest }}' -Dsurefire.failIfNoSpecifiedTests=false -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true test"
+      args: "test -Dtest='${{ matrix.Dtest }}' -Dsurefire.failIfNoSpecifiedTests=false -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true"
       jdk: ${{ inputs.jdk }}
