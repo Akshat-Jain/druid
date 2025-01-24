@@ -37,20 +37,20 @@ jobs:
           ./${{ inputs.script }} ${{ inputs.args }} 
 
       - name: Collect surefire reports
-        if: ${{ always() && inputs.upload_surefire_reports }}
+        if: ${{ inputs.upload_surefire_reports }}
         run: |
           mkdir -p target/surefire-reports
           find . -type f -name "TEST-*.xml" -exec cp {} target/surefire-reports \;
 
       - name: Calculate hash for input args
-        if: ${{ always() && inputs.upload_surefire_reports }}
+        if: ${{ inputs.upload_surefire_reports }}
         shell: bash
         run: |
           HASH=$(echo -n "${{ inputs.args }}" | sha256sum | cut -d' ' -f1 | cut -c1-8)
           echo "HASH=$HASH" >> $GITHUB_ENV
 
       - name: Upload surefire reports
-        if: ${{ always() && inputs.upload_surefire_reports }}
+        if: ${{ inputs.upload_surefire_reports }}
         uses: actions/upload-artifact@v4
         with:
           name: "surefire-reports-${{ env.HASH }}-${{ github.run_attempt }}"

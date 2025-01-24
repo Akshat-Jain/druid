@@ -23,7 +23,7 @@ jobs:
     uses: ./.github/workflows/worker.yml
     with:
       script: ".github/scripts/run-maven-command.sh"
-      args: "test -Dtest='${{ matrix.Dtest }}' -Dsurefire.failIfNoSpecifiedTests=false -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true --fail-at-end"
+      args: "test -Dtest='${{ matrix.Dtest }}' -Dsurefire.failIfNoSpecifiedTests=false -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true --fail-at-end -Dmaven.test.failure.ignore=true"
       jdk: ${{ inputs.jdk }}
       upload_surefire_reports: true
 
@@ -31,7 +31,6 @@ jobs:
     name: "report-unit-test-failures"
     needs: run-unit-tests
     runs-on: ubuntu-latest
-    if: ${{ always() }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -49,12 +48,9 @@ jobs:
           
           # Remove the empty subdirectories
           find target/surefire-reports -type d -empty -delete
-
-      - name: Print files in surefire-reports
-        run: |
+          
+          # List the files, only for development phase, will remove later
           ls -l target/surefire-reports
-          cat target/surefire-reports/*.xml
 
       - name: Publish Test Report
-        if: ${{ always() }}
         uses: scacap/action-surefire-report@v1
