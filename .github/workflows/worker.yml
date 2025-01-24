@@ -28,22 +28,6 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ inputs.jdk }}
 
-      - name: Load or build cache
-        id: cache-deps
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ci-maven-cache-${{ hashFiles('**/pom.xml', '.github/workflows/ci.yml', '.github/workflows/worker.yml') }}
-
-      - name: Build cache if missing
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: |
-          # Download dependencies without running tests
-          mvn dependency:resolve-plugins dependency:go-offline verify -DskipTests -Pci-cache -T1C
-          
-          # Clean project files and local artifacts
-          rm -rf ~/.m2/repository/org/apache/druid/
-
       - name: Execute script
         run: |
           ./${{ inputs.script }} ${{ inputs.args }} 

@@ -14,48 +14,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  cache-builder:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: cache-builder
-        id: cache-builder
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ci-maven-cache-${{ hashFiles('**/pom.xml', '.github/workflows/ci.yml', '.github/workflows/worker.yml') }}
-
-      - name: Build and cache dependencies
-        if: steps.cache-builder.outputs.cache-hit != 'true'
-        run: |
-          # Download dependencies without running tests
-          mvn dependency:resolve-plugins dependency:go-offline verify -DskipTests -Pci-cache -T1C
-          
-          # Clean project files and local artifacts
-          rm -rf ~/.m2/repository/org/apache/druid/
-
-      # Development only: Upload Maven repository for inspection
-      - name: Archive Maven repository
-        uses: actions/upload-artifact@v4
-        with:
-          name: maven-repository
-          path: ~/.m2/repository
-          retention-days: 2
-
   run-unit-tests:
     name: "unit tests"
     strategy:
       fail-fast: false
       matrix:
         dtest: [ "A*,B*", "C*,D*" ]
-    needs: cache-builder
     uses: ./.github/workflows/worker.yml
     with:
       script: ".github/scripts/run-tests.sh"
