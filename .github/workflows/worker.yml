@@ -36,12 +36,10 @@ jobs:
         run: |
           ./${{ inputs.script }} ${{ inputs.args }} 
 
-      - name: Calculate hash for input args
+      - name: Calculate hash for artifact name
         if: ${{ inputs.upload_surefire_reports }}
-        shell: bash
         run: |
-          HASH=$(echo -n "${{ inputs.args }}" | sha256sum | cut -d' ' -f1 | cut -c1-8)
-          echo "HASH=$HASH" >> $GITHUB_ENV
+          ./.github/scripts/make-hash-for-artifact-name.sh "${{ inputs.args }}"
 
       - name: Upload surefire reports
         if: ${{ inputs.upload_surefire_reports }}
