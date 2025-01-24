@@ -45,7 +45,7 @@ jobs:
       - name: Flatten surefire reports
         run: |
           # Copy all files from subdirectories to the target directory
-          find target/surefire-reports -mindepth 2 -type f -exec cp {} target/surefire-reports/ \;
+          find target/surefire-reports -mindepth 2 -type f -exec mv {} target/surefire-reports/ \;
           
           # Remove the empty subdirectories
           find target/surefire-reports -type d -empty -delete
