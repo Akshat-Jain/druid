@@ -54,3 +54,7 @@ jobs:
         run: |
           ls -l target/surefire-reports
           cat target/surefire-reports/*.xml
+
+      - name: Publish Test Report
+        if: ${{ always() }}
+        uses: scacap/action-surefire-report@v1
