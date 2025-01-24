@@ -3,4 +3,4 @@
 set -e
 set -x
 
-eval mvn -B "$1"
+eval mvn -B "$@"
