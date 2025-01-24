@@ -41,16 +41,5 @@ jobs:
           pattern: "surefire-reports-*"
           path: target/surefire-reports
 
-      - name: Flatten surefire reports
-        run: |
-          # Copy all files from subdirectories to the target directory
-          find target/surefire-reports -mindepth 2 -type f -exec mv {} target/surefire-reports/ \;
-          
-          # Remove the empty subdirectories
-          find target/surefire-reports -type d -empty -delete
-          
-          # List the files, only for development phase, will remove later
-          ls -l target/surefire-reports
-
       - name: Publish Test Report
         uses: scacap/action-surefire-report@v1
