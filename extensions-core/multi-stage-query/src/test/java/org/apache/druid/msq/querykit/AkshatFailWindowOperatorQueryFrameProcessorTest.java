@@ -64,7 +64,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class WindowOperatorQueryFrameProcessorTest extends FrameProcessorTestBase
+public class AkshatFailWindowOperatorQueryFrameProcessorTest extends FrameProcessorTestBase
 {
   private static final List<Map<String, Object>> INPUT_ROWS = ImmutableList.of(
       ImmutableMap.of("added", 1L, "cityName", "city1"),
@@ -144,7 +144,7 @@ public class WindowOperatorQueryFrameProcessorTest extends FrameProcessorTestBas
     );
 
     List<List<Object>> outputRows = rowsFromProcessor.toList();
-    Assert.assertEquals(INPUT_ROWS.size(), outputRows.size());
+    Assert.assertEquals(123, outputRows.size());
 
     for (int i = 0; i < INPUT_ROWS.size(); i++) {
       Map<String, Object> inputRow = INPUT_ROWS.get(i);
