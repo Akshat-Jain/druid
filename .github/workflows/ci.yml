@@ -42,6 +42,13 @@ jobs:
           pattern: "surefire-reports-*"
           path: target/surefire-reports
 
+      - name: Flatten surefire reports
+        run: |
+          # Copy all files from subdirectories to the target directory
+          find target/surefire-reports -mindepth 2 -type f -exec cp {} target/surefire-reports/ \;
+          # Remove the empty subdirectories
+          find target/surefire-reports -mindepth 1 -type d -exec rm -r {} \;
+
       - name: Print files in surefire-reports
         run: |
           ls -l target/surefire-reports
