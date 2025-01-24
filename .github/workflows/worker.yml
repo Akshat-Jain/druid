@@ -46,5 +46,5 @@ jobs:
         if: ${{ always() && inputs.upload_surefire_reports }}
         uses: actions/upload-artifact@v4
         with:
-          name: "surefire-reports-${{ github.run_id }}-${{ github.run_attempt }}"
+          name: "surefire-reports-$(echo -n '${{ inputs.args }}' | sha256sum | cut -d' ' -f1)-${{ github.run_attempt }}"
           path: target/surefire-reports
