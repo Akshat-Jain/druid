@@ -47,5 +47,5 @@ jobs:
         if: ${{ inputs.upload_surefire_reports }}
         uses: actions/upload-artifact@v4
         with:
-          name: "surefire-reports-${{ env.HASH }}-${{ github.run_attempt }}"
+          name: "surefire-reports-${{ env.HASH }}"
           path: ./**/surefire-reports/**/*.xml
