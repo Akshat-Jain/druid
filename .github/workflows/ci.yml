@@ -31,6 +31,7 @@ jobs:
     name: "report-unit-test-failures"
     needs: run-unit-tests
     runs-on: ubuntu-latest
+    if: ${{ always() }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,7 +39,7 @@ jobs:
       - name: Download individual surefire reports
         uses: actions/download-artifact@v4
         with:
-          name: "surefire-reports-*"
+          pattern: "surefire-reports-*"
           path: target/surefire-reports
 
       - name: Print files in surefire-reports
