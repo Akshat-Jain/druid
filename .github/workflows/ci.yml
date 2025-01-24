@@ -25,7 +25,9 @@ jobs:
       script: ".github/scripts/run-maven-command.sh"
       args: "test -Dtest='${{ matrix.Dtest }}' -Dsurefire.failIfNoSpecifiedTests=false -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true -Dmaven.test.failure.ignore=true"
       jdk: ${{ inputs.jdk }}
-      upload_surefire_reports: true
+      upload_reports: true
+      artifact_prefix: "surefire-reports"
+      report_directory_pattern: "./**/surefire-reports/**/*.xml"
 
   reporting:
     name: "report-unit-test-failures"

@@ -15,10 +15,18 @@ on:
         required: false
         type: string
         description: "Arguments for the script"
-      upload_surefire_reports:
+      upload_reports:
         required: false
         type: boolean
-        description: "Upload surefire reports"
+        description: "Upload report artifacts"
+      artifact_prefix:
+        required: false
+        type: string
+        description: "Prefix for the artifact name"
+      report_directory_pattern:
+        required: false
+        type: string
+        description: "Pattern to match report files (e.g., './**/surefire-reports/**/*.xml')"
 
 jobs:
   execute:
@@ -37,13 +45,13 @@ jobs:
           ./${{ inputs.script }} ${{ inputs.args }} 
 
       - name: Calculate hash for artifact name
-        if: ${{ inputs.upload_surefire_reports }}
+        if: ${{ inputs.upload_reports }}
         run: |
           ./.github/scripts/make-hash-for-artifact-name.sh "${{ inputs.args }}"
 
-      - name: Upload surefire reports
-        if: ${{ inputs.upload_surefire_reports }}
+      - name: Upload reports
+        if: ${{ inputs.upload_reports }}
         uses: actions/upload-artifact@v4
         with:
-          name: "surefire-reports-${{ env.HASH }}"
-          path: ./**/surefire-reports/**/*.xml
+          name: "${{ inputs.artifact_prefix }}-${{ env.HASH }}"
+          path: ${{ inputs.report_directory_pattern }}
