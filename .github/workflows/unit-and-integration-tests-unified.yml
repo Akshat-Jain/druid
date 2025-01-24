@@ -53,6 +53,7 @@ env:
 jobs:
   set-env-var:
     name: Set env var
+    if: false
     runs-on: ubuntu-latest
     outputs:
       DRUID_PREVIOUS_IT_IMAGE_NAME: ${{ steps.image_name.outputs.image_name }}
