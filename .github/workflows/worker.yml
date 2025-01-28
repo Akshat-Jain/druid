@@ -15,6 +15,10 @@ on:
         required: false
         type: string
         description: "Arguments for the script"
+      artifact_prefix:
+        required: false
+        type: string
+        description: "Prefix for the artifact name"
 
 jobs:
   execute:
@@ -31,3 +35,13 @@ jobs:
       - name: Execute script
         run: |
           ./${{ inputs.script }} ${{ inputs.args }} 
+
+      - name: Calculate hash for artifact name
+        run: |
+          ./.github/scripts/make-hash-for-artifact-name.sh "${{ inputs.args }}"
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ inputs.artifact_prefix }}-${{ env.HASH }}"
+          path: ./**/TEST-*.xml
