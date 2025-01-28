@@ -1077,14 +1077,14 @@ public class MSQTestBase extends BaseCalciteQueryTest
     protected void verifyLookupLoadingInfoInTaskContext(Map<String, Object> context)
     {
       LookupLoadingSpec specFromContext = LookupLoadingSpec.createFromContext(context, LookupLoadingSpec.ALL);
-      Assert.assertEquals(null, specFromContext);
+      Assert.assertEquals(expectedLookupLoadingSpec, specFromContext);
     }
 
     protected void verifyWorkerCount(CounterSnapshotsTree counterSnapshotsTree)
     {
       Map<Integer, Map<Integer, CounterSnapshots>> counterMap = counterSnapshotsTree.copyMap();
       for (Map.Entry<Integer, Integer> stageWorkerCount : expectedStageVsWorkerCount.entrySet()) {
-        Assert.assertEquals(123, counterMap.get(stageWorkerCount.getKey()).size());
+        Assert.assertEquals(stageWorkerCount.getValue().intValue(), counterMap.get(stageWorkerCount.getKey()).size());
       }
     }
 

@@ -250,7 +250,7 @@ public class GoogleCloudStorageInputSourceTest extends InitializedNullHandlingTe
         null,
         new MaxSizeSplitHintSpec(10, null)
     );
-    Assert.assertEquals(null, splits.map(InputSplit::get).collect(Collectors.toList()));
+    Assert.assertEquals(EXPECTED_OBJECTS, splits.map(InputSplit::get).collect(Collectors.toList()));
     EasyMock.verify(STORAGE);
   }
 

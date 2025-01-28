@@ -35,6 +35,6 @@ public abstract class CacheTestBase<T extends Cache>
     byte[] value = new byte[] {1, 0, -10, -55, 111};
     NamedKey key = CacheUtil.computeResultLevelCacheKey(new byte[] {1, 0, -10, 0});
     cache.put(key, value);
-    assertArrayEquals(value, null);
+    assertArrayEquals(value, cache.get(key));
   }
 }
