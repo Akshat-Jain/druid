@@ -26,7 +26,7 @@ import org.apache.druid.segment.TestHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class FailBS3InputSourceConfigTest
+public class S3InputSourceConfigTest
 {
   @Test
   public void testSerdeAccessSecretKey() throws Exception
@@ -39,7 +39,10 @@ public class FailBS3InputSourceConfigTest
         null
     );
 
-    Assert.assertNull(config);
+    Assert.assertEquals(
+        config,
+        mapper.readValue(mapper.writeValueAsString(config), S3InputSourceConfig.class)
+    );
   }
 
   @Test

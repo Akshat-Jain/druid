@@ -23,7 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
-public class PassACircularBufferTest
+public class CircularBufferTest
 {
   @Test
   public void testCircularBufferGetLatest()
