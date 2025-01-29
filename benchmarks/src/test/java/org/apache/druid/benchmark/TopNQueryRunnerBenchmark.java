@@ -17,37 +17,62 @@
  * under the License.
  */
 
-package org.apache.druid.query.topn;
+package org.apache.druid.benchmark;
 
-import com.carrotsearch.junitbenchmarks.AbstractBenchmark;
-import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import org.apache.druid.collections.StupidPool;
+import org.apache.druid.collections.CloseableStupidPool;
+import org.apache.druid.java.util.common.guava.Sequence;
+import org.apache.druid.java.util.common.io.Closer;
+import org.apache.druid.math.expr.ExpressionProcessing;
 import org.apache.druid.query.QueryPlus;
 import org.apache.druid.query.QueryRunner;
 import org.apache.druid.query.QueryRunnerFactory;
 import org.apache.druid.query.QueryRunnerTestHelper;
 import org.apache.druid.query.aggregation.DoubleMaxAggregatorFactory;
 import org.apache.druid.query.aggregation.DoubleMinAggregatorFactory;
+import org.apache.druid.query.topn.TopNQuery;
+import org.apache.druid.query.topn.TopNQueryBuilder;
+import org.apache.druid.query.topn.TopNQueryConfig;
+import org.apache.druid.query.topn.TopNQueryQueryToolChest;
+import org.apache.druid.query.topn.TopNQueryRunnerFactory;
 import org.apache.druid.segment.IncrementalIndexSegment;
 import org.apache.druid.segment.QueryableIndexSegment;
 import org.apache.druid.segment.TestIndex;
 import org.apache.druid.timeline.SegmentId;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.infra.Blackhole;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-/**
- * Based on TopNQueryRunnerTest
- */
-public class TopNQueryRunnerBenchmark extends AbstractBenchmark
+@State(Scope.Benchmark)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Fork(value = 1)
+@Warmup(iterations = 1)
+@Measurement(iterations = 5)
+public class TopNQueryRunnerBenchmark
 {
+  static {
+    ExpressionProcessing.initializeForTests();
+  }
+
+  private final Closer closer = Closer.create();
 
   public enum TestCases
   {
@@ -79,23 +104,24 @@ public class TopNQueryRunnerBenchmark extends AbstractBenchmark
       .build();
   private static final Map<TestCases, QueryRunner> TEST_CASE_MAP = new HashMap<>();
 
-  @BeforeClass
-  public static void setUp()
+  @Setup(Level.Trial)
+  public void setup()
   {
+    CloseableStupidPool<ByteBuffer> closeableStupidPool = new CloseableStupidPool<>(
+        "TopNQueryRunnerFactory-directBufferPool",
+        new Supplier<>()
+        {
+          @Override
+          public ByteBuffer get()
+          {
+            // See OffheapByteBufferPool
+            // Instead of causing a circular dependency, we simply mimic its behavior
+            return ByteBuffer.allocateDirect(2000);
+          }
+        }
+    );
     QueryRunnerFactory factory = new TopNQueryRunnerFactory(
-        new StupidPool<>(
-            "TopNQueryRunnerFactory-directBufferPool",
-            new Supplier<>()
-            {
-              @Override
-              public ByteBuffer get()
-              {
-                // See OffheapByteBufferPool
-                // Instead of causing a circular dependency, we simply mimic its behavior
-                return ByteBuffer.allocateDirect(2000);
-              }
-            }
-        ),
+        closeableStupidPool,
         new TopNQueryQueryToolChest(new TopNQueryConfig()),
         QueryRunnerTestHelper.NOOP_QUERYWATCHER
     );
@@ -123,37 +149,41 @@ public class TopNQueryRunnerBenchmark extends AbstractBenchmark
             null
         )
     );
-    //Thread.sleep(10000);
+
+    closer.register(closeableStupidPool);
   }
 
-  @BenchmarkOptions(warmupRounds = 10000, benchmarkRounds = 10000)
-  @Test
-  public void testmMapped()
+  @TearDown(Level.Trial)
+  public void tearDown() throws Exception
   {
-    TEST_CASE_MAP.get(TestCases.mMappedTestIndex).run(QueryPlus.wrap(QUERY));
+    closer.close();
   }
 
-  @Ignore
-  @BenchmarkOptions(warmupRounds = 10000, benchmarkRounds = 10000)
-  @Test
-  public void testrtIndex()
+  @Benchmark
+  public void testmMapped(Blackhole blackhole)
   {
-    TEST_CASE_MAP.get(TestCases.rtIndex).run(QueryPlus.wrap(QUERY));
+    Sequence sequence = TEST_CASE_MAP.get(TestCases.mMappedTestIndex).run(QueryPlus.wrap(QUERY));
+    blackhole.consume(sequence);
   }
 
-  @Ignore
-  @BenchmarkOptions(warmupRounds = 10000, benchmarkRounds = 10000)
-  @Test
-  public void testMerged()
+  @Benchmark
+  public void testrtIndex(Blackhole blackhole)
   {
-    TEST_CASE_MAP.get(TestCases.mergedRealtimeIndex).run(QueryPlus.wrap(QUERY));
+    Sequence sequence = TEST_CASE_MAP.get(TestCases.rtIndex).run(QueryPlus.wrap(QUERY));
+    blackhole.consume(sequence);
   }
 
-  @Ignore
-  @BenchmarkOptions(warmupRounds = 10000, benchmarkRounds = 10000)
-  @Test
-  public void testOffHeap()
+  @Benchmark
+  public void testMerged(Blackhole blackhole)
   {
-    TEST_CASE_MAP.get(TestCases.rtIndexOffheap).run(QueryPlus.wrap(QUERY));
+    Sequence sequence = TEST_CASE_MAP.get(TestCases.mergedRealtimeIndex).run(QueryPlus.wrap(QUERY));
+    blackhole.consume(sequence);
+  }
+
+  @Benchmark
+  public void testOffHeap(Blackhole blackhole)
+  {
+    Sequence sequence = TEST_CASE_MAP.get(TestCases.rtIndexOffheap).run(QueryPlus.wrap(QUERY));
+    blackhole.consume(sequence);
   }
 }
