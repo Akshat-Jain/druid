@@ -609,7 +609,7 @@ public class ApproximateHistogram
     return this;
   }
 
-  protected ApproximateHistogram foldRule(ApproximateHistogram h, @Nullable float[] mergedPositions, @Nullable long[] mergedBins)
+  public ApproximateHistogram foldRule(ApproximateHistogram h, @Nullable float[] mergedPositions, @Nullable long[] mergedBins)
   {
     // ruleCombine bins requires at least one bin
     if (h.binCount == 0) {
