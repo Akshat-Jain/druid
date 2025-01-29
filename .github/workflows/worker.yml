@@ -37,8 +37,12 @@ jobs:
         run: |
           ./${{ inputs.script }} 
 
+      - name: Calculate hash for artifact name
+        run: |
+          ./.github/scripts/make-hash-for-artifact-name.sh "${{ inputs.key }}"
+
       - name: Upload reports
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ inputs.artifact_prefix }}-${{ hashFiles(inputs.key) }}"
+          name: "${{ inputs.artifact_prefix }}-${{ env.HASH }}"
           path: ./**/TEST-*.xml
