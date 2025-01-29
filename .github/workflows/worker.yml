@@ -11,10 +11,10 @@ on:
         required: true
         type: string
         description: "Script to execute"
-      args:
+      key:
         required: false
         type: string
-        description: "Arguments for the script"
+        description: "Key for the matrix"
       artifact_prefix:
         required: false
         type: string
@@ -22,6 +22,7 @@ on:
 
 jobs:
   execute:
+    name: "Execute (${{ inputs.key }})"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -32,13 +33,13 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ inputs.jdk }}
 
-      - name: Execute script
+      - name: 'Execute script: ${{ inputs.key }}'
         run: |
-          ./${{ inputs.script }} ${{ inputs.args }} 
+          ./${{ inputs.script }} 
 
       - name: Calculate hash for artifact name
         run: |
-          ./.github/scripts/make-hash-for-artifact-name.sh "${{ inputs.args }}"
+          ./.github/scripts/make-hash-for-artifact-name.sh "${{ inputs.key }}"
 
       - name: Upload reports
         uses: actions/upload-artifact@v4
