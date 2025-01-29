@@ -33,7 +33,7 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ inputs.jdk }}
 
-      - name: 'Execute script: ${{ inputs.key }}'
+      - name: 'Execute script: (${{ inputs.key }})'
         run: |
           ./${{ inputs.script }} 
 
