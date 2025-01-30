@@ -45,4 +45,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "${{ inputs.artifact_prefix }}-${{ env.HASH }}"
-          path: ./**/TEST-*.xml
+          path: |
+           ./**/TEST-*.xml
+           ./**/target/jacoco*.exec
