@@ -19,11 +19,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-#        Dtest: [ "V*", "W*" ]
-        Dtest: [ "A*,B*", "C*", "D*,E*,F*", "G*,H*", "I*,J*", "K*,L*", "M*,N*", "O*,P*", "Q*", "R*", "S*", "T*,U*", "V*,W*,X*,Y*,Z*", "nonexistingtest" ]
+        Dtest: [ "V*", "W*" ]
+#        Dtest: [ "A*,B*", "C*", "D*,E*,F*", "G*,H*", "I*,J*", "K*,L*", "M*,N*", "O*,P*", "Q*", "R*", "S*", "T*,U*", "V*,W*,X*,Y*,Z*", "nonexistingtest" ]
     uses: ./.github/workflows/worker.yml
     with:
-      script: ".github/scripts/run-maven-command.sh test -pl '!integration-tests,!:druid-it-tools,!:druid-it-image,!:druid-it-cases' -Dtest='${{ matrix.Dtest }}' -Dsurefire.failIfNoSpecifiedTests=false -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true -Dmaven.test.failure.ignore=true -Djacoco.skip=true"
+      script: ".github/scripts/run-maven-command.sh test -pl '!integration-tests,!:druid-it-tools,!:druid-it-image,!:druid-it-cases' -Dtest='${{ matrix.Dtest }}' -Dsurefire.failIfNoSpecifiedTests=false -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true -Dmaven.test.failure.ignore=true"
       jdk: ${{ inputs.jdk }}
       artifact_prefix: "unit-test-reports"
       key: ${{ matrix.Dtest }}
