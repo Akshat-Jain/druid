@@ -78,3 +78,13 @@ jobs:
 
       - name: Print the jacoco exec and xml files after report
         run: find . -name '*jacoco*.xml'
+
+      - name: Add coverage to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.7.1
+        with:
+          paths: |
+            ./**/target/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 40
+          min-coverage-changed-files: 60
