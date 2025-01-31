@@ -3,6 +3,9 @@
 set -e
 set -x
 
+echo "Printing git branch:"
+git branch
+
 echo "Printing git remote -v:"
 git remote -v
 
@@ -10,7 +13,12 @@ echo "Printing all jacoco.exec files"
 find . -name '*jacoco*.exec'
 
 echo "Setting up git remote"
-git remote set-branches --add origin ${GITHUB_BASE_REF} && git fetch
+git remote set-branches --add origin ${GITHUB_BASE_REF}
+
+git fetch
+
+echo "Printing git branch:"
+git branch
 
 # Compile the project. jacoco:report needs class files along with jacoco.exec files to generate the report.
 #mvn -B clean install -DskipTests -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true
