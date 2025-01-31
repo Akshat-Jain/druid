@@ -24,6 +24,9 @@ on:
         type: string
         description: "Artifacts to download. For example: 'unit-test-reports-*'"
 
+env:
+  FORCE_COLOR: 2
+
 jobs:
   execute:
     name: "Execute (${{ inputs.key }})"
