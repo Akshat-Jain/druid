@@ -75,5 +75,9 @@ jobs:
 
       - name: Print the jacoco exec and xml files after report
         run: |
+         echo "Printing extenstions-core/multi-stage-query/target"
+         find ./extensions-core/multi-stage-query/target -type f
+         echo "Printing jacoco.exec files"
          find . -name '*jacoco*.exec'
+         echo "Printing jacoco.xml files"
          find . -name '*jacoco*.xml'
