@@ -4,28 +4,13 @@ set -e
 set -x
 
 echo "GITHUB_BASE_REF: ${GITHUB_BASE_REF}"
-#
-#echo "Printing git status:"
-#git status
-#
-#echo "Printing git branch:"
-#git branch
-#
-#echo "Printing git remote -v:"
-#git remote -v
-#
-#echo "Printing all jacoco.exec files"
-#find . -name '*jacoco*.exec'
+
+echo "Printing all jacoco.exec files"
+find . -name '*jacoco*.exec'
 
 echo "Setting up git remote"
 git remote set-branches --add origin ${GITHUB_BASE_REF}
 git fetch
-
-#echo "Printing git branch:"
-#git branch
-#
-#echo "Printing git branch -a:"
-#git branch -a
 
 # Compile the project. jacoco:report needs class files along with jacoco.exec files to generate the report.
 mvn -B clean install -DskipTests -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true
@@ -35,7 +20,7 @@ mvn jacoco:merge
 
 mvn jacoco:report
 
-changed_files="$(git diff --name-only remotes/origin/${GITHUB_BASE_REF}...HEAD | grep "\.java$" || [[ $? == 1 ]])"
+changed_files="$(git diff --name-only origin/${GITHUB_BASE_REF}...HEAD | grep "\.java$" || [[ $? == 1 ]])"
 
 echo "Changed files:"
 for f in ${changed_files}
