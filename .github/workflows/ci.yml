@@ -55,6 +55,9 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ inputs.jdk }}
 
+      - name: Compile the code
+        run: mvn clean install -DskipTests
+
       - name: Download reports for all unit test jobs
         uses: actions/download-artifact@v4
         with:
