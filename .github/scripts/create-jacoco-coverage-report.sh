@@ -3,6 +3,8 @@
 set -e
 set -x
 
+echo "GITHUB_BASE_REF: ${GITHUB_BASE_REF}"
+
 echo "Printing git status:"
 git status
 
@@ -17,7 +19,6 @@ find . -name '*jacoco*.exec'
 
 echo "Setting up git remote"
 git remote set-branches --add origin ${GITHUB_BASE_REF}
-
 git fetch
 
 echo "Printing git branch:"
