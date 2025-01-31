@@ -14,37 +14,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-#  run-unit-tests:
-#    name: "unit tests"
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        Dtest: [ "V*", "W*" ]
-##        Dtest: [ "A*,B*", "C*", "D*,E*,F*", "G*,H*", "I*,J*", "K*,L*", "M*,N*", "O*,P*", "Q*", "R*", "S*", "T*,U*", "V*,W*,X*,Y*,Z*", "nonexistingtest" ]
-#    uses: ./.github/workflows/worker.yml
-#    with:
-#      script: .github/scripts/run-unit-tests.sh '${{ matrix.Dtest }}'
-#      jdk: ${{ inputs.jdk }}
-#      artifact_prefix: "unit-test-reports"
-#      key: ${{ matrix.Dtest }}
-#
-#  reporting-unit-test-failures:
-#    name: "report-unit-test-failures"
-#    needs: run-unit-tests
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Download reports for all unit test jobs
-#        uses: actions/download-artifact@v4
-#        with:
-#          pattern: "unit-test-reports-*"
-#          path: target/surefire-reports
-#
-#      - name: Publish Test Report
-#        uses: scacap/action-surefire-report@v1
+  run-unit-tests:
+    name: "unit tests"
+    strategy:
+      fail-fast: false
+      matrix:
+        Dtest: [ "V*", "W*" ]
+#        Dtest: [ "A*,B*", "C*", "D*,E*,F*", "G*,H*", "I*,J*", "K*,L*", "M*,N*", "O*,P*", "Q*", "R*", "S*", "T*,U*", "V*,W*,X*,Y*,Z*", "nonexistingtest" ]
+    uses: ./.github/workflows/worker.yml
+    with:
+      script: .github/scripts/run-unit-tests.sh '${{ matrix.Dtest }}'
+      jdk: ${{ inputs.jdk }}
+      artifact_prefix: "unit-test-reports"
+      key: ${{ matrix.Dtest }}
+
+  reporting-unit-test-failures:
+    name: "report-unit-test-failures"
+    needs: run-unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download reports for all unit test jobs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "unit-test-reports-*"
+          path: target/surefire-reports
+
+      - name: Publish Test Report
+        uses: scacap/action-surefire-report@v1
 
   reporting-jacoco-coverage-failures:
     name: "report-jacoco-coverage-failures"
-#    needs: run-unit-tests
+    needs: run-unit-tests
     uses: ./.github/workflows/worker.yml
     with:
       script: .github/scripts/create-jacoco-coverage-report.sh
