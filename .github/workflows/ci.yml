@@ -19,8 +19,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        Dtest: [ "V*", "W*" ]
-#        Dtest: [ "A*,B*", "C*", "D*,E*,F*", "G*,H*", "I*,J*", "K*,L*", "M*,N*", "O*,P*", "Q*", "R*", "S*", "T*,U*", "V*,W*,X*,Y*,Z*", "nonexistingtest" ]
+#        Dtest: [ "V*", "W*" ]
+        Dtest: [ "A*,B*", "C*", "D*,E*,F*", "G*,H*", "I*,J*", "K*,L*", "M*,N*", "O*,P*", "Q*", "R*", "S*", "T*,U*", "V*,W*,X*,Y*,Z*", "nonexistingtest" ]
     uses: ./.github/workflows/worker.yml
     with:
       script: .github/scripts/run-unit-tests.sh '${{ matrix.Dtest }}'
@@ -49,56 +49,3 @@ jobs:
     with:
       script: .github/scripts/create-jacoco-coverage-report.sh
       artifacts_to_download: "unit-test-reports-*"
-
-#  reporting-jacoco-coverage-failures:
-#    name: "report-jacoco-coverage-failures"
-#    needs: run-unit-tests
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
-#
-#      - uses: actions/setup-java@v4
-#        with:
-#          distribution: 'zulu'
-#          java-version: ${{ inputs.jdk }}
-#
-#      - name: Compile the code
-#        run: mvn -B clean install -DskipTests -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true
-#
-#      - name: Download reports for all unit test jobs
-#        uses: actions/download-artifact@v4
-#        with:
-#          pattern: "unit-test-reports-*"
-#          merge-multiple: true
-#
-#      - name: Print the downloaded files
-#        run: find . -name '*jacoco*.exec'
-#
-#      - name: Merge the jacoco.exec files
-#        run: mvn jacoco:merge
-#
-#      - name: Print the jacoco exec files after merge
-#        run: find . -name '*jacoco*.exec'
-#
-#      - name: Create jacoco report
-#        run: mvn jacoco:report
-#
-#      - name: Print the jacoco exec and xml files after report
-#        run: find . -name '*jacoco*.xml'
-#
-#      - name: Upload Jacoco report for multi-stage-query extension for debugging
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: jacoco-report-multi-stage-query
-#          path: ./extensions-core/multi-stage-query/target/site/jacoco
-#
-#      - name: Add coverage to PR
-#        id: jacoco
-#        uses: madrapps/jacoco-report@v1.7.1
-#        with:
-#          paths: |
-#            ./**/target/**/jacoco.xml
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          min-coverage-overall: 40
-#          min-coverage-changed-files: 60
