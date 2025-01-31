@@ -56,7 +56,7 @@ jobs:
           java-version: ${{ inputs.jdk }}
 
       - name: Compile the code
-        run: mvn clean install -DskipTests
+        run: mvn -B clean install -DskipTests -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true
 
       - name: Download reports for all unit test jobs
         uses: actions/download-artifact@v4
@@ -77,10 +77,4 @@ jobs:
         run: mvn jacoco:report
 
       - name: Print the jacoco exec and xml files after report
-        run: |
-         echo "Printing extenstions-core/multi-stage-query/target"
-         find ./extensions-core/multi-stage-query/target -type f
-         echo "Printing jacoco.exec files"
-         find . -name '*jacoco*.exec'
-         echo "Printing jacoco.xml files"
-         find . -name '*jacoco*.xml'
+        run: find . -name '*jacoco*.xml'
