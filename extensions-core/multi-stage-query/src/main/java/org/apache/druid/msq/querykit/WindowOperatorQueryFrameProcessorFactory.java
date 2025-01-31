@@ -182,6 +182,7 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
   @Override
   public boolean equals(Object o)
   {
+    testCoverage(true);
     if (this == o) {
       return true;
     }
@@ -200,5 +201,16 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
   public int hashCode()
   {
     return Objects.hash(query, operatorList, stageRowSignature, maxRowsMaterializedInWindow, partitionColumnNames);
+  }
+
+  private void testCoverage(boolean x)
+  {
+    if (x) {
+      System.out.println("Coverage test for x = true");
+    }
+    else {
+      System.out.println("Coverage test for x = false");
+      System.out.println("stageRowSignature = " + stageRowSignature);
+    }
   }
 }

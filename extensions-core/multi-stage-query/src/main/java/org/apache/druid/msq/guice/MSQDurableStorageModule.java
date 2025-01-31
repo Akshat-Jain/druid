@@ -103,4 +103,10 @@ public class MSQDurableStorageModule implements DruidModule
   {
     return Boolean.parseBoolean(properties.getProperty(MSQ_INTERMEDIATE_STORAGE_ENABLED, "false"));
   }
+
+  @Override
+  public String toString()
+  {
+    return super.toString();
+  }
 }
