@@ -33,7 +33,7 @@ git branch
 #
 #echo "GITHUB_BASE_REF: ${GITHUB_BASE_REF}"
 
-changed_files_x="$(git diff --name-only akshat/new-workflow...HEAD | grep "\.java$" || [[ $? == 1 ]])"
+changed_files_x="$(git diff --name-only origin/akshat/new-workflow...HEAD | grep "\.java$" || [[ $? == 1 ]])"
 echo "changed_files_x: $changed_files_x"
 
 changed_files="$(git diff --name-only origin/${GITHUB_BASE_REF}...HEAD | grep "\.java$" || [[ $? == 1 ]])"
