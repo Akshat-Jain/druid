@@ -13,7 +13,7 @@ git remote set-branches --add origin ${GITHUB_BASE_REF}
 git fetch
 
 # Compile the project. jacoco:report needs class files along with jacoco.exec files to generate the report.
-mvn -B clean install -DskipTests -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true
+mvn -B install -DskipTests -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true
 
 # If there are multiple jacoco.exec files present in any module, merge them into a single jacoco.exec file for that module.
 mvn jacoco:merge
