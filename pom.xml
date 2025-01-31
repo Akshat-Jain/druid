@@ -1497,7 +1497,7 @@
                         <fileSet>
                             <directory>${project.basedir}</directory>
                             <includes>
-                                <include>**target/jacoco*.exec</include>
+                                <include>**/target/jacoco*.exec</include>
                             </includes>
                         </fileSet>
                     </fileSets>
