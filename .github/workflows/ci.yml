@@ -49,3 +49,4 @@ jobs:
     with:
       script: .github/scripts/create-jacoco-coverage-report.sh
       artifacts_to_download: "unit-test-reports-*"
+      key: "jacoco-coverage-report"
