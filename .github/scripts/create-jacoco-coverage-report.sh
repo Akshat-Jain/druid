@@ -3,6 +3,9 @@
 set -e
 set -x
 
+echo "Printing git status:"
+git status
+
 echo "Printing git branch:"
 git branch
 
