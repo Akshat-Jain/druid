@@ -3,6 +3,9 @@
 set -e
 set -x
 
+echo "Printing git remote -v:"
+git remote -v
+
 echo "Printing all jacoco.exec files"
 find . -name '*jacoco*.exec'
 
