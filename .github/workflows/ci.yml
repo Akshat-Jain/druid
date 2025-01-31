@@ -63,3 +63,17 @@ jobs:
 
       - name: Print the downloaded files
         run: find . -name '*jacoco*.exec'
+
+      - name: Merge the jacoco.exec files
+        run: mvn jacoco:merge
+
+      - name: Print the jacoco exec files after merge
+        run: find . -name '*jacoco*.exec'
+
+      - name: Create jacoco report
+        run: mvn jacoco:report
+
+      - name: Print the jacoco exec and xml files after report
+        run: |
+         find . -name '*jacoco*.exec'
+         find . -name '*jacoco*.xml'
