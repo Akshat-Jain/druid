@@ -40,6 +40,13 @@ git branch -a
 #changed_files_x="$(git diff --name-only origin/akshat/new-workflow...HEAD | grep "\.java$" || [[ $? == 1 ]])"
 #echo "changed_files_x: $changed_files_x"
 #
+
+echo "Printing git log --oneline -20 remotes/origin/akshat/new-workflow"
+git log --oneline -20 remotes/origin/akshat/new-workflow
+
+echo "Printing git log --oneline -20 origin/akshat/new-workflow"
+git log --oneline -20 origin/akshat/new-workflow
+
 changed_files="$(git diff --name-only remotes/origin/${GITHUB_BASE_REF}...HEAD | grep "\.java$" || [[ $? == 1 ]])"
 
 echo "Changed files:"
