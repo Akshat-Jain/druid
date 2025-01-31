@@ -19,6 +19,10 @@ on:
         required: false
         type: string
         description: "Prefix for the artifact name"
+      artifacts_to_download:
+        required: false
+        type: string
+        description: "Artifacts to download. For example: 'unit-test-reports-*'"
 
 jobs:
   execute:
@@ -32,6 +36,18 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: ${{ inputs.jdk }}
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16.17.0
+
+      - name: Download required artifacts
+        if: ${{ inputs.artifacts_to_download != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ${{ inputs.artifacts_to_download }}
+          merge-multiple: true
 
       - name: 'Execute script: (${{ inputs.key }})'
         run: |
