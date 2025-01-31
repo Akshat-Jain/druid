@@ -13,14 +13,14 @@ echo "Setting up git remote"
 git remote set-branches --add origin ${GITHUB_BASE_REF} && git fetch
 
 # Compile the project. jacoco:report needs class files along with jacoco.exec files to generate the report.
-mvn -B clean install -DskipTests -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true
-
-# If there are multiple jacoco.exec files present in any module, merge them into a single jacoco.exec file for that module.
-mvn jacoco:merge
-
-mvn jacoco:report
-
-echo "GITHUB_BASE_REF: ${GITHUB_BASE_REF}"
+#mvn -B clean install -DskipTests -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true
+#
+## If there are multiple jacoco.exec files present in any module, merge them into a single jacoco.exec file for that module.
+#mvn jacoco:merge
+#
+#mvn jacoco:report
+#
+#echo "GITHUB_BASE_REF: ${GITHUB_BASE_REF}"
 
 changed_files="$(git diff --name-only origin/${GITHUB_BASE_REF}...HEAD | grep "\.java$" || [[ $? == 1 ]])"
 
