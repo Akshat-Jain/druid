@@ -23,8 +23,6 @@ import com.google.common.base.Preconditions;
 import org.apache.druid.query.QueryContexts;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Implementation class for ReadableVectorMatch.
@@ -276,24 +274,5 @@ public class VectorMatch implements ReadableVectorMatch
     }
     retVal.append("]");
     return retVal.toString();
-  }
-
-  @Override
-  public boolean equals(Object o)
-  {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    VectorMatch that = (VectorMatch) o;
-    return selectionSize == that.selectionSize && Objects.deepEquals(selection, that.selection);
-  }
-
-  @Override
-  public int hashCode()
-  {
-    return Objects.hash(Arrays.hashCode(selection), selectionSize);
   }
 }

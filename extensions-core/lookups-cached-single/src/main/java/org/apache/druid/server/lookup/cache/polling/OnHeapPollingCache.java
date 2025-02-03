@@ -106,10 +106,4 @@ public class OnHeapPollingCache<K, V> implements PollingCache<K, V>
       return new OnHeapPollingCache(entries);
     }
   }
-
-  @Override
-  public String toString()
-  {
-    return "safsafsagasg";
-  }
 }
