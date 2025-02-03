@@ -1492,7 +1492,7 @@
                         <exclude>org/apache/druid/common/aws/AWSCredentials*</exclude>
                         <exclude>com/fasterxml/jackson/databind/*</exclude>
                     </excludes>
-                    <!-- fileSets specify the target directories which will be scanned by jacoco:merge -->
+                    <!-- fileSets specify the target locations which will be scanned by jacoco:merge -->
                     <fileSets>
                         <fileSet>
                             <directory>${project.basedir}</directory>

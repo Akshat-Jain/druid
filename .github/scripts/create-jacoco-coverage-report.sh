@@ -5,9 +5,6 @@ set -x
 
 echo "GITHUB_BASE_REF: ${GITHUB_BASE_REF}"
 
-echo "Printing all jacoco.exec files"
-find . -name '*jacoco*.exec'
-
 echo "Setting up git remote"
 git remote set-branches --add origin ${GITHUB_BASE_REF}
 git fetch
@@ -18,13 +15,7 @@ mvn -B install -DskipTests -P skip-static-checks -Dweb.console.skip=true -Dmaven
 # If there are multiple jacoco.exec files present in any module, merge them into a single jacoco.exec file for that module.
 mvn jacoco:merge
 
-echo "Printing all jacoco.exec files after merge"
-find . -name '*jacoco*.exec'
-
 mvn jacoco:report
-
-echo "Printing all jacoco.xml files"
-find . -name '*jacoco*.xml'
 
 changed_files="$(git diff --name-only origin/${GITHUB_BASE_REF}...HEAD | grep "\.java$" || [[ $? == 1 ]])"
 
