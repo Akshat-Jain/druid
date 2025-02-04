@@ -211,6 +211,16 @@ public class WindowOperatorQueryFrameProcessorFactory extends BaseFrameProcessor
     else {
       System.out.println("Coverage test for x = false");
       System.out.println("stageRowSignature = " + stageRowSignature);
+      if (partitionColumnNames != null) {
+        System.out.println("partitionColumnNames = " + partitionColumnNames);
+      } else {
+        System.out.println("partitionColumnNames = null");
+      }
+      if (query != null) {
+        System.out.println("query = " + query);
+      } else {
+        System.out.println("query = null");
+      }
     }
   }
 }
