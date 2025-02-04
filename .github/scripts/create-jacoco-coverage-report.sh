@@ -34,7 +34,7 @@ export FORCE_COLOR=2
 if [ -n "${changed_files}" ]
 then
   git diff origin/${GITHUB_BASE_REF}...HEAD -- ${changed_files} |
-  web-console/target/node/node_modules/.bin/diff-test-coverage \
+  node_modules/.bin/diff-test-coverage \
   --coverage "**/target/site/jacoco/jacoco.xml" \
   --type jacoco \
   --line-coverage 50 \
