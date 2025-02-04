@@ -19,16 +19,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        Dtest: [ "V*", "W*" ]
+        Dtest: [ "X*", "W*" ]
 #        Dtest: [ "A*,B*", "C*", "D*,E*,F*", "G*,H*", "I*,J*", "K*,L*", "M*,N*", "O*,P*", "Q*", "R*", "S*", "T*,U*", "V*,W*,X*,Y*,Z*", "nonexistingtest" ]
     uses: ./.github/workflows/worker.yml
     with:
-      script: ".github/scripts/run-maven-command.sh test -pl '!integration-tests,!:druid-it-tools,!:druid-it-image,!:druid-it-cases' -Dtest='${{ matrix.Dtest }}' -Dsurefire.failIfNoSpecifiedTests=false -P skip-static-checks -Dweb.console.skip=true -Dmaven.javadoc.skip=true -Dmaven.test.failure.ignore=true"
+      script: .github/scripts/run-unit-tests.sh -Dtest='${{ matrix.Dtest }}' -Dmaven.test.failure.ignore=true
       jdk: ${{ inputs.jdk }}
       artifact_prefix: "unit-test-reports"
       key: ${{ matrix.Dtest }}
 
-  reporting:
+  reporting-unit-test-failures:
     name: "report-unit-test-failures"
     needs: run-unit-tests
     runs-on: ubuntu-latest
@@ -41,3 +41,14 @@ jobs:
 
       - name: Publish Test Report
         uses: scacap/action-surefire-report@v1
+        with:
+          check_name: "Unit Test Report"
+
+  reporting-jacoco-coverage-failures:
+    name: "report-jacoco-coverage-failures"
+    needs: run-unit-tests
+    uses: ./.github/workflows/worker.yml
+    with:
+      script: .github/scripts/create-jacoco-coverage-report.sh
+      artifacts_to_download: "unit-test-reports-*"
+      key: "jacoco-coverage-report"
