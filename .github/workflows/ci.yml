@@ -41,6 +41,8 @@ jobs:
 
       - name: Publish Test Report
         uses: scacap/action-surefire-report@v1
+        with:
+          check_name: "Unit Test Report"
 
   reporting-jacoco-coverage-failures:
     name: "report-jacoco-coverage-failures"
