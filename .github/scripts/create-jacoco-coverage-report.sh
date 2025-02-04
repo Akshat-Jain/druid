@@ -25,12 +25,16 @@ do
   echo $f
 done
 
+mvn com.github.eirslett:frontend-maven-plugin:install-node-and-npm@install-node-and-npm -pl web-console/
+PATH+=:web-console/target/node/
 npm install @connectis/diff-test-coverage@1.5.3
+
+export FORCE_COLOR=2
 
 if [ -n "${changed_files}" ]
 then
   git diff origin/${GITHUB_BASE_REF}...HEAD -- ${changed_files} |
-  node_modules/.bin/diff-test-coverage \
+  web-console/target/node/node_modules/.bin/diff-test-coverage \
   --coverage "**/target/site/jacoco/jacoco.xml" \
   --type jacoco \
   --line-coverage 50 \
