@@ -19,8 +19,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        Dtest: [ "X*", "W*" ]
-#        Dtest: [ "A*,B*", "C*", "D*,E*,F*", "G*,H*", "I*,J*", "K*,L*", "M*,N*", "O*,P*", "Q*", "R*", "S*", "T*,U*", "V*,W*,X*,Y*,Z*", "nonexistingtest" ]
+#        Dtest: [ "X*", "W*" ]
+        Dtest: [ "A*,B*", "C*", "D*,E*,F*", "G*,H*", "I*,J*", "K*,L*", "M*,N*", "O*,P*", "Q*", "R*", "S*", "T*,U*", "V*,W*,X*,Y*,Z*", "nonexistingtest" ]
     uses: ./.github/workflows/worker.yml
     with:
       script: .github/scripts/run-unit-tests.sh -Dtest='${{ matrix.Dtest }}' -Dmaven.test.failure.ignore=true
@@ -43,6 +43,7 @@ jobs:
         uses: scacap/action-surefire-report@v1
         with:
           check_name: "Unit Test Report"
+          ignore_flaky_tests: true
 
   reporting-jacoco-coverage-failures:
     name: "report-jacoco-coverage-failures"
