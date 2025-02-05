@@ -65,6 +65,7 @@ jobs:
           comment: true
           fail_on_failure: true
           check_retries: true
+          updateComment: false
 
   reporting-jacoco-coverage-failures:
     name: "report-jacoco-coverage-failures"
