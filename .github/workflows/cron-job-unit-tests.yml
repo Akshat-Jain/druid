@@ -17,10 +17,6 @@ name: "Cron Job Unit Tests"
 on:
   schedule: # Runs by default on master branch
     - cron: '0 3 * * 6' # Runs every Saturday at 03:00 AM UTC
-  pull_request:
-    branches:
-      - master
-      - akshat/new-workflow
 
 jobs:
   run-unit-tests:

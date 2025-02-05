@@ -32,7 +32,7 @@ public class WindowOperatorQueryFrameProcessorFactoryTest
                       "query",
                       "operatorList",
                       "stageRowSignature",
-                      "asfasf",
+                      "maxRowsMaterializedInWindow",
                       "partitionColumnNames"
                   )
                   .usingGetClass()
