@@ -61,6 +61,8 @@ jobs:
           report_paths: '**/target/surefire-reports/TEST-*.xml'
           detailed_summary: true
           flaky_summary: true
+          annotate_only: true
+          comment: true
 
   reporting-jacoco-coverage-failures:
     name: "report-jacoco-coverage-failures"
