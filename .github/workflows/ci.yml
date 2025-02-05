@@ -55,10 +55,10 @@ jobs:
           path: target/surefire-reports
 
       - name: Publish Test Report
-        uses: scacap/action-surefire-report@v1
+        uses: mikepenz/action-junit-report@v5
         with:
           check_name: "Unit Test Report"
-          ignore_flaky_tests: true
+          report_paths: '**/target/surefire-reports/TEST-*.xml'
 
   reporting-jacoco-coverage-failures:
     name: "report-jacoco-coverage-failures"
