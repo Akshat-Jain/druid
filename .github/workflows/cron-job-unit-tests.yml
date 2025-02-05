@@ -33,31 +33,31 @@ jobs:
         # Dtest: [ "A*,B*", "C*", "D*,E*,F*", "G*,H*", "I*,J*", "K*,L*", "M*,N*", "O*,P*", "Q*", "R*", "S*", "T*,U*", "V*,W*,X*,Y*,Z*", "nonexistingtest" ]
     uses: ./.github/workflows/worker.yml
     with:
-      script: .github/scripts/run-unit-tests.sh -Dtest='${{ matrix.Dtest }}' -Dmaven.test.failure.ignore=true
+      script: .github/scripts/run-unit-tests.sh -Dtest='${{ matrix.Dtest }}' --fail-at-end
       jdk: ${{ matrix.jdk }}
       artifact_prefix: "unit-test-reports-${{ matrix.jdk }}"
       key: ${{ matrix.Dtest }}
 
-  reporting-unit-test-failures:
-    name: "report-unit-test-failures-${{ matrix.jdk }}"
-    needs: run-unit-tests
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        jdk: [ '11', '21.0.4' ]
-    steps:
-      - name: Download reports for all unit test jobs
-        uses: actions/download-artifact@v4
-        with:
-          pattern: "unit-test-reports-${{ matrix.jdk }}-*"
-          path: target/surefire-reports
-
-      - name: Publish Test Report
-        uses: scacap/action-surefire-report@v1
-        with:
-          check_name: "Unit Test Report (JDK ${{ matrix.jdk }})"
-          ignore_flaky_tests: true
+#  reporting-unit-test-failures:
+#    name: "report-unit-test-failures-${{ matrix.jdk }}"
+#    needs: run-unit-tests
+#    runs-on: ubuntu-latest
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        jdk: [ '11', '21.0.4' ]
+#    steps:
+#      - name: Download reports for all unit test jobs
+#        uses: actions/download-artifact@v4
+#        with:
+#          pattern: "unit-test-reports-${{ matrix.jdk }}-*"
+#          path: target/surefire-reports
+#
+#      - name: Publish Test Report
+#        uses: scacap/action-surefire-report@v1
+#        with:
+#          check_name: "Unit Test Report (JDK ${{ matrix.jdk }})"
+#          ignore_flaky_tests: true
 
   reporting-jacoco-coverage-failures:
     name: "report-jacoco-coverage-failures-${{ matrix.jdk }}"
