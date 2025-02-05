@@ -39,6 +39,9 @@ on:
         type: string
         description: "Artifacts to download. For example: 'unit-test-reports-*'"
 
+env:
+  SEGMENT_DOWNLOAD_TIMEOUT_MINS: 5
+
 jobs:
   execute:
     name: "Execute (${{ inputs.key }})"
