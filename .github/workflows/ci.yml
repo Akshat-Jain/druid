@@ -59,6 +59,8 @@ jobs:
         with:
           check_name: "Unit Test Report"
           report_paths: '**/target/surefire-reports/TEST-*.xml'
+          detailed_summary: true
+          flaky_summary: true
 
   reporting-jacoco-coverage-failures:
     name: "report-jacoco-coverage-failures"
