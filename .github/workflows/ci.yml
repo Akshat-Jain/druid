@@ -63,6 +63,7 @@ jobs:
           flaky_summary: true
           annotate_only: true
           comment: true
+          fail_on_failure: true
 
   reporting-jacoco-coverage-failures:
     name: "report-jacoco-coverage-failures"
