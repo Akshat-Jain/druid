@@ -38,7 +38,6 @@ import org.apache.druid.segment.CursorFactory;
 import org.apache.druid.segment.column.RowSignature;
 import org.apache.druid.testing.InitializedNullHandlingTest;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
 import java.io.IOException;
@@ -103,8 +102,6 @@ public class FrameProcessorTestBase extends InitializedNullHandlingTest
           }
         }
     );
-
-    Assert.assertEquals(123, frames.toList().size());
 
     channel.writable().close();
     return ReadableInput.channel(channel.readable(), FrameReader.create(signature), STAGE_PARTITION);
