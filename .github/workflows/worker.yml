@@ -64,6 +64,10 @@ jobs:
           pattern: ${{ inputs.artifacts_to_download }}
           merge-multiple: true
 
+      - name: Calculate hash for artifact name
+        run: |
+          ./.github/scripts/make-hash-for-artifact-name.sh "${{ inputs.key }}"
+
       - name: 'Execute script: (${{ inputs.key }})'
         run: |
           ./${{ inputs.script }} 
@@ -83,12 +87,8 @@ jobs:
         if: ${{ failure() && env.found_dumps == 'true' }}
         uses: actions/upload-artifact@v4
         with:
-          name: Failure-${{ inputs.key }}-${{ inputs.jdk }}
+          name: "$Failure-${{ env.HASH }}-${{ inputs.jdk }}"
           path: ${{ runner.temp }}/failure-dumps.tar.gz
-
-      - name: Calculate hash for artifact name
-        run: |
-          ./.github/scripts/make-hash-for-artifact-name.sh "${{ inputs.key }}"
 
       - name: Upload reports
         uses: actions/upload-artifact@v4
