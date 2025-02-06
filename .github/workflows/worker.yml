@@ -64,13 +64,31 @@ jobs:
           pattern: ${{ inputs.artifacts_to_download }}
           merge-multiple: true
 
+      - name: Calculate hash for artifact name
+        run: |
+          ./.github/scripts/make-hash-for-artifact-name.sh "${{ inputs.key }}"
+
       - name: 'Execute script: (${{ inputs.key }})'
         run: |
           ./${{ inputs.script }} 
 
-      - name: Calculate hash for artifact name
+      - name: Check for dumps on failure
+        if: ${{ failure() }}
+        id: check_for_dumps
         run: |
-          ./.github/scripts/make-hash-for-artifact-name.sh "${{ inputs.key }}"
+          DUMP_FILES=$(find "${GITHUB_WORKSPACE}" \( -name '*.hprof' -or -name 'hs_err_pid*' -or -name 'replay_pid*' -or -regex '.*/core\.[0-9]*' \))
+          
+          if [[ -n "$DUMP_FILES" ]]; then
+            tar -cvzf "${RUNNER_TEMP}/failure-dumps.tar.gz" ${DUMP_FILES}
+            echo "found_dumps=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Upload Dumps to GitHub
+        if: ${{ failure() && env.found_dumps == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: "Failure-${{ inputs.jdk }}-${{ env.HASH }}"
+          path: ${{ runner.temp }}/failure-dumps.tar.gz
 
       - name: Upload reports
         uses: actions/upload-artifact@v4
