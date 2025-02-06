@@ -39,7 +39,6 @@ on:
       - 'website/**'
     branches:
       - master
-      - akshat/new-workflow
       - '[0-9]+.[0-9]+.[0-9]+' # release branches
       - '[0-9]+.[0-9]+.[0-9]+-[A-Za-z0-9]+' # release branches
 
@@ -54,7 +53,6 @@ env:
 jobs:
   set-env-var:
     name: Set env var
-    if: false
     runs-on: ubuntu-latest
     outputs:
       DRUID_PREVIOUS_IT_IMAGE_NAME: ${{ steps.image_name.outputs.image_name }}
@@ -209,33 +207,20 @@ jobs:
     with:
       jdk: 17
 
-#  unit-tests-phase2:
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        # Use JDK 21.0.4 to work around https://github.com/apache/druid/issues/17429
-#        jdk: [ '11', '21.0.4' ]
-#    name: "unit tests (jdk${{ matrix.jdk }})"
-#    uses: ./.github/workflows/ci.yml
-#    needs: [unit-tests-unapproved, check-approval]
-#    if: ${{ always() && (needs.check-approval.outputs.approved == 'true' || needs.unit-tests-unapproved.result == 'success' || needs.unit-tests-unapproved.outputs.continue_tests) }}
-#    with:
-#      jdk: ${{ matrix.jdk }}
+  standard-its:
+    needs: [build, unit-tests-unapproved, check-approval]
+    if: ${{ always() && (needs.check-approval.outputs.approved == 'true' || needs.unit-tests-unapproved.result == 'success') }}
+    uses: ./.github/workflows/standard-its.yml
 
-  # standard-its:
-  #   needs: [unit-tests-unapproved, check-approval]
-  #   if: ${{ always() && (needs.check-approval.outputs.approved == 'true' || needs.unit-tests-unapproved.result == 'success' || needs.unit-tests-unapproved.outputs.continue_tests) }}
-  #   uses: ./.github/workflows/standard-its.yml
-
-  # revised-its:
-  #   needs: [unit-tests-unapproved, check-approval, set-env-var]
-  #   if: ${{ always() && (needs.check-approval.outputs.approved == 'true' || needs.unit-tests-unapproved.result == 'success' || needs.unit-tests-unapproved.outputs.continue_tests) }}
-  #   uses: ./.github/workflows/revised-its.yml
-  #   with:
-  #     BACKWARD_COMPATIBILITY_IT_ENABLED: ${{ needs.set-env-var.outputs.BACKWARD_COMPATIBILITY_IT_ENABLED }}
-  #     DRUID_PREVIOUS_VERSION: ${{ needs.set-env-var.outputs.DRUID_PREVIOUS_VERSION }}
-  #     DRUID_PREVIOUS_VERSION_DOWNLOAD_URL: ${{ needs.set-env-var.outputs.DRUID_PREVIOUS_VERSION_DOWNLOAD_URL }}
-  #     DRUID_PREVIOUS_IT_IMAGE_NAME: ${{ needs.set-env-var.outputs.DRUID_PREVIOUS_IT_IMAGE_NAME }}
+  revised-its:
+    needs: [build, unit-tests-unapproved, check-approval, set-env-var]
+    if: ${{ always() && (needs.check-approval.outputs.approved == 'true' || needs.unit-tests-unapproved.result == 'success') }}
+    uses: ./.github/workflows/revised-its.yml
+    with:
+      BACKWARD_COMPATIBILITY_IT_ENABLED: ${{ needs.set-env-var.outputs.BACKWARD_COMPATIBILITY_IT_ENABLED }}
+      DRUID_PREVIOUS_VERSION: ${{ needs.set-env-var.outputs.DRUID_PREVIOUS_VERSION }}
+      DRUID_PREVIOUS_VERSION_DOWNLOAD_URL: ${{ needs.set-env-var.outputs.DRUID_PREVIOUS_VERSION_DOWNLOAD_URL }}
+      DRUID_PREVIOUS_IT_IMAGE_NAME: ${{ needs.set-env-var.outputs.DRUID_PREVIOUS_IT_IMAGE_NAME }}
 
   actions-timeline:
     needs: [unit-tests-unapproved]
