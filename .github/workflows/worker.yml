@@ -87,7 +87,7 @@ jobs:
         if: ${{ failure() && env.found_dumps == 'true' }}
         uses: actions/upload-artifact@v4
         with:
-          name: "$Failure-${{ env.HASH }}-${{ inputs.jdk }}"
+          name: "Failure-${{ inputs.jdk }}-${{ env.HASH }}"
           path: ${{ runner.temp }}/failure-dumps.tar.gz
 
       - name: Upload reports
