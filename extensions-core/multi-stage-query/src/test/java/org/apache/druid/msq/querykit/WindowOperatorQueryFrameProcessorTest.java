@@ -58,6 +58,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -79,6 +80,18 @@ public class WindowOperatorQueryFrameProcessorTest extends FrameProcessorTestBas
   @Test
   public void testFrameWriterReachingCapacity() throws IOException
   {
+    List<byte[]> memoryHog = new ArrayList<>();
+    try {
+      while (true) {
+        memoryHog.add(new byte[1024 * 1024]); // Allocate 1MB chunks
+      }
+    } catch (OutOfMemoryError e) {
+      System.out.println("OOM occurred!");
+      System.out.println("e = " + e);
+    }
+
+    System.out.println("memoryHog.size() = " + memoryHog.size());
+
     // This test validates that all output rows are flushed to the output channel even if frame writer's
     // capacity is reached, by subsequent iterations of runIncrementally.
     final ReadableInput factChannel = buildWindowTestInputChannel();
