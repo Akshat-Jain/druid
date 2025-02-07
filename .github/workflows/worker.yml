@@ -81,5 +81,5 @@ jobs:
             **/hs_err_pid*
             **/replay_pid*
             **/core.[0-9]*
-           ./**/TEST-*.xml
-           ./**/target/jacoco*.exec
+            ./**/TEST-*.xml
+            ./**/target/jacoco*.exec
