@@ -65,8 +65,7 @@ jobs:
           merge-multiple: true
 
       - name: Calculate hash for artifact name
-        run: |
-          ./.github/scripts/make-hash-for-artifact-name.sh "${{ inputs.key }}"
+        run: echo "HASH=$(echo -n "${{ inputs.key }}" | sha256sum | cut -d' ' -f1 | cut -c1-8)" >> $GITHUB_ENV
 
       - name: 'Execute script: (${{ inputs.key }})'
         run: |
