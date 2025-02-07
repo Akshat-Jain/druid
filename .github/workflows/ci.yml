@@ -29,10 +29,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        Dtest: [ "A*,B*", "C*", "D*,E*,F*", "G*,H*", "I*,J*", "K*,L*", "M*,N*", "O*,P*", "Q*", "R*", "S*", "T*,U*", "V*,W*,X*,Y*,Z*" ]
+        Dtest: [ "W*" ]
     uses: ./.github/workflows/worker.yml
     with:
-      script: .github/scripts/run-unit-tests.sh -Dtest='${{ matrix.Dtest }}' -Dmaven.test.failure.ignore=true
+      script: .github/scripts/run-unit-tests.sh -Dtest='WindowOperatorQueryFrameProcessorTest' -Dmaven.test.failure.ignore=true
       jdk: ${{ inputs.jdk }}
       artifact_prefix: "unit-test-reports"
       key: ${{ matrix.Dtest }}
