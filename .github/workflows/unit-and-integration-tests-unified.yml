@@ -79,8 +79,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Use JDK 21.0.4 to work around https://github.com/apache/druid/issues/17429
-        jdk: [ '11', '17', '21.0.4' ]
+        jdk: [ '11', '17', '21' ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -213,7 +212,7 @@ jobs:
     uses: ./.github/workflows/standard-its.yml
 
   revised-its:
-    needs: [build, unit-tests-unapproved, check-approval, set-env-var]
+    needs: [build, unit-tests-unapproved, check-approval]
     if: ${{ always() && (needs.check-approval.outputs.approved == 'true' || needs.unit-tests-unapproved.result == 'success') }}
     uses: ./.github/workflows/revised-its.yml
     with:
