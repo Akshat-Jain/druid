@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        Dtest: [ "A*,B*", "C*", "D*,E*,F*", "G*,H*", "I*,J*", "K*,L*", "M*", "N*,O*,P*", "Q*", "R*", "S*", "T*,U*", "V*,W*,X*,Y*,Z*" ]
+        Dtest: [ "M*", "C*", "Q*", "R*", "S*", "H*,U*,X*,Y*,Z*", "K*,E*,O*", "T*,N*,V*,W*", "D*,G*,L*", "P*,F*,A*", "I*,B*,J*"]
     uses: ./.github/workflows/worker.yml
     with:
       script: .github/scripts/run-unit-tests.sh -Dtest='${{ matrix.Dtest }}' -Dmaven.test.failure.ignore=true
