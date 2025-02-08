@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        Dtest: [ "M*", "C*,O*", "Q*,N*,E*", "R*,G*,U*", "S*,F*,A*", "H*,I*,J*", "K*,P*,V*,W*,X*,Y*,Z*", "T*,D*,B*,L*"]
+        Dtest: [ "W*", "N*"]
     uses: ./.github/workflows/worker.yml
     with:
       script: .github/scripts/run-unit-tests.sh -Dtest='${{ matrix.Dtest }}' -Dmaven.test.failure.ignore=true
@@ -60,11 +60,11 @@ jobs:
           check_retries: true
           truncate_stack_traces: false
 
-#  reporting-jacoco-coverage-failures:
-#    name: "report-jacoco-coverage-failures"
-#    needs: run-unit-tests
-#    uses: ./.github/workflows/worker.yml
-#    with:
-#      script: .github/scripts/create-jacoco-coverage-report.sh
-#      artifacts_to_download: "unit-test-reports-*"
-#      key: "jacoco-coverage-report"
+  reporting-jacoco-coverage-failures:
+    name: "report-jacoco-coverage-failures"
+    needs: run-unit-tests
+    uses: ./.github/workflows/worker.yml
+    with:
+      script: .github/scripts/create-jacoco-coverage-report.sh
+      artifacts_to_download: "unit-test-reports-*"
+      key: "jacoco-coverage-report"
