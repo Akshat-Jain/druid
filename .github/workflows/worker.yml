@@ -71,15 +71,10 @@ jobs:
         run: |
           ./${{ inputs.script }} 
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Dummy step 1
         if: ${{ failure() }} || ${{ inputs.artifact_prefix != '' }}
-        with:
-          name: "${{ inputs.artifact_prefix }}-${{ env.HASH }}"
-          path: |
-            **/*.hprof
-            **/hs_err_pid*
-            **/replay_pid*
-            **/core.[0-9]*
-            ./**/TEST-*.xml
-            ./**/target/jacoco*.exec
+        run: echo "this is a dummy step to trigger the upload artifact step"
+
+      - name: Dummy step 2
+        if: ${{ failure() || inputs.artifact_prefix != '' }}
+        run: echo "this is a dummy step to trigger the upload artifact step"
