@@ -31,7 +31,7 @@ mvn -B -ff \
       install \
       -Pdist,bundle-contrib-exts \
       -Pskip-static-checks,skip-tests \
-      -Dmaven.javadoc.skip=true -T1C
+      -Dmaven.javadoc.skip=true
 
 echo "Finished running mvn -B -ff install command"
 
