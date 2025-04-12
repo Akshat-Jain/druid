@@ -29,6 +29,7 @@ echo "Running mvn -B -ff install command"
 # Build Docker images for pods
 mvn -B -ff \
       install \
+      -pl '!benchmarks' \
       -Pdist,bundle-contrib-exts \
       -Pskip-static-checks,skip-tests \
       -Dmaven.javadoc.skip=true -T1C
