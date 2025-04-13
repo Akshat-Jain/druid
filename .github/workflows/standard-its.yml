@@ -110,16 +110,50 @@ jobs:
           mvn -v
           echo "--------------------"
 
-          echo "Running mvn -B -ff install command for dist"
-          # Build Docker images for pods
-          MAVEN_OPTS='-Xmx2048m -XX:+ExitOnOutOfMemoryError' mvn -B -ff -X install -Dmaven.build.cache.enabled=false -Pdist -Pskip-static-checks,skip-tests -Dmaven.javadoc.skip=true
-          echo "Finished running mvn -B -ff install command for dist"
+          # Define common skip flags derived from the working example's env vars + explicit flags
+          # Combining MAVEN_SKIP and MAVEN_SKIP_TESTS
+          COMMON_SKIP_FLAGS="-Pskip-static-checks -Pskip-tests -Dmaven.javadoc.skip=true"
+          # Use -T1C as in the working example
+          PARALLEL_FLAG="-T1C"
 
-          echo "Running mvn -B -ff install command for bundle-contrib-exts"
-          MAVEN_OPTS='-Xmx2048m -XX:+ExitOnOutOfMemoryError' mvn -B -ff -X install -Dmaven.build.cache.enabled=false -Pbundle-contrib-exts -Pskip-static-checks,skip-tests -Dmaven.javadoc.skip=true
-          echo "Finished running mvn -B -ff install command for bundle-contrib-exts"
+          # --- Phase 1: Build core modules + web-console (excluding benchmarks, distribution) ---
+          echo "Phase 1: Building core modules + web-console (excluding benchmarks, distribution)"
+          # Mimic working command: clean install, --fail-at-end, -pl, explicit skips, -Dweb.console.skip=false, -T1C, -Prat
+          # Keep diagnostics: -X, ExitOnOutOfMemoryError. Start without explicit -Xmx.
+          MAVEN_OPTS='-XX:+ExitOnOutOfMemoryError' mvn -B -X clean install --fail-at-end \
+            -pl '!benchmarks,!distribution' \
+            ${COMMON_SKIP_FLAGS} \
+            -Dweb.console.skip=false \
+            ${PARALLEL_FLAG}
 
-          # Debug echo
+          # Check exit code of Phase 1 before proceeding (optional but recommended)
+          if [ $? -ne 0 ]; then
+            echo "Phase 1 failed!"
+            exit 1
+          fi
+          echo "Finished Phase 1 successfully."
+
+          # --- Phase 2: Build distribution module ---
+          echo "Phase 2: Building distribution module"
+          # Mimic working command: install, --fail-at-end, -pl, explicit skips, Pdist/bundle, -T1C, -Prat
+          # Keep diagnostics: -X, ExitOnOutOfMemoryError. Start without explicit -Xmx.
+          MAVEN_OPTS='-XX:+ExitOnOutOfMemoryError' mvn -B -X install --fail-at-end \
+            -pl distribution \
+            -Pdist -Pbundle-contrib-exts \
+            ${COMMON_SKIP_FLAGS} \
+            -Dweb.console.skip=false `# Has no effect here but included for mimicry` \
+            ${PARALLEL_FLAG}
+
+          # Check exit code of Phase 2 before proceeding (optional but recommended)
+          if [ $? -ne 0 ]; then
+            echo "Phase 2 failed!"
+            exit 1
+          fi
+          echo "Finished Phase 2 successfully."
+
+          # --- Phase 3: Run the actual tests ---
+          echo "Phase 3: Running integration tests"
+          # Use the specific verify command for ITs, using the job's original env vars for this part
           echo "MAVEN_OPTS='-Xmx2048m' ${MVN} verify -pl integration-tests -P int-tests-config-file ${IT_TEST} ${MAVEN_SKIP} -Dpod.name=${POD_NAME} -Dpod.namespace=${POD_NAMESPACE} -Dbuild.druid.cluster=${BUILD_DRUID_CLUSTER}"
           MAVEN_OPTS='-Xmx2048m' ${MVN} verify -pl integration-tests -P int-tests-config-file ${IT_TEST} ${MAVEN_SKIP} -Dpod.name=${POD_NAME} -Dpod.namespace=${POD_NAMESPACE} -Dbuild.druid.cluster=${BUILD_DRUID_CLUSTER}
           echo "Successfully completed the integration test"
