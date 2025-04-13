@@ -82,8 +82,13 @@ jobs:
 
       - name: Run IT
         id: test
-        timeout-minutes: 60
+        timeout-minutes: 30
         run: |
+          echo "Running mvn -B -ff install command"
+          # Build Docker images for pods
+          mvn -B -ff install -pl '!web-console' -Pdist,bundle-contrib-exts -Pskip-static-checks,skip-tests -Dmaven.javadoc.skip=true -T1C
+
+          echo "Finished running mvn -B -ff install command"
           # Debug echo
           echo "MAVEN_OPTS='-Xmx2048m' ${MVN} verify -pl integration-tests -P int-tests-config-file ${IT_TEST} ${MAVEN_SKIP} -Dpod.name=${POD_NAME} -Dpod.namespace=${POD_NAMESPACE} -Dbuild.druid.cluster=${BUILD_DRUID_CLUSTER}"
           MAVEN_OPTS='-Xmx2048m' ${MVN} verify -pl integration-tests -P int-tests-config-file ${IT_TEST} ${MAVEN_SKIP} -Dpod.name=${POD_NAME} -Dpod.namespace=${POD_NAMESPACE} -Dbuild.druid.cluster=${BUILD_DRUID_CLUSTER}
