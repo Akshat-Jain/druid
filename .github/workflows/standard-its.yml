@@ -80,15 +80,41 @@ jobs:
         run: |
           ./it.sh ci
 
+      - name: Monitor Resources Before IT
+        run: |
+          echo "--- Disk Usage (df -h) ---"
+          df -h
+          echo "--- Inode Usage (df -i) ---"
+          df -i
+          echo "--- Memory Usage (free -h) ---"
+          free -h
+          echo "--- CPU Info (lscpu) ---"
+          lscpu
+          echo "--- Uptime / Load Average (uptime) ---"
+          uptime
+          echo "--- VM Stats (vmstat 1 3) ---"
+          vmstat 1 3
+          echo "--- Top Processes (top -bn1) ---"
+          top -bn1
+          echo "--- Process List (ps auxf) ---"
+          ps auxf
+          echo "--- End Resource Monitoring Before IT ---"
+
       - name: Run IT
         id: test
-        timeout-minutes: 60
+        timeout-minutes: 30
         run: |
+          echo "--- Java Version ---"
+          java -version
+          echo "--- Maven Version ---"
+          mvn -v
+          echo "--------------------"
+
           echo "Running mvn -B -ff install command for dist"
           # Build Docker images for pods
           MAVEN_OPTS='-XX:+ExitOnOutOfMemoryError' mvn -B -ff -X install -Pdist -Pskip-static-checks,skip-tests -Dmaven.javadoc.skip=true -T1C
           echo "Finished running mvn -B -ff install command for dist"
-          
+
           echo "Running mvn -B -ff install command for bundle-contrib-exts"
           MAVEN_OPTS='-XX:+ExitOnOutOfMemoryError' mvn -B -ff -X install -Pbundle-contrib-exts -Pskip-static-checks,skip-tests -Dmaven.javadoc.skip=true -T1C
           echo "Finished running mvn -B -ff install command for bundle-contrib-exts"
@@ -97,6 +123,29 @@ jobs:
           echo "MAVEN_OPTS='-Xmx2048m' ${MVN} verify -pl integration-tests -P int-tests-config-file ${IT_TEST} ${MAVEN_SKIP} -Dpod.name=${POD_NAME} -Dpod.namespace=${POD_NAMESPACE} -Dbuild.druid.cluster=${BUILD_DRUID_CLUSTER}"
           MAVEN_OPTS='-Xmx2048m' ${MVN} verify -pl integration-tests -P int-tests-config-file ${IT_TEST} ${MAVEN_SKIP} -Dpod.name=${POD_NAME} -Dpod.namespace=${POD_NAMESPACE} -Dbuild.druid.cluster=${BUILD_DRUID_CLUSTER}
           echo "Successfully completed the integration test"
+
+
+      - name: Monitor Resources After IT
+        if: always()
+        run: |
+          echo "--- Status of Previous Step (Run IT): ${{ steps.test.conclusion }} ---"
+          echo "--- Disk Usage (df -h) ---"
+          df -h
+          echo "--- Inode Usage (df -i) ---"
+          df -i
+          echo "--- Memory Usage (free -h) ---"
+          free -h
+          echo "--- CPU Info (lscpu) ---"
+          lscpu
+          echo "--- Uptime / Load Average (uptime) ---"
+          uptime
+          echo "--- VM Stats (vmstat 1 3) ---"
+          vmstat 1 3
+          echo "--- Top Processes (top -bn1) ---"
+          top -bn1
+          echo "--- Process List (ps auxf) ---"
+          ps auxf
+          echo "--- End Resource Monitoring After IT ---"
 
       - name: Debug on failure
         if: ${{ failure() && steps.test.conclusion == 'failure' }}
