@@ -102,7 +102,7 @@ jobs:
 
       - name: Run IT
         id: test
-        timeout-minutes: 30
+        timeout-minutes: 30 # Keep reduced timeout for this test
         run: |
           echo "--- Java Version ---"
           java -version
@@ -110,28 +110,20 @@ jobs:
           mvn -v
           echo "--------------------"
 
-          # Define common skip flags derived from the working example's env vars + explicit flags
-          # Combining MAVEN_SKIP and MAVEN_SKIP_TESTS
           COMMON_SKIP_FLAGS="-Pskip-static-checks -Pskip-tests -Dmaven.javadoc.skip=true"
-          # Use -T1C as in the working example
-          PARALLEL_FLAG="-T1C"
+          PARALLEL_FLAG="-T1C" # Keeping -T1C as per working example
 
-          # --- Phase 1: Build core modules + web-console (excluding benchmarks, distribution) ---
-          echo "Phase 1: Building core modules + web-console (excluding benchmarks, distribution)"
-          # Mimic working command: clean install, --fail-at-end, -pl, explicit skips, -Dweb.console.skip=false, -T1C, -Prat
-          # Keep diagnostics: -X, ExitOnOutOfMemoryError. Start without explicit -Xmx.
+          echo "Phase 1: Building core modules (EXCLUDING web-console, benchmarks, distribution)"
           MAVEN_OPTS='-XX:+ExitOnOutOfMemoryError' mvn -B -X clean install --fail-at-end \
-            -pl '!benchmarks,!distribution' \
+            -pl '!benchmarks,!distribution,!web-console' \
             ${COMMON_SKIP_FLAGS} \
-            -Dweb.console.skip=false \
             ${PARALLEL_FLAG}
 
-          # Check exit code of Phase 1 before proceeding (optional but recommended)
           if [ $? -ne 0 ]; then
-            echo "Phase 1 failed!"
+            echo "Phase 1 failed! web-console might not be the problem."
             exit 1
           fi
-          echo "Finished Phase 1 successfully."
+          echo "Finished Phase 1 successfully (web-console was excluded)."
 
           # --- Phase 2: Build distribution module ---
           echo "Phase 2: Building distribution module"
@@ -141,10 +133,9 @@ jobs:
             -pl distribution \
             -Pdist -Pbundle-contrib-exts \
             ${COMMON_SKIP_FLAGS} \
-            -Dweb.console.skip=false `# Has no effect here but included for mimicry` \
             ${PARALLEL_FLAG}
 
-          # Check exit code of Phase 2 before proceeding (optional but recommended)
+          # Check exit code of Phase 2 before proceeding
           if [ $? -ne 0 ]; then
             echo "Phase 2 failed!"
             exit 1
@@ -153,11 +144,9 @@ jobs:
 
           # --- Phase 3: Run the actual tests ---
           echo "Phase 3: Running integration tests"
-          # Use the specific verify command for ITs, using the job's original env vars for this part
           echo "MAVEN_OPTS='-Xmx2048m' ${MVN} verify -pl integration-tests -P int-tests-config-file ${IT_TEST} ${MAVEN_SKIP} -Dpod.name=${POD_NAME} -Dpod.namespace=${POD_NAMESPACE} -Dbuild.druid.cluster=${BUILD_DRUID_CLUSTER}"
           MAVEN_OPTS='-Xmx2048m' ${MVN} verify -pl integration-tests -P int-tests-config-file ${IT_TEST} ${MAVEN_SKIP} -Dpod.name=${POD_NAME} -Dpod.namespace=${POD_NAMESPACE} -Dbuild.druid.cluster=${BUILD_DRUID_CLUSTER}
           echo "Successfully completed the integration test"
-
 
       - name: Monitor Resources After IT
         if: always()
