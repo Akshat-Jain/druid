@@ -15,6 +15,7 @@
 # limitations under the License.
 
 set -e
+set -x
 
 export KUBECTL="/usr/local/bin/kubectl"
 
