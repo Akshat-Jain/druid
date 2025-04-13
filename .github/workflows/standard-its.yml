@@ -112,11 +112,11 @@ jobs:
 
           echo "Running mvn -B -ff install command for dist"
           # Build Docker images for pods
-          MAVEN_OPTS='-XX:+ExitOnOutOfMemoryError' mvn -B -ff -X install -Pdist -Pskip-static-checks,skip-tests -Dmaven.javadoc.skip=true -T1C
+          MAVEN_OPTS='-XX:+ExitOnOutOfMemoryError' mvn -B -ff -X install -Dmaven.build.cache.enabled=false -Pdist -Pskip-static-checks,skip-tests -Dmaven.javadoc.skip=true -T1C
           echo "Finished running mvn -B -ff install command for dist"
 
           echo "Running mvn -B -ff install command for bundle-contrib-exts"
-          MAVEN_OPTS='-XX:+ExitOnOutOfMemoryError' mvn -B -ff -X install -Pbundle-contrib-exts -Pskip-static-checks,skip-tests -Dmaven.javadoc.skip=true -T1C
+          MAVEN_OPTS='-XX:+ExitOnOutOfMemoryError' mvn -B -ff -X install -Dmaven.build.cache.enabled=false -Pbundle-contrib-exts -Pskip-static-checks,skip-tests -Dmaven.javadoc.skip=true -T1C
           echo "Finished running mvn -B -ff install command for bundle-contrib-exts"
 
           # Debug echo
