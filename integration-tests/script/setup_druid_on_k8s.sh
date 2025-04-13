@@ -25,15 +25,7 @@ rm -rf docker/client_tls
 cp -r client_tls docker/client_tls
 cd ..
 
-echo "Running mvn -B -ff install command"
-# Build Docker images for pods
-mvn -B -ff \
-      install \
-      -Pdist,bundle-contrib-exts \
-      -Pskip-static-checks,skip-tests \
-      -Dmaven.javadoc.skip=true -T1C
-
-echo "Finished running mvn -B -ff install command"
+echo "Reached the place where the nested maven command was originally getting called from"
 
 DOCKER_BUILDKIT=1 docker build --build-arg BUILD_FROM_SOURCE=0 -t druid/base:v1 -f distribution/docker/Dockerfile .
 DOCKER_BUILDKIT=1 docker build --build-arg BASE_IMAGE=druid/base:v1 -t druid/cluster:v1 -f distribution/docker/DockerfileBuildTarAdvanced .
