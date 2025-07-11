@@ -160,14 +160,17 @@ jobs:
   unit-tests:
     name: "unit tests"
     uses: ./.github/workflows/ci.yml
+    timeout-minutes: 60
 
   standard-its:
     needs: [build, unit-tests]
     uses: ./.github/workflows/standard-its.yml
+    timeout-minutes: 60
 
   revised-its:
     needs: [build, unit-tests]
     uses: ./.github/workflows/revised-its.yml
+    timeout-minutes: 60
     with:
       BACKWARD_COMPATIBILITY_IT_ENABLED: ${{ needs.set-env-var.outputs.BACKWARD_COMPATIBILITY_IT_ENABLED }}
       DRUID_PREVIOUS_VERSION: ${{ needs.set-env-var.outputs.DRUID_PREVIOUS_VERSION }}
