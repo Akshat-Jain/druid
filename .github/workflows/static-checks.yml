@@ -17,12 +17,12 @@ name: "Static Checks CI"
 on:
   push:
     branches:
-      - master
+      - idk
       - '[0-9]+.[0-9]+.[0-9]+' # release branches
       - '[0-9]+.[0-9]+.[0-9]+-[A-Za-z0-9]+' # release branches
   pull_request:
     branches:
-      - master
+      - idk
       - '[0-9]+.[0-9]+.[0-9]+' # release branches
       - '[0-9]+.[0-9]+.[0-9]+-[A-Za-z0-9]+' # release branches
 
